@@ -334,461 +334,1363 @@ function generateUnlimitedMathQuestion(
 
     // 1. जोड़ (Addition)
     if (chosenTopic.includes('जोड़ (Addition)')) {
-      if (difficulty === 'सरल') {
-        const a = Math.floor(Math.random() * 80) + 15;
-        const b = Math.floor(Math.random() * 80) + 12;
-        const ans = a + b;
-        qText = `मान ज्ञात कीजिए: ${a} + ${b} = ?`;
-        qTextEn = `Evaluate: ${a} + ${b} = ?`;
+      const typeVar = Math.floor(Math.random() * 6);
+      if (typeVar === 0) {
+        // Multi-term addition
+        const count = difficulty === 'सरल' ? 2 : difficulty === 'मध्यम' ? 3 : 4;
+        const nums = Array.from({ length: count }, () => Math.floor(Math.random() * (difficulty === 'प्रो' ? 4500 : 850)) + 45);
+        const ans = nums.reduce((a, b) => a + b, 0);
+        qText = `योग ज्ञात कीजिए: ${nums.join(' + ')} = ?`;
+        qTextEn = `Calculate the sum: ${nums.join(' + ')} = ?`;
         ansStr = `${ans}`;
-        explanation = `इकाई और दहाई जोड़ें:\n${a} + ${b} = ${ans}।`;
-        explanationEn = `Step-by-step addition: ${a} + ${b} = ${ans}.`;
-        shortcut = `मानसिक जोड़: (${Math.floor(a / 10) * 10} + ${Math.floor(b / 10) * 10}) + (${a % 10} + ${b % 10}) = ${ans}`;
-        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 2}`, `${ans - 2}`];
-      } else if (difficulty === 'मध्यम') {
-        const isThree = Math.random() > 0.5;
-        if (isThree) {
-          const a = Math.floor(Math.random() * 85) + 25;
-          const b = Math.floor(Math.random() * 85) + 25;
-          const c = Math.floor(Math.random() * 85) + 15;
-          const ans = a + b + c;
-          qText = `तीनों संख्याओं का योग क्या होगा: ${a} + ${b} + ${c} = ?`;
-          qTextEn = `Calculate the sum: ${a} + ${b} + ${c} = ?`;
+        explanation = `सभी पदों का योग:\n${nums.join(' + ')} = ${ans}।`;
+        explanationEn = `Sum of all terms: ${nums.join(' + ')} = ${ans}.`;
+        shortcut = `इकाई और दहाई अंकों को समूह बनाकर तेजी से जोड़ें = ${ans}`;
+        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 20}`, `${Math.max(1, ans - 20)}`];
+      } else if (typeVar === 1) {
+        // Missing term addition: A + X + B = C
+        const a = Math.floor(Math.random() * 450) + 50;
+        const b = Math.floor(Math.random() * 350) + 50;
+        const x = Math.floor(Math.random() * 500) + 100;
+        const c = a + b + x;
+        qText = `समीकरण में अज्ञात संख्या 'X' का मान क्या होगा: ${a} + X + ${b} = ${c}?`;
+        qTextEn = `Find the missing number 'X' in: ${a} + X + ${b} = ${c}?`;
+        ansStr = `${x}`;
+        explanation = `X = ${c} - (${a} + ${b}) = ${c} - ${a + b} = ${x}।`;
+        explanationEn = `X = ${c} - (${a} + ${b}) = ${x}.`;
+        shortcut = `कुल योग में से ज्ञात संख्याओं का योग घटाएं: ${c} - ${a + b} = ${x}`;
+        distractors = [`${x + 10}`, `${Math.max(1, x - 10)}`, `${x + 25}`, `${Math.max(1, x - 25)}`];
+      } else if (typeVar === 2) {
+        // Sum of first N natural numbers
+        const n = Math.floor(Math.random() * 40) + 10;
+        const ans = (n * (n + 1)) / 2;
+        qText = `प्रथम ${n} प्राकृत संख्याओं का योग (1 + 2 + 3 + ... + ${n}) कितना होगा?`;
+        qTextEn = `What is the sum of first ${n} natural numbers (1 + 2 + 3 + ... + ${n})?`;
+        ansStr = `${ans}`;
+        explanation = `प्राकृत संख्याओं का योग सूत्र: S = [N × (N + 1)] ÷ 2\nS = [${n} × ${n + 1}] ÷ 2 = ${n * (n + 1)} ÷ 2 = ${ans}।`;
+        explanationEn = `Sum formula = [N * (N + 1)] / 2 = [${n} * ${n + 1}] / 2 = ${ans}.`;
+        shortcut = `शॉर्टकट सूत्र: S = [${n} × ${n + 1}] ÷ 2 = ${ans}`;
+        distractors = [`${ans + n}`, `${ans - n}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+      } else if (typeVar === 3) {
+        // Sum of first N odd or even numbers
+        const isEven = Math.random() > 0.5;
+        const n = Math.floor(Math.random() * 25) + 10;
+        if (isEven) {
+          const ans = n * (n + 1);
+          qText = `प्रथम ${n} सम (Even) संख्याओं का योग (2 + 4 + 6 + ... + ${2 * n}) क्या होगा?`;
+          qTextEn = `What is the sum of first ${n} even numbers (2 + 4 + 6 + ... + ${2 * n})?`;
           ansStr = `${ans}`;
-          explanation = `चरण 1: ${a} + ${b} = ${a + b}\nचरण 2: ${a + b} + ${c} = ${ans}।`;
-          explanationEn = `Step 1: ${a} + ${b} = ${a + b}. Step 2: ${a + b} + ${c} = ${ans}.`;
-          shortcut = `जोड़ विधि: समूह बनाकर तेजी से जोड़ें = ${ans}`;
-          distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 5}`, `${ans - 5}`];
+          explanation = `प्रथम N सम संख्याओं का योग सूत्र: N × (N + 1)\nयोग = ${n} × ${n + 1} = ${ans}।`;
+          explanationEn = `Sum of first N even numbers = N * (N + 1) = ${n} * ${n + 1} = ${ans}.`;
+          shortcut = `सूत्र: ${n} × ${n + 1} = ${ans}`;
+          distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 20}`, `${ans - 20}`];
         } else {
-          const a = Math.floor(Math.random() * 800) + 120;
-          const b = Math.floor(Math.random() * 800) + 120;
-          const ans = a + b;
-          qText = `मान ज्ञात कीजिए: ${a} + ${b} = ?`;
-          qTextEn = `Evaluate: ${a} + ${b} = ?`;
+          const ans = n * n;
+          qText = `प्रथम ${n} विषम (Odd) संख्याओं का योग (1 + 3 + 5 + ... + ${2 * n - 1}) क्या होगा?`;
+          qTextEn = `What is the sum of first ${n} odd numbers (1 + 3 + 5 + ... + ${2 * n - 1})?`;
           ansStr = `${ans}`;
-          explanation = `सैकड़ा, दहाई व इकाई का योग:\n${a} + ${b} = ${ans}।`;
-          explanationEn = `Place-value addition: ${a} + ${b} = ${ans}.`;
-          shortcut = `निकटतम पूर्णांक विधि: ${a} + ${b} = ${ans}`;
-          distractors = [`${ans + 20}`, `${ans - 20}`, `${ans + 10}`, `${ans - 10}`];
+          explanation = `प्रथम N विषम संख्याओं का योग सूत्र: N²\nयोग = (${n})² = ${ans}।`;
+          explanationEn = `Sum of first N odd numbers = N² = (${n})² = ${ans}.`;
+          shortcut = `सूत्र: (${n})² = ${ans}`;
+          distractors = [`${ans + n}`, `${ans - n}`, `${ans + 15}`, `${Math.max(1, ans - 15)}`];
         }
-      } else if (difficulty === 'कठिन') {
-        const a = Math.floor(Math.random() * 7500) + 1500;
-        const b = Math.floor(Math.random() * 7500) + 1500;
-        const ans = a + b;
-        qText = `मान ज्ञात कीजिए: ${a} + ${b} = ?`;
-        qTextEn = `Evaluate: ${a} + ${b} = ?`;
-        ansStr = `${ans}`;
-        explanation = `स्तम्भ जोड़ (Column Addition):\n  ${a}\n+ ${b}\n= ${ans}।`;
-        explanationEn = `Standard column addition: ${a} + ${b} = ${ans}.`;
-        shortcut = `हजारों और सैकड़ों को अलग-अलग जोड़कर त्वरित हल = ${ans}`;
-        distractors = [`${ans + 100}`, `${ans - 100}`, `${ans + 50}`, `${ans - 50}`];
+      } else if (typeVar === 4) {
+        // Unit digit of sum
+        const a = Math.floor(Math.random() * 800) + 123;
+        const b = Math.floor(Math.random() * 800) + 145;
+        const c = Math.floor(Math.random() * 800) + 167;
+        const d = Math.floor(Math.random() * 800) + 189;
+        const unitAns = (a % 10 + b % 10 + c % 10 + d % 10) % 10;
+        qText = `व्यंजक (${a} + ${b} + ${c} + ${d}) का इकाई अंक (Unit Digit) क्या होगा?`;
+        qTextEn = `What is the unit digit of (${a} + ${b} + ${c} + ${d})?`;
+        ansStr = `${unitAns}`;
+        explanation = `केवल इकाई अंकों को जोड़ें:\n${a % 10} + ${b % 10} + ${c % 10} + ${d % 10} = ${a % 10 + b % 10 + c % 10 + d % 10}।\nइकाई का अंक = ${unitAns}।`;
+        explanationEn = `Add only the unit digits: ${a % 10} + ${b % 10} + ${c % 10} + ${d % 10} = ${unitAns}.`;
+        shortcut = `इकाई अंक की ट्रिक: अंतिम अंकों का योग mod 10 = ${unitAns}`;
+        distractors = [`${(unitAns + 1) % 10}`, `${(unitAns + 2) % 10}`, `${(unitAns + 3) % 10}`, `${(unitAns + 5) % 10}`];
       } else {
-        // प्रो (Pro)
-        const a = Math.floor(Math.random() * 65000) + 15000;
-        const b = Math.floor(Math.random() * 65000) + 15000;
-        const ans = a + b;
-        qText = `त्वरित गणना: ${a} + ${b} = ?`;
-        qTextEn = `Speed addition: ${a} + ${b} = ?`;
+        // Decimal addition
+        const a = (Math.floor(Math.random() * 850) + 100) / 10;
+        const b = (Math.floor(Math.random() * 650) + 50) / 10;
+        const c = (Math.floor(Math.random() * 450) + 20) / 10;
+        const ans = Math.round((a + b + c) * 10) / 10;
+        qText = `दशमलव जोड़: ${a} + ${b} + ${c} = ?`;
+        qTextEn = `Decimal sum: ${a} + ${b} + ${c} = ?`;
         ansStr = `${ans}`;
-        explanation = `बड़ी संख्याओं का योग:\n${a} + ${b} = ${ans}।`;
-        explanationEn = `Large number addition: ${a} + ${b} = ${ans}.`;
-        shortcut = `बाएं से दाएं (Left-to-right) वैदिक विधि = ${ans}`;
-        distractors = [`${ans + 200}`, `${ans - 200}`, `${ans + 100}`, `${ans - 100}`];
+        explanation = `दशमलव बिंदुओं को सीध में रखकर जोड़ें:\n${a} + ${b} + ${c} = ${ans}।`;
+        explanationEn = `Align decimal points and add: ${a} + ${b} + ${c} = ${ans}.`;
+        shortcut = `दशमलव बिंदु सीधे जोड़ें = ${ans}`;
+        distractors = [`${Math.round((ans + 1.2) * 10) / 10}`, `${Math.round(Math.max(0.1, ans - 1.2) * 10) / 10}`, `${Math.round((ans + 2.5) * 10) / 10}`, `${Math.round(Math.max(0.1, ans - 2.5) * 10) / 10}`];
       }
     }
     // 2. घटाव (Subtraction)
     else if (chosenTopic.includes('घटाव (Subtraction)')) {
-      if (difficulty === 'सरल') {
-        const a = Math.floor(Math.random() * 70) + 30;
-        const b = Math.floor(Math.random() * (a - 15)) + 10;
-        const ans = a - b;
-        qText = `मान ज्ञात कीजिए: ${a} - ${b} = ?`;
-        qTextEn = `Evaluate: ${a} - ${b} = ?`;
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // Base method subtract (1000, 10000, 100000)
+        const base = [1000, 10000, 100000][Math.floor(Math.random() * 3)];
+        const b = Math.floor(Math.random() * (base * 0.8)) + Math.floor(base * 0.1);
+        const ans = base - b;
+        qText = `आधार विधि से घटाव हल करें: ${base} - ${b} = ?`;
+        qTextEn = `Base subtraction: ${base} - ${b} = ?`;
         ansStr = `${ans}`;
-        explanation = `घटाव प्रक्रिया:\n${a} - ${b} = ${ans}।`;
-        explanationEn = `Step subtraction: ${a} - ${b} = ${ans}.`;
-        shortcut = `उल्टा जोड़ (Counting up): ${b} में कितना जोड़ें कि ${a} आ जाए? उत्तर = ${ans}`;
-        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 2}`, `${ans - 2}`];
-      } else if (difficulty === 'मध्यम') {
-        const isBase = Math.random() > 0.6;
-        if (isBase) {
-          const b = Math.floor(Math.random() * 750) + 120;
-          const ans = 1000 - b;
-          qText = `आधार विधि से हल करें: 1000 - ${b} = ?`;
-          qTextEn = `Evaluate using base method: 1000 - ${b} = ?`;
-          ansStr = `${ans}`;
-          explanation = `1000 में से घटाव:\n1000 - ${b} = ${ans}।`;
-          explanationEn = `Subtracting from 1000: 1000 - ${b} = ${ans}.`;
-          shortcut = `वैदिक सूत्र (निखिलं नवतश्चरमं दशतः): सभी अंकों को 9 से और अंतिम को 10 से घटाएं = ${ans}`;
-          distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 100}`, `${ans - 100}`];
+        explanation = `${base} में से ${b} घटाया:\n${base} - ${b} = ${ans}।`;
+        explanationEn = `Subtract from base ${base}: ${base} - ${b} = ${ans}.`;
+        shortcut = `वैदिक सूत्र (निखिलं नवतश्चरमं दशतः): सभी अंकों को 9 से तथा अंतिम अंक को 10 से घटाएं = ${ans}`;
+        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 100}`, `${Math.max(1, ans - 100)}`];
+      } else if (typeVar === 1) {
+        // Missing term subtraction: A - X = B or X - A = B
+        const isUnknownFirst = Math.random() > 0.5;
+        if (isUnknownFirst) {
+          const a = Math.floor(Math.random() * 400) + 150;
+          const b = Math.floor(Math.random() * 600) + 200;
+          const x = a + b;
+          qText = `समीकरण में 'X' का मान बताइए: X - ${a} = ${b}`;
+          qTextEn = `Solve for 'X' in equation: X - ${a} = ${b}`;
+          ansStr = `${x}`;
+          explanation = `X = ${b} + ${a} = ${x}।`;
+          explanationEn = `X = ${b} + ${a} = ${x}.`;
+          shortcut = `पक्षांतरण नियम: X = ${b} + ${a} = ${x}`;
+          distractors = [`${x + 20}`, `${x - 20}`, `${x + 50}`, `${Math.max(1, x - 50)}`];
         } else {
-          const a = Math.floor(Math.random() * 750) + 250;
-          const b = Math.floor(Math.random() * (a - 60)) + 45;
-          const ans = a - b;
-          qText = `मान ज्ञात कीजिए: ${a} - ${b} = ?`;
-          qTextEn = `Evaluate: ${a} - ${b} = ?`;
-          ansStr = `${ans}`;
-          explanation = `घटाव चरण:\n${a} - ${b} = ${ans}।`;
-          explanationEn = `3-digit subtraction: ${a} - ${b} = ${ans}.`;
-          shortcut = `निकटतम सैकड़े पर तोड़कर घटाव = ${ans}`;
-          distractors = [`${ans + 20}`, `${ans - 20}`, `${ans + 10}`, `${ans - 10}`];
+          const a = Math.floor(Math.random() * 1200) + 500;
+          const b = Math.floor(Math.random() * 400) + 100;
+          const x = a - b;
+          qText = `समीकरण में 'X' का मान बताइए: ${a} - X = ${b}`;
+          qTextEn = `Solve for 'X' in equation: ${a} - X = ${b}`;
+          ansStr = `${x}`;
+          explanation = `X = ${a} - ${b} = ${x}।`;
+          explanationEn = `X = ${a} - ${b} = ${x}.`;
+          shortcut = `X = ${a} - ${b} = ${x}`;
+          distractors = [`${x + 20}`, `${x - 20}`, `${x + 40}`, `${Math.max(1, x - 40)}`];
         }
-      } else if (difficulty === 'कठिन') {
-        const a = Math.floor(Math.random() * 7500) + 2500;
-        const b = Math.floor(Math.random() * (a - 300)) + 200;
-        const ans = a - b;
-        qText = `मान ज्ञात कीजिए: ${a} - ${b} = ?`;
-        qTextEn = `Evaluate: ${a} - ${b} = ?`;
+      } else if (typeVar === 2) {
+        // Difference of squares formula: A² - B² = (A-B)(A+B)
+        const a = Math.floor(Math.random() * 60) + 40;
+        const b = a - (Math.floor(Math.random() * 10) + 1); // small gap
+        const ans = a * a - b * b;
+        qText = `बीजगणितीय सूत्र (A² - B²) का प्रयोग कर मान निकालें: (${a})² - (${b})² = ?`;
+        qTextEn = `Evaluate using (A² - B²) formula: (${a})² - (${b})² = ?`;
         ansStr = `${ans}`;
-        explanation = `4-अंकीय घटाव:\n${a} - ${b} = ${ans}।`;
-        explanationEn = `4-digit subtraction: ${a} - ${b} = ${ans}.`;
-        shortcut = `वैदिक पूरक (Complement) तकनीक = ${ans}`;
-        distractors = [`${ans + 100}`, `${ans - 100}`, `${ans + 50}`, `${ans - 50}`];
+        explanation = `सूत्र: A² - B² = (A - B) × (A + B)\n= (${a} - ${b}) × (${a} + ${b}) = ${a - b} × ${a + b} = ${ans}।`;
+        explanationEn = `Formula A² - B² = (A - B) * (A + B) = (${a - b}) * (${a + b}) = ${ans}.`;
+        shortcut = `(${a} - ${b}) × (${a} + ${b}) = ${a - b} × ${a + b} = ${ans}`;
+        distractors = [`${ans + 20}`, `${ans - 20}`, `${ans + 100}`, `${Math.max(1, ans - 100)}`];
+      } else if (typeVar === 3) {
+        // Decimal subtraction
+        const a = (Math.floor(Math.random() * 15000) + 2000) / 10;
+        const b = (Math.floor(Math.random() * (a * 10 - 500)) + 100) / 10;
+        const ans = Math.round((a - b) * 10) / 10;
+        qText = `दशमलव घटाव: ${a} - ${b} = ?`;
+        qTextEn = `Decimal subtraction: ${a} - ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `दशमलव बिंदु सीध में रखकर घटाएं:\n${a} - ${b} = ${ans}।`;
+        explanationEn = `Align decimal points and subtract: ${a} - ${b} = ${ans}.`;
+        shortcut = `${a} - ${b} = ${ans}`;
+        distractors = [`${Math.round((ans + 1.5) * 10) / 10}`, `${Math.round(Math.max(0.1, ans - 1.5) * 10) / 10}`, `${Math.round((ans + 3) * 10) / 10}`, `${Math.round(Math.max(0.1, ans - 3) * 10) / 10}`];
       } else {
-        // प्रो (Pro)
-        const b = Math.floor(Math.random() * 8500) + 1200;
-        const ans = 10000 - b;
-        qText = `मानसिक गणना: 10000 - ${b} = ?`;
-        qTextEn = `Mental calculation: 10000 - ${b} = ?`;
+        // Reversed 2-digit number difference: AB - BA
+        const d1 = Math.floor(Math.random() * 7) + 3;
+        const d2 = d1 - (Math.floor(Math.random() * 2) + 1);
+        const num1 = d1 * 10 + d2;
+        const num2 = d2 * 10 + d1;
+        const ans = num1 - num2;
+        qText = `वैदिक ट्रिक से हल करें: ${num1} - ${num2} = ?`;
+        qTextEn = `Solve using Vedic trick: ${num1} - ${num2} = ?`;
         ansStr = `${ans}`;
-        explanation = `10000 में से घटाव:\n10000 - ${b} = ${ans}।`;
-        explanationEn = `Subtracting from 10000: 10000 - ${b} = ${ans}.`;
-        shortcut = `निखिलं नवतश्चरमं दशतः: 9 से सभी तथा इकाई को 10 से = ${ans}`;
-        distractors = [`${ans + 100}`, `${ans - 100}`, `${ans + 10}`, `${ans - 10}`];
+        explanation = `दो अंकों की संख्या और उसके अंकों को पलटने पर अंतर की शॉर्टकट ट्रिक:\nअंतर = 9 × (अंकों का अंतर) = 9 × (${d1} - ${d2}) = 9 × ${d1 - d2} = ${ans}।`;
+        explanationEn = `Difference = 9 * (Difference of digits) = 9 * (${d1} - ${d2}) = ${ans}.`;
+        shortcut = `वैदिक जादू: 9 × (${d1} - ${d2}) = ${ans}`;
+        distractors = [`${ans + 9}`, `${Math.max(1, ans - 9)}`, `${ans + 18}`, `${Math.max(1, ans - 18)}`];
       }
     }
     // 3. गुणा (Multiplication)
     else if (chosenTopic.includes('गुणा (Multiplication)')) {
-      const trickType = Math.floor(Math.random() * 4);
-      if (trickType === 0) {
-        // Multiply by 11 trick
-        const num = Math.floor(Math.random() * 85) + 14;
-        const ans = num * 11;
-        qText = `वैदिक विधि से हल करें: ${num} × 11 = ?`;
-        qTextEn = `Solve using Vedic trick: ${num} × 11 = ?`;
+      const typeVar = Math.floor(Math.random() * 6);
+      if (typeVar === 0) {
+        // Vedic Trick multipliers (11, 25, 99, 101, 125, 15)
+        const tricks = [11, 25, 99, 101, 15, 125];
+        const m = tricks[Math.floor(Math.random() * tricks.length)];
+        let num = Math.floor(Math.random() * 80) + 12;
+        if (m === 25 || m === 125) {
+          num = (Math.floor(Math.random() * 20) + 3) * 4; // divisible by 4 for exact trick
+        }
+        const ans = num * m;
+        qText = `वैदिक गुणा ट्रिक से उत्तर निकालें: ${num} × ${m} = ?`;
+        qTextEn = `Solve using speed multiplication: ${num} × ${m} = ?`;
         ansStr = `${ans}`;
-        const d1 = Math.floor(num / 10);
-        const d2 = num % 10;
-        explanation = `${num} × 11 की शॉर्ट ट्रिक:\nप्रथम अंक: ${d1}, मध्य अंक: (${d1} + ${d2}), अंतिम अंक: ${d2}।\nकुल मान = ${ans}।`;
-        explanationEn = `${num} * 11 trick: Sandwich the sum of digits (${d1} + ${d2} = ${d1 + d2}) between ${d1} and ${d2} = ${ans}.`;
-        shortcut = `11 का वैदिक जादू: दोनों अंकों को फैलाकर उनका योग बीच में रखें = ${ans}`;
-        distractors = [`${ans + 11}`, `${ans - 11}`, `${ans + 22}`, `${ans - 22}`];
-      } else if (trickType === 1) {
-        // Multiply by 25 trick
-        const multiplier = Math.floor(Math.random() * 22) + 4;
-        const num = multiplier * 4; // guarantees divisible by 4
-        const ans = num * 25;
-        qText = `त्वरित गुणा ट्रिक: ${num} × 25 = ?`;
-        qTextEn = `Fast multiply trick: ${num} × 25 = ?`;
+        explanation = m === 11
+          ? `${num} × 11 ट्रिक: इकाई और दहाई अंक के बीच उनका योग रखें = ${ans}।`
+          : m === 25
+          ? `${num} × 25 ट्रिक: (${num} ÷ 4) × 100 = ${num / 4} × 100 = ${ans}।`
+          : m === 99
+          ? `${num} × 99 ट्रिक: ${num} × (100 - 1) = ${num * 100} - ${num} = ${ans}।`
+          : m === 101
+          ? `${num} × 101 ट्रिक: दो अंकों की संख्या को दोहराएं = ${ans}।`
+          : `${num} × ${m} = ${ans}।`;
+        explanationEn = `${num} * ${m} = ${ans}.`;
+        shortcut = `स्पीड मैथ वैदिक शॉर्टकट = ${ans}`;
+        distractors = [`${ans + m}`, `${ans - m}`, `${ans + m * 2}`, `${Math.max(1, ans - m * 2)}`];
+      } else if (typeVar === 1) {
+        // Base 100 multiplication (e.g. 98 x 97 or 103 x 106)
+        const isAbove = Math.random() > 0.5;
+        if (isAbove) {
+          const d1 = Math.floor(Math.random() * 8) + 2; // 102 to 109
+          const d2 = Math.floor(Math.random() * 8) + 2;
+          const a = 100 + d1;
+          const b = 100 + d2;
+          const ans = a * b;
+          qText = `100 के आधार (Base 100) वैदिक सूत्र से हल करें: ${a} × ${b} = ?`;
+          qTextEn = `Solve using Base 100 Vedic formula: ${a} × ${b} = ?`;
+          ansStr = `${ans}`;
+          explanation = `Base 100 ट्रिक (+${d1}, +${d2}):\nबाएं भाग: 100 + ${d1} + ${d2} = ${100 + d1 + d2}\nदाएं भाग: ${d1} × ${d2} = ${d1 * d2 < 10 ? '0' + (d1 * d2) : d1 * d2}\nकुल मान = ${ans}।`;
+          explanationEn = `Base 100 trick: (${100 + d1 + d2})|(${d1 * d2}) = ${ans}.`;
+          shortcut = `वैदिक आधार सूत्र: (${100 + d1 + d2})|(${d1 * d2}) = ${ans}`;
+          distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 100}`, `${ans - 100}`];
+        } else {
+          const d1 = Math.floor(Math.random() * 8) + 2; // 92 to 98
+          const d2 = Math.floor(Math.random() * 8) + 2;
+          const a = 100 - d1;
+          const b = 100 - d2;
+          const ans = a * b;
+          qText = `100 के आधार (Base 100) वैदिक सूत्र से हल करें: ${a} × ${b} = ?`;
+          qTextEn = `Solve using Base 100 Vedic formula: ${a} × ${b} = ?`;
+          ansStr = `${ans}`;
+          explanation = `Base 100 ट्रिक (-${d1}, -${d2}):\nबाएं भाग: 100 - ${d1} - ${d2} = ${100 - d1 - d2}\nदाएं भाग: (-${d1}) × (-${d2}) = ${d1 * d2 < 10 ? '0' + (d1 * d2) : d1 * d2}\nकुल मान = ${ans}।`;
+          explanationEn = `Base 100 trick: (${100 - d1 - d2})|(${d1 * d2}) = ${ans}.`;
+          shortcut = `वैदिक आधार सूत्र: (${100 - d1 - d2})|(${d1 * d2}) = ${ans}`;
+          distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 100}`, `${ans - 100}`];
+        }
+      } else if (typeVar === 2) {
+        // Ending in 5 multiplication (e.g. 35 x 35 or 85 x 85)
+        const tens = Math.floor(Math.random() * 11) + 2; // 25 to 125
+        const num = tens * 10 + 5;
+        const ans = num * num;
+        qText = `5 पर समाप्त होने वाली संख्या का वर्ग: (${num})² = ${num} × ${num} = ?`;
+        qTextEn = `Square of number ending in 5: (${num})² = ?`;
         ansStr = `${ans}`;
-        explanation = `25 से गुणा करने का नियम:\nसंख्या को 4 से भाग देकर 100 से गुणा करें।\n(${num} ÷ 4) × 100 = ${multiplier} × 100 = ${ans}।`;
-        explanationEn = `Rule for multiplying by 25: Divide by 4 and multiply by 100: (${num} / 4) * 100 = ${ans}.`;
-        shortcut = `(${num} ÷ 4) × 100 = ${multiplier} × 100 = ${ans}`;
-        distractors = [`${ans + 50}`, `${ans - 50}`, `${ans + 100}`, `${ans - 100}`];
-      } else if (trickType === 2) {
-        // Multiply by 99 trick
-        const num = Math.floor(Math.random() * 65) + 15;
-        const ans = num * 99;
-        qText = `शॉर्टकट से मान निकालें: ${num} × 99 = ?`;
-        qTextEn = `Evaluate using shortcut: ${num} × 99 = ?`;
-        ansStr = `${ans}`;
-        explanation = `99 से गुणा करने का सूत्र:\n${num} × (100 - 1) = (${num} × 100) - ${num} = ${num * 100} - ${num} = ${ans}।`;
-        explanationEn = `${num} * (100 - 1) = ${num * 100} - ${num} = ${ans}.`;
-        shortcut = `${num * 100} - ${num} = ${ans}`;
-        distractors = [`${ans + 99}`, `${ans - 99}`, `${ans + 100}`, `${ans - 100}`];
-      } else {
-        // Standard 2-digit multiplication
+        explanation = `इकाई अंक 5 वाले वर्ग की ट्रिक (एकाधिकेन पूर्वेण):\nप्रथम भाग = दहाई × (दहाई + 1) = ${tens} × ${tens + 1} = ${tens * (tens + 1)}\nअंतिम भाग = 25\nकुल मान = ${ans}।`;
+        explanationEn = `Square of ending 5 trick: ${tens} * (${tens} + 1) = ${tens * (tens + 1)} concatenated with 25 = ${ans}.`;
+        shortcut = `${tens} × ${tens + 1} = ${tens * (tens + 1)} फिर 25 चिपकाएं = ${ans}`;
+        distractors = [`${ans + 100}`, `${ans - 100}`, `${ans + 200}`, `${Math.max(1, ans - 200)}`];
+      } else if (typeVar === 3) {
+        // Unit digit of multiplication product
+        const a = Math.floor(Math.random() * 80) + 12;
+        const b = Math.floor(Math.random() * 80) + 13;
+        const c = Math.floor(Math.random() * 80) + 14;
+        const d = Math.floor(Math.random() * 80) + 17;
+        const unitAns = (a % 10 * b % 10 * c % 10 * d % 10) % 10;
+        qText = `गुणनफल (${a} × ${b} × ${c} × ${d}) का इकाई का अंक (Unit Digit) क्या होगा?`;
+        qTextEn = `Find the unit digit of product (${a} × ${b} × ${c} × ${d})?`;
+        ansStr = `${unitAns}`;
+        explanation = `केवल इकाई अंकों की गुणा करें:\n${a % 10} × ${b % 10} × ${c % 10} × ${d % 10} mod 10 = ${unitAns}।`;
+        explanationEn = `Multiply only unit digits: ${a % 10} * ${b % 10} * ${c % 10} * ${d % 10} mod 10 = ${unitAns}.`;
+        shortcut = `इकाई अंकों का गुणनफल mod 10 = ${unitAns}`;
+        distractors = [`${(unitAns + 1) % 10}`, `${(unitAns + 2) % 10}`, `${(unitAns + 4) % 10}`, `${(unitAns + 5) % 10}`];
+      } else if (typeVar === 4) {
+        // Missing multiplier: A x X = B
         const a = Math.floor(Math.random() * 45) + 12;
-        const b = [12, 14, 15, 16, 18, 20, 24, 25][Math.floor(Math.random() * 8)];
-        const ans = a * b;
-        qText = `मान ज्ञात कीजिए: ${a} × ${b} = ?`;
-        qTextEn = `Evaluate: ${a} × ${b} = ?`;
+        const x = Math.floor(Math.random() * 60) + 15;
+        const b = a * x;
+        qText = `समीकरण में अज्ञात संख्या 'X' ज्ञात कीजिए: ${a} × X = ${b}`;
+        qTextEn = `Solve for missing multiplier 'X': ${a} × X = ${b}`;
+        ansStr = `${x}`;
+        explanation = `X = ${b} ÷ ${a} = ${x}।`;
+        explanationEn = `X = ${b} / ${a} = ${x}.`;
+        shortcut = `X = ${b} ÷ ${a} = ${x}`;
+        distractors = [`${x + 2}`, `${Math.max(1, x - 2)}`, `${x + 5}`, `${Math.max(1, x - 5)}`];
+      } else {
+        // Decimal multiplication
+        const a = (Math.floor(Math.random() * 80) + 12) / 100; // e.g. 0.25
+        const b = (Math.floor(Math.random() * 40) + 10) / 10;  // e.g. 1.2
+        const ans = Math.round(a * b * 1000) / 1000;
+        qText = `दशमलव गुणनफल ज्ञात कीजिए: ${a} × ${b} = ?`;
+        qTextEn = `Calculate decimal product: ${a} × ${b} = ?`;
         ansStr = `${ans}`;
-        explanation = `गुणा की विधि:\n${a} × ${b} = ${ans}।`;
-        explanationEn = `Multiplication: ${a} * ${b} = ${ans}.`;
-        shortcut = `दहाई में तोड़ें: (${a} × ${Math.floor(b / 10) * 10}) + (${a} × ${b % 10}) = ${ans}`;
-        distractors = [`${ans + b}`, `${ans - b}`, `${ans + 20}`, `${ans - 20}`];
+        explanation = `दशमलव स्थान गिनकर गुणा करें:\n${a} × ${b} = ${ans}।`;
+        explanationEn = `Count total decimal places and multiply: ${a} * ${b} = ${ans}.`;
+        shortcut = `दशमलव स्थान का योग = ${ans}`;
+        distractors = [`${Math.round((ans + 0.05) * 1000) / 1000}`, `${Math.round(Math.max(0.001, ans - 0.05) * 1000) / 1000}`, `${Math.round((ans + 0.1) * 1000) / 1000}`, `${Math.round(Math.max(0.001, ans - 0.1) * 1000) / 1000}`];
       }
     }
     // 4. भाग (Division)
     else if (chosenTopic.includes('भाग (Division)')) {
-      const divisors = difficulty === 'सरल' ? [3, 4, 5, 6, 8, 9, 10] : [12, 14, 15, 16, 18, 24, 25, 36];
-      const div = divisors[Math.floor(Math.random() * divisors.length)];
-      const quotient = Math.floor(Math.random() * 50) + (difficulty === 'सरल' ? 12 : 25);
-      const dividend = div * quotient; // 100% exact integer division guaranteed
-
-      qText = `भाग दीजिए: ${dividend} ÷ ${div} = ?`;
-      qTextEn = `Divide: ${dividend} ÷ ${div} = ?`;
-      ansStr = `${quotient}`;
-      explanation = `भागफल = भाज्य ÷ भाजक\n${dividend} ÷ ${div} = ${quotient}।`;
-      explanationEn = `Quotient = Dividend / Divisor: ${dividend} / ${div} = ${quotient}.`;
-      shortcut = `उभयनिष्ठ गुणनखंड काटकर छोटा करें: ${dividend} ÷ ${div} = ${quotient}`;
-      distractors = [`${quotient + 2}`, `${quotient - 2}`, `${quotient + 5}`, `${Math.max(1, quotient - 5)}`];
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // Standard clean integer division
+        const divisors = difficulty === 'सरल' ? [4, 5, 6, 8, 9, 12, 15] : [16, 18, 24, 25, 36, 45, 48, 72];
+        const div = divisors[Math.floor(Math.random() * divisors.length)];
+        const quotient = Math.floor(Math.random() * 80) + 15;
+        const dividend = div * quotient;
+        qText = `भाग दीजिए: ${dividend} ÷ ${div} = ?`;
+        qTextEn = `Divide: ${dividend} ÷ ${div} = ?`;
+        ansStr = `${quotient}`;
+        explanation = `भागफल = ${dividend} ÷ ${div} = ${quotient}।`;
+        explanationEn = `Quotient = ${dividend} / ${div} = ${quotient}.`;
+        shortcut = `उभयनिष्ठ गुणनखंड काटकर हल करें = ${quotient}`;
+        distractors = [`${quotient + 2}`, `${Math.max(1, quotient - 2)}`, `${quotient + 5}`, `${Math.max(1, quotient - 5)}`];
+      } else if (typeVar === 1) {
+        // Divisibility rule test
+        const testDiv = [9, 11, 4, 8, 3][Math.floor(Math.random() * 5)];
+        if (testDiv === 9) {
+          const base3 = Math.floor(Math.random() * 700) + 100; // e.g. 451
+          const dSum = String(base3).split('').reduce((s, d) => s + Number(d), 0);
+          const reqDigit = (9 - (dSum % 9)) % 9;
+          const numStr = `${base3}${reqDigit}`;
+          qText = `यदि संख्या ${base3}X, 9 से पूर्णतः विभाजित (Divisible) होती है, तो स्थान 'X' पर कौनसा अंक आएगा?`;
+          qTextEn = `If number ${base3}X is completely divisible by 9, what is the value of digit 'X'?`;
+          ansStr = `${reqDigit}`;
+          explanation = `9 की विभाज्यता का नियम: सभी अंकों का योग 9 से विभाजित होना चाहिए।\nअंकों का योग = ${dSum} + X\nX = ${reqDigit} रखने पर योग 9 का गुणज बनता है।`;
+          explanationEn = `Divisibility rule of 9: Sum of digits must be divisible by 9. X = ${reqDigit}.`;
+          shortcut = `अंकों का योग 9 का गुणज बनाएं: X = ${reqDigit}`;
+          distractors = [`${(reqDigit + 1) % 9}`, `${(reqDigit + 2) % 9}`, `${(reqDigit + 4) % 9}`, `${(reqDigit + 5) % 9}`];
+        } else {
+          const divBase = 11;
+          const k = Math.floor(Math.random() * 50) + 15;
+          const targetNum = k * 11;
+          qText = `क्या संख्या ${targetNum}, 11 से पूर्णतः विभाजित है? विभाजित करने पर भागफल क्या होगा: ${targetNum} ÷ 11 = ?`;
+          qTextEn = `What is the quotient when ${targetNum} is divided by 11: ${targetNum} ÷ 11 = ?`;
+          ansStr = `${k}`;
+          explanation = `${targetNum} ÷ 11 = ${k}।`;
+          explanationEn = `${targetNum} / 11 = ${k}.`;
+          shortcut = `11 का विभाज्यता नियम = ${k}`;
+          distractors = [`${k + 2}`, `${Math.max(1, k - 2)}`, `${k + 5}`, `${Math.max(1, k - 5)}`];
+        }
+      } else if (typeVar === 2) {
+        // Missing divisor: A ÷ X = B
+        const x = Math.floor(Math.random() * 35) + 12;
+        const b = Math.floor(Math.random() * 45) + 15;
+        const a = x * b;
+        qText = `समीकरण में भाजक 'X' का मान ज्ञात कीजिए: ${a} ÷ X = ${b}`;
+        qTextEn = `Find divisor 'X' in equation: ${a} ÷ X = ${b}`;
+        ansStr = `${x}`;
+        explanation = `X = ${a} ÷ ${b} = ${x}।`;
+        explanationEn = `X = ${a} / ${b} = ${x}.`;
+        shortcut = `X = ${a} ÷ ${b} = ${x}`;
+        distractors = [`${x + 2}`, `${Math.max(1, x - 2)}`, `${x + 4}`, `${Math.max(1, x - 4)}`];
+      } else if (typeVar === 3) {
+        // Remainder Theorem basic
+        const div = Math.floor(Math.random() * 15) + 7;
+        const q = Math.floor(Math.random() * 40) + 10;
+        const rem = Math.floor(Math.random() * (div - 2)) + 1;
+        const num = div * q + rem;
+        qText = `शेषफल ज्ञात कीजिए: जब ${num} को ${div} से भाग दिया जाता है, तो शेषफल (Remainder) क्या बचेगा?`;
+        qTextEn = `Find the remainder when ${num} is divided by ${div}?`;
+        ansStr = `${rem}`;
+        explanation = `भाज्य = (भाजक × भागफल) + शेषफल\n${num} = (${div} × ${q}) + ${rem}।\nशेषफल = ${rem}।`;
+        explanationEn = `Dividend = (Divisor * Quotient) + Remainder. Remainder = ${rem}.`;
+        shortcut = `${num} mod ${div} = ${rem}`;
+        distractors = [`${(rem + 1) % div}`, `${(rem + 2) % div}`, `${(rem + 3) % div}`, `${(rem + 4) % div}`];
+      } else {
+        // Decimal division
+        const div = [0.2, 0.4, 0.5, 0.05, 0.08, 0.12][Math.floor(Math.random() * 6)];
+        const ans = Math.floor(Math.random() * 80) + 15;
+        const dividend = Math.round(div * ans * 1000) / 1000;
+        qText = `दशमलव भाग: ${dividend} ÷ ${div} = ?`;
+        qTextEn = `Decimal division: ${dividend} ÷ ${div} = ?`;
+        ansStr = `${ans}`;
+        explanation = `अंश और हर दोनों को 100 या 1000 से गुणा करके दशमलव हटाएं:\n${dividend} ÷ ${div} = ${ans}।`;
+        explanationEn = `Remove decimals and divide: ${dividend} / ${div} = ${ans}.`;
+        shortcut = `दशमलव हटाकर सीधी विभाजन प्रक्रिया = ${ans}`;
+        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans * 10}`, `${Math.max(1, Math.round(ans / 10))}`];
+      }
     }
     // 5. जोड़ व घटाव (Add & Subtract)
     else if (chosenTopic.includes('जोड़ व घटाव')) {
-      const a = Math.floor(Math.random() * 250) + 100;
-      const b = Math.floor(Math.random() * 200) + 50;
-      const c = Math.floor(Math.random() * (a + b - 50)) + 30;
-      const ans = a + b - c;
-
-      qText = `सरल कीजिए: ${a} + ${b} - ${c} = ?`;
-      qTextEn = `Simplify: ${a} + ${b} - ${c} = ?`;
-      ansStr = `${ans}`;
-      explanation = `चरण 1: पहले जोड़ें -> ${a} + ${b} = ${a + b}।\nचरण 2: फिर घटाएं -> ${a + b} - ${c} = ${ans}।`;
-      explanationEn = `Step 1: Add first -> ${a} + ${b} = ${a + b}. Step 2: Then subtract -> ${a + b} - ${c} = ${ans}.`;
-      shortcut = `BODMAS नियम: जोड़ पहले, घटाव बाद में = ${ans}`;
-      distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 20}`, `${Math.max(5, ans - 20)}`];
+      const typeVar = Math.floor(Math.random() * 4);
+      if (typeVar === 0) {
+        // Multi-term Add & Subtract: A + B - C + D - E
+        const a = Math.floor(Math.random() * 300) + 100;
+        const b = Math.floor(Math.random() * 250) + 50;
+        const c = Math.floor(Math.random() * 200) + 40;
+        const d = Math.floor(Math.random() * 150) + 30;
+        const ans = a + b - c + d;
+        qText = `सरल कीजिए: ${a} + ${b} - ${c} + ${d} = ?`;
+        qTextEn = `Simplify: ${a} + ${b} - ${c} + ${d} = ?`;
+        ansStr = `${ans}`;
+        explanation = `पहले सभी धनात्मक संख्याओं को जोड़ें -> (${a} + ${b} + ${d}) = ${a + b + d}।\nफिर ऋणात्मक संख्या घटाएं -> ${a + b + d} - ${c} = ${ans}।`;
+        explanationEn = `Add positive numbers first (${a + b + d}), then subtract ${c} = ${ans}.`;
+        shortcut = `धनात्मक योग - ऋणात्मक = ${ans}`;
+        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 20}`, `${Math.max(1, ans - 20)}`];
+      } else if (typeVar === 1) {
+        // Missing variable equation: A + X - B = C
+        const a = Math.floor(Math.random() * 400) + 100;
+        const b = Math.floor(Math.random() * 250) + 50;
+        const c = Math.floor(Math.random() * 500) + 200;
+        const x = c + b - a;
+        qText = `समीकरण में 'X' का मान क्या होगा: ${a} + X - ${b} = ${c}`;
+        qTextEn = `Solve for 'X' in equation: ${a} + X - ${b} = ${c}`;
+        ansStr = `${x}`;
+        explanation = `X = ${c} + ${b} - ${a} = ${c + b} - ${a} = ${x}।`;
+        explanationEn = `X = ${c} + ${b} - ${a} = ${x}.`;
+        shortcut = `X = ${c} + ${b} - ${a} = ${x}`;
+        distractors = [`${x + 15}`, `${x - 15}`, `${x + 30}`, `${Math.max(1, x - 30)}`];
+      } else if (typeVar === 2) {
+        // Decimal multi-term
+        const a = (Math.floor(Math.random() * 800) + 100) / 10;
+        const b = (Math.floor(Math.random() * 500) + 50) / 10;
+        const c = (Math.floor(Math.random() * 400) + 30) / 10;
+        const ans = Math.round((a + b - c) * 10) / 10;
+        qText = `दशमलव व्यंजक सरल करें: ${a} + ${b} - ${c} = ?`;
+        qTextEn = `Simplify decimal expression: ${a} + ${b} - ${c} = ?`;
+        ansStr = `${ans}`;
+        explanation = `चरण 1: ${a} + ${b} = ${Math.round((a + b) * 10) / 10}\nचरण 2: ${Math.round((a + b) * 10) / 10} - ${c} = ${ans}।`;
+        explanationEn = `Step 1: ${a} + ${b} = ${a + b}. Step 2: Subtract ${c} = ${ans}.`;
+        shortcut = `दशमलव योग व अंतर = ${ans}`;
+        distractors = [`${Math.round((ans + 1.2) * 10) / 10}`, `${Math.round(Math.max(0.1, ans - 1.2) * 10) / 10}`, `${Math.round((ans + 2.5) * 10) / 10}`, `${Math.round(Math.max(0.1, ans - 2.5) * 10) / 10}`];
+      } else {
+        // Integer + Fraction mix
+        const a = Math.floor(Math.random() * 10) + 3; // e.g. 5
+        const num = Math.floor(Math.random() * 3) + 1; // 1 to 3
+        const den = Math.floor(Math.random() * 4) + 4; // 4 to 7
+        const ansNum = a * den - num;
+        ansStr = `${ansNum}/${den}`;
+        qText = `पूर्णांक व भिन्न का अंतर निकालें: ${a} - (${num}/${den}) = ?`;
+        qTextEn = `Subtract fraction from integer: ${a} - (${num}/${den}) = ?`;
+        explanation = `${a} - (${num}/${den}) = [(${a} × ${den}) - ${num}] ÷ ${den} = (${a * den} - ${num}) ÷ ${den} = ${ansNum}/${den}।`;
+        explanationEn = `${a} - (${num}/${den}) = (${a * den} - ${num}) / ${den} = ${ansNum}/${den}.`;
+        shortcut = `(${a * den} - ${num}) ÷ ${den} = ${ansNum}/${den}`;
+        distractors = [`${ansNum + 1}/${den}`, `${Math.max(1, ansNum - 1)}/${den}`, `${ansNum + 2}/${den}`, `${Math.max(1, ansNum - 2)}/${den}`];
+      }
     }
     // 6. गुणा व भाग (Multiply & Divide)
     else if (chosenTopic.includes('गुणा व भाग')) {
-      // (A * B) / C where (A * B) is cleanly divisible by C
-      const c = [4, 6, 8, 12, 15][Math.floor(Math.random() * 5)];
-      const k1 = Math.floor(Math.random() * 5) + 2;
-      const a = c * k1; // a is multiple of c
-      const b = Math.floor(Math.random() * 15) + 3;
-      const ans = (a * b) / c;
-
-      qText = `मान ज्ञात कीजिए: (${a} × ${b}) ÷ ${c} = ?`;
-      qTextEn = `Evaluate: (${a} × ${b}) ÷ ${c} = ?`;
-      ansStr = `${ans}`;
-      explanation = `काटने का नियम:\n(${a} ÷ ${c}) × ${b} = ${k1} × ${b} = ${ans}।`;
-      explanationEn = `Cancellation rule: (${a} / ${c}) * ${b} = ${k1} * ${b} = ${ans}.`;
-      shortcut = `गुणा करने से पहले काटें: ${a} ÷ ${c} = ${k1}, फिर ${k1} × ${b} = ${ans}`;
-      distractors = [`${ans + b}`, `${Math.max(1, ans - b)}`, `${ans + 5}`, `${ans - 5}`];
-    }
-    // 7. भिन्न व दशमलव (Fractions & Decimals)
-    else if (chosenTopic.includes('भिन्न व दशमलव')) {
-      const denoms = [2, 3, 4, 5, 6, 8, 10];
-      const d1 = denoms[Math.floor(Math.random() * denoms.length)];
-      let d2 = denoms[Math.floor(Math.random() * denoms.length)];
-      while (d2 === d1) {
-        d2 = denoms[Math.floor(Math.random() * denoms.length)];
+      const typeVar = Math.floor(Math.random() * 4);
+      if (typeVar === 0) {
+        // Combined product and division: (A x B) / C
+        const c = [4, 6, 8, 12, 15, 18, 24][Math.floor(Math.random() * 7)];
+        const k = Math.floor(Math.random() * 6) + 2;
+        const a = c * k;
+        const b = Math.floor(Math.random() * 20) + 5;
+        const ans = k * b;
+        qText = `मान ज्ञात कीजिए: (${a} × ${b}) ÷ ${c} = ?`;
+        qTextEn = `Evaluate: (${a} × ${b}) ÷ ${c} = ?`;
+        ansStr = `${ans}`;
+        explanation = `काटने की विधि: (${a} ÷ ${c}) × ${b} = ${k} × ${b} = ${ans}।`;
+        explanationEn = `Cancel common factor: (${a} / ${c}) * ${b} = ${k} * ${b} = ${ans}.`;
+        shortcut = `गुणा से पहले काटें: ${k} × ${b} = ${ans}`;
+        distractors = [`${ans + b}`, `${Math.max(1, ans - b)}`, `${ans + 5}`, `${Math.max(1, ans - 5)}`];
+      } else if (typeVar === 1) {
+        // Continued fraction product division: (A x B) / (C x D)
+        const c = Math.floor(Math.random() * 6) + 2;
+        const d = Math.floor(Math.random() * 5) + 3;
+        const k1 = Math.floor(Math.random() * 4) + 2;
+        const k2 = Math.floor(Math.random() * 4) + 2;
+        const a = c * k1;
+        const b = d * k2;
+        const ans = k1 * k2;
+        qText = `अंश व हर काटकर मान निकालें: (${a} × ${b}) ÷ (${c} × ${d}) = ?`;
+        qTextEn = `Evaluate by canceling common terms: (${a} × ${b}) ÷ (${c} × ${d}) = ?`;
+        ansStr = `${ans}`;
+        explanation = `(${a} ÷ ${c}) × (${b} ÷ ${d}) = ${k1} × ${k2} = ${ans}।`;
+        explanationEn = `(${a} / ${c}) * (${b} / ${d}) = ${k1} * ${k2} = ${ans}.`;
+        shortcut = `तिर्यक कटाई: ${k1} × ${k2} = ${ans}`;
+        distractors = [`${ans + 2}`, `${Math.max(1, ans - 2)}`, `${ans + 4}`, `${Math.max(1, ans - 4)}`];
+      } else if (typeVar === 2) {
+        // Decimal product division
+        const c = 0.05;
+        const a = (Math.floor(Math.random() * 15) + 2) * 0.1; // e.g. 0.4
+        const b = (Math.floor(Math.random() * 10) + 2) * 0.25; // e.g. 1.0
+        const ans = Math.round((a * b) / c);
+        qText = `दशमलव गुणा व भाग: (${a} × ${b}) ÷ ${c} = ?`;
+        qTextEn = `Decimal multiply and divide: (${a} × ${b}) ÷ ${c} = ?`;
+        ansStr = `${ans}`;
+        explanation = `अंश = ${a} × ${b} = ${Math.round(a * b * 100) / 100}\nभाग = ${Math.round(a * b * 100) / 100} ÷ ${c} = ${ans}।`;
+        explanationEn = `Numerator = ${a * b}. Division by ${c} = ${ans}.`;
+        shortcut = `दशमलव संतुलन = ${ans}`;
+        distractors = [`${ans + 10}`, `${Math.max(1, ans - 10)}`, `${ans + 20}`, `${Math.max(1, ans - 20)}`];
+      } else {
+        // Algebraic identity division: (A² - B²) / (A - B) = A + B
+        const a = Math.floor(Math.random() * 70) + 30;
+        const b = Math.floor(Math.random() * (a - 10)) + 5;
+        const num = a * a - b * b;
+        const den = a - b;
+        const ans = a + b;
+        qText = `बीजगणितीय सूत्र से मान निकालें: (${num}) ÷ (${den}) = ?`;
+        qTextEn = `Evaluate using algebraic formula: (${num}) ÷ (${den}) = ?`;
+        ansStr = `${ans}`;
+        explanation = `नोट करें कि ${num} = (${a})² - (${b})² तथा ${den} = (${a} - ${b})।\nसूत्र: (A² - B²) ÷ (A - B) = (A + B) = ${a} + ${b} = ${ans}।`;
+        explanationEn = `Formula: (A² - B²) / (A - B) = A + B = ${a} + ${b} = ${ans}.`;
+        shortcut = `शॉर्टकट सूत्र: A + B = ${a} + ${b} = ${ans}`;
+        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 20}`, `${Math.max(1, ans - 20)}`];
       }
-      const n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
-      const n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
-
-      // Common denominator LCM
-      const commonLcm = (d1 * d2) / gcd(d1, d2);
-      const numSum = n1 * (commonLcm / d1) + n2 * (commonLcm / d2);
-      const finalGcd = gcd(numSum, commonLcm);
-      const simpNum = numSum / finalGcd;
-      const simpDen = commonLcm / finalGcd;
-
-      ansStr = simpDen === 1 ? `${simpNum}` : `${simpNum}/${simpDen}`;
-      qText = `भिन्नों का योग ज्ञात कीजिए: (${n1}/${d1}) + (${n2}/${d2}) = ?`;
-      qTextEn = `Calculate sum of fractions: (${n1}/${d1}) + (${n2}/${d2}) = ?`;
-      explanation = `ल.स.प. (LCM) ऑफ (${d1}, ${d2}) = ${commonLcm}।\n= [(${n1} × ${commonLcm / d1}) + (${n2} × ${commonLcm / d2})] ÷ ${commonLcm}\n= (${n1 * (commonLcm / d1)} + ${n2 * (commonLcm / d2)}) ÷ ${commonLcm} = ${numSum}/${commonLcm} = ${ansStr}।`;
-      explanationEn = `LCM of denominators = ${commonLcm}. Sum = ${ansStr}.`;
-      shortcut = `तिर्यक गुणा (Cross multiply): (${n1}×${d2} + ${n2}×${d1}) ÷ (${d1}×${d2}) = ${ansStr}`;
-
-      distractors = [
-        `${simpNum + 1}/${simpDen}`,
-        simpDen > 2 ? `${simpNum}/${simpDen + 1}` : `${simpNum + 2}/${simpDen}`,
-        `${simpNum + 2}/${simpDen}`,
-        simpNum > 1 ? `${simpNum - 1}/${simpDen}` : `${simpNum + 3}/${simpDen}`
-      ];
     }
-    // 8. प्रतिशत (Percentage)
+    // 7. सरलीकरण (BODMAS)
+    else if (chosenTopic.includes('सरलीकरण')) {
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // Direct BODMAS: (A + B) x C / D - E
+        const d = [2, 3, 4, 5, 6][Math.floor(Math.random() * 5)];
+        const k = Math.floor(Math.random() * 10) + 4;
+        const sumAB = d * k;
+        const a = Math.floor(sumAB / 2);
+        const b = sumAB - a;
+        const c = Math.floor(Math.random() * 8) + 3;
+        const e = Math.floor(Math.random() * 15) + 2;
+        const ans = k * c - e;
+        qText = `BODMAS नियम से सरल करें: (${a} + ${b}) × ${c} ÷ ${d} - ${e} = ?`;
+        qTextEn = `Simplify using BODMAS: (${a} + ${b}) × ${c} ÷ ${d} - ${e} = ?`;
+        ansStr = `${ans}`;
+        explanation = `BODMAS चरण:\n1. कोष्ठक (Bracket): (${a} + ${b}) = ${sumAB}\n2. भाग (Division): ${sumAB} ÷ ${d} = ${k}\n3. गुणा (Multiplication): ${k} × ${c} = ${k * c}\n4. घटाव (Subtraction): ${k * c} - ${e} = ${ans}।`;
+        explanationEn = `BODMAS steps: Bracket (${sumAB}) -> Division (${k}) -> Multiply (${k * c}) -> Subtract (${ans}).`;
+        shortcut = `BODMAS क्रमानुसार: ${ans}`;
+        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+      } else if (typeVar === 1) {
+        // Nested Brackets: [A + {B x (C - D)} / E]
+        const c = Math.floor(Math.random() * 20) + 15;
+        const d = Math.floor(Math.random() * 10) + 2;
+        const diff = c - d;
+        const b = Math.floor(Math.random() * 5) + 2;
+        const prod = b * diff;
+        const e = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+        const divPart = Math.floor(prod / e) * e; // make divisible
+        const a = Math.floor(Math.random() * 30) + 10;
+        const ans = a + divPart / e;
+        qText = `कोष्ठक BODMAS नियम: ${a} + [{${b} × (${c} - ${d})} ÷ ${e}] = ?`;
+        qTextEn = `Nested Bracket BODMAS: ${a} + [{${b} × (${c} - ${d})} ÷ ${e}] = ?`;
+        ansStr = `${ans}`;
+        explanation = `चरण 1 (छोटा कोष्ठक): ${c} - ${d} = ${diff}\nचरण 2 (मझला कोष्ठक): ${b} × ${diff} = ${prod}\nचरण 3 (बड़ा कोष्ठक): ${divPart} ÷ ${e} = ${divPart / e}\nचरण 4 (जोड़): ${a} + ${divPart / e} = ${ans}।`;
+        explanationEn = `Inner bracket -> middle -> outer -> addition = ${ans}.`;
+        shortcut = `अंदर से बाहर की ओर कोष्ठक खोलें = ${ans}`;
+        distractors = [`${ans + 4}`, `${Math.max(1, ans - 4)}`, `${ans + 8}`, `${Math.max(1, ans - 8)}`];
+      } else if (typeVar === 2) {
+        // Algebraic identity BODMAS: If a + b + c = 0, find a³ + b³ + c³ - 3abc
+        const isIdentity = Math.random() > 0.5;
+        if (isIdentity) {
+          const a = Math.floor(Math.random() * 25) + 10;
+          const b = Math.floor(Math.random() * 15) + 5;
+          const c = -(a + b);
+          qText = `यदि a = ${a}, b = ${b}, c = ${c} (जहाँ a + b + c = 0), तो व्यंजक (a³ + b³ + c³ - 3abc) का मान क्या होगा?`;
+          qTextEn = `If a = ${a}, b = ${b}, c = ${c} (where a + b + c = 0), what is the value of (a³ + b³ + c³ - 3abc)?`;
+          ansStr = `0`;
+          explanation = `बीजगणितीय सर्वसमिका का नियम:\nयदि a + b + c = 0 होता है, तो a³ + b³ + c³ - 3abc = 0 सदैव होता है।`;
+          explanationEn = `Identity rule: If a + b + c = 0, then a³ + b³ + c³ - 3abc = 0 always.`;
+          shortcut = `वैदिक सर्वसमिका नियम: जब a + b + c = 0 हो, उत्तर = 0`;
+          distractors = [`1`, `${a + b}`, `${a * b}`, `-1`];
+        } else {
+          // (x² - y²) / (x + y)
+          const x = Math.floor(Math.random() * 80) + 20;
+          const y = Math.floor(Math.random() * (x - 5)) + 3;
+          const num = x * x - y * y;
+          const den = x + y;
+          const ans = x - y;
+          qText = `बीजगणितीय सरलीकरण: (${num}) ÷ (${den}) = ?`;
+          qTextEn = `Algebraic simplification: (${num}) ÷ (${den}) = ?`;
+          ansStr = `${ans}`;
+          explanation = `${num} = (${x})² - (${y})² = (${x} - ${y})(${x} + ${y})।\nअतः (${x} - ${y})(${x} + ${y}) ÷ (${x} + ${y}) = ${x} - ${y} = ${ans}।`;
+          explanationEn = `(x² - y²) / (x + y) = x - y = ${x} - ${y} = ${ans}.`;
+          shortcut = `सूत्र: x - y = ${x} - ${y} = ${ans}`;
+          distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+        }
+      } else if (typeVar === 3) {
+        // Square root BODMAS: √(A + B) x C - D
+        const sqBase = Math.floor(Math.random() * 15) + 5; // e.g. 12
+        const sq = sqBase * sqBase;
+        const part1 = Math.floor(sq * 0.6);
+        const part2 = sq - part1;
+        const c = Math.floor(Math.random() * 6) + 3;
+        const d = Math.floor(Math.random() * 20) + 5;
+        const ans = sqBase * c - d;
+        qText = `वर्गमूल BODMAS: √( ${part1} + ${part2} ) × ${c} - ${d} = ?`;
+        qTextEn = `Square root BODMAS: √( ${part1} + ${part2} ) × ${c} - ${d} = ?`;
+        ansStr = `${ans}`;
+        explanation = `1. वर्गमूल: √(${part1} + ${part2}) = √${sq} = ${sqBase}\n2. गुणा: ${sqBase} × ${c} = ${sqBase * c}\n3. घटाव: ${sqBase * c} - ${d} = ${ans}।`;
+        explanationEn = `1. Root = ${sqBase}. 2. Multiply = ${sqBase * c}. 3. Subtract = ${ans}.`;
+        shortcut = `वर्गमूल निकाल कर गुणा करें = ${ans}`;
+        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+      } else {
+        // Standard BODMAS fallback
+        const a = (Math.floor(Math.random() * 10) + 2) * 6;
+        const b = [2, 3, 6][Math.floor(Math.random() * 3)];
+        const c = Math.floor(Math.random() * 5) + 3;
+        const d = Math.floor(Math.random() * 15) + 5;
+        const ans = (a / b) * c + d;
+        qText = `BODMAS मान: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
+        qTextEn = `BODMAS value: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
+        ansStr = `${ans}`;
+        explanation = `1. भाग: ${a} ÷ ${b} = ${a / b}\n2. गुणा: ${a / b} × ${c} = ${(a / b) * c}\n3. जोड़: ${(a / b) * c} + ${d} = ${ans}।`;
+        explanationEn = `Division -> Multiply -> Addition = ${ans}.`;
+        shortcut = `BODMAS = ${ans}`;
+        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+      }
+    }
+    // 8. भिन्न व दशमलव (Fractions & Decimals)
+    else if (chosenTopic.includes('भिन्न व दशमलव')) {
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // Sum of fractions
+        const denoms = [2, 3, 4, 5, 6, 8, 10, 12];
+        const d1 = denoms[Math.floor(Math.random() * denoms.length)];
+        let d2 = denoms[Math.floor(Math.random() * denoms.length)];
+        while (d2 === d1) {
+          d2 = denoms[Math.floor(Math.random() * denoms.length)];
+        }
+        const n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+        const n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+
+        const commonLcm = (d1 * d2) / gcd(d1, d2);
+        const numSum = n1 * (commonLcm / d1) + n2 * (commonLcm / d2);
+        const finalGcd = gcd(numSum, commonLcm);
+        const simpNum = numSum / finalGcd;
+        const simpDen = commonLcm / finalGcd;
+
+        ansStr = simpDen === 1 ? `${simpNum}` : `${simpNum}/${simpDen}`;
+        qText = `भिन्नों का योग ज्ञात कीजिए: (${n1}/${d1}) + (${n2}/${d2}) = ?`;
+        qTextEn = `Sum of fractions: (${n1}/${d1}) + (${n2}/${d2}) = ?`;
+        explanation = `ल.स.प. (LCM) ऑफ (${d1}, ${d2}) = ${commonLcm}।\nयोग = [(${n1} × ${commonLcm / d1}) + (${n2} × ${commonLcm / d2})] ÷ ${commonLcm} = ${numSum}/${commonLcm} = ${ansStr}।`;
+        explanationEn = `LCM = ${commonLcm}. Sum = ${ansStr}.`;
+        shortcut = `तिर्यक गुणा (Cross multiply): (${n1}×${d2} + ${n2}×${d1}) ÷ (${d1}×${d2}) = ${ansStr}`;
+        distractors = [`${simpNum + 1}/${simpDen}`, `${Math.max(1, simpNum - 1)}/${simpDen}`, `${simpNum + 2}/${simpDen}`, `${simpNum}/${simpDen + 1}`];
+      } else if (typeVar === 1) {
+        // Division of fractions: (n1/d1) ÷ (n2/d2)
+        const n1 = Math.floor(Math.random() * 5) + 2;
+        const d1 = Math.floor(Math.random() * 5) + 3;
+        const n2 = Math.floor(Math.random() * 5) + 2;
+        const d2 = Math.floor(Math.random() * 5) + 3;
+
+        const prodNum = n1 * d2;
+        const prodDen = d1 * n2;
+        const g = gcd(prodNum, prodDen);
+        const simpNum = prodNum / g;
+        const simpDen = prodDen / g;
+
+        ansStr = simpDen === 1 ? `${simpNum}` : `${simpNum}/${simpDen}`;
+        qText = `भिन्नों का भागफल हल करें: (${n1}/${d1}) ÷ (${n2}/${d2}) = ?`;
+        qTextEn = `Division of fractions: (${n1}/${d1}) ÷ (${n2}/${d2}) = ?`;
+        explanation = `द्वितीय भिन्न को पलटकर गुणा करें:\n(${n1}/${d1}) × (${d2}/${n2}) = ${n1 * d2}/${d1 * n2} = ${ansStr}।`;
+        explanationEn = `Invert second fraction and multiply: (${n1} * ${d2}) / (${d1} * ${n2}) = ${ansStr}.`;
+        shortcut = `उल्टा करके गुणा करें = ${ansStr}`;
+        distractors = [`${simpNum + 1}/${simpDen}`, `${Math.max(1, simpNum - 1)}/${simpDen}`, `${simpNum}/${simpDen + 1}`, `${simpNum + 2}/${simpDen}`];
+      } else if (typeVar === 2) {
+        // Recurring decimal to fraction
+        const recs = [
+          { dec: '0.666...', num: 2, den: 3 },
+          { dec: '0.333...', num: 1, den: 3 },
+          { dec: '0.2727...', num: 3, den: 11 },
+          { dec: '0.3636...', num: 4, den: 11 },
+          { dec: '0.1818...', num: 2, den: 11 },
+          { dec: '0.142857...', num: 1, den: 7 },
+          { dec: '0.444...', num: 4, den: 9 }
+        ];
+        const chosen = recs[Math.floor(Math.random() * recs.length)];
+        ansStr = `${chosen.num}/${chosen.den}`;
+        qText = `आवर्ती दशमलव (Recurring Decimal) को साधारण भिन्न में बदलें: ${chosen.dec} = ?`;
+        qTextEn = `Convert recurring decimal to fraction: ${chosen.dec} = ?`;
+        explanation = `आवर्ती दशमलव सूत्र:\n0.X̅ = X/9, 0.XY̅ = XY/99।\nअतः ${chosen.dec} = ${chosen.num}/${chosen.den}।`;
+        explanationEn = `Recurring decimal rule: ${chosen.dec} = ${chosen.num}/${chosen.den}.`;
+        shortcut = `वैदिक भिन्न रूपांतरण = ${ansStr}`;
+        distractors = [`${chosen.num + 1}/${chosen.den}`, `${chosen.num}/${chosen.den + 1}`, `${chosen.num + 2}/${chosen.den}`, `${Math.max(1, chosen.num - 1)}/${chosen.den}`];
+      } else if (typeVar === 3) {
+        // Mixed fraction arithmetic: A(b/c) + X(y/z)
+        const a = Math.floor(Math.random() * 4) + 1;
+        const b = Math.floor(Math.random() * 4) + 2;
+        const c = 1; // 1/2
+        const d = 2;
+        const x = Math.floor(Math.random() * 4) + 1;
+        const y = 1; // 1/4
+        const z = 4;
+        const totalInt = a + x;
+        const fracSumNum = 2 + 1; // 1/2 + 1/4 = 3/4
+        ansStr = `${totalInt} (3/4)`;
+        qText = `मिश्रित भिन्न का योग: ${a}½ + ${x}¼ = ?`;
+        qTextEn = `Sum of mixed fractions: ${a}½ + ${x}¼ = ?`;
+        explanation = `पूर्णांकों का योग = ${a} + ${x} = ${totalInt}।\nभिन्नों का योग = (1/2) + (1/4) = 3/4।\nकुल योग = ${totalInt} (3/4) = ${(totalInt * 4 + 3)}/4।`;
+        explanationEn = `Integer sum = ${totalInt}. Fraction sum = 3/4. Total = ${ansStr}.`;
+        shortcut = `पूर्णांक व भिन्न अलग-अलग जोड़ें = ${ansStr}`;
+        distractors = [`${totalInt} (1/4)`, `${totalInt + 1} (1/4)`, `${totalInt} (1/2)`, `${totalInt + 1} (1/2)`];
+      } else {
+        // Decimal place value conversion
+        const decimals = [
+          { dec: '0.125', num: 1, den: 8 },
+          { dec: '0.375', num: 3, den: 8 },
+          { dec: '0.625', num: 5, den: 8 },
+          { dec: '0.875', num: 7, den: 8 },
+          { dec: '0.04', num: 1, den: 25 },
+          { dec: '0.16', num: 4, den: 25 }
+        ];
+        const chosen = decimals[Math.floor(Math.random() * decimals.length)];
+        ansStr = `${chosen.num}/${chosen.den}`;
+        qText = `दशमलव संख्या ${chosen.dec} का सरलतम भिन्न रूप (Simplest Fraction) क्या होगा?`;
+        qTextEn = `Simplest fraction form of decimal ${chosen.dec}?`;
+        explanation = `${chosen.dec} = ${chosen.num}/${chosen.den}।`;
+        explanationEn = `Decimal ${chosen.dec} = ${chosen.num}/${chosen.den}.`;
+        shortcut = `स्थान मान काटकर सरल करें = ${ansStr}`;
+        distractors = [`${chosen.num + 1}/${chosen.den}`, `${chosen.num}/${chosen.den + 2}`, `${chosen.num + 2}/${chosen.den}`, `${Math.max(1, chosen.num - 1)}/${chosen.den}`];
+      }
+    }
+    // 9. प्रतिशत (Percentage)
     else if (chosenTopic.includes('प्रतिशत')) {
-      const percentages = [5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75];
-      const p = percentages[Math.floor(Math.random() * percentages.length)];
-      const baseMultiplier = Math.floor(Math.random() * 25) + 3;
-      const base = baseMultiplier * 100;
-      const ans = Math.round((p * base) / 100);
-
-      qText = `₹${base} का ${p}% कितना होगा?`;
-      qTextEn = `What is ${p}% of ₹${base}?`;
-      ansStr = `₹${ans}`;
-      explanation = `${p}% = ${p} ÷ 100। कुल मान = (${base} × ${p}) ÷ 100 = ₹${ans}।`;
-      explanationEn = `${p}% = ${p} / 100. Total value = (${base} * ${p}) / 100 = ₹${ans}.`;
-      shortcut = `शॉर्टकट: 10% = ₹${base / 10}, 1% = ₹${base / 100}। मान निकालें = ₹${ans}`;
-      distractors = [
-        `₹${ans + Math.max(10, Math.round(ans * 0.1))}`,
-        `₹${Math.max(10, ans - Math.max(10, Math.round(ans * 0.1)))}`,
-        `₹${ans + 25}`,
-        `₹${Math.max(5, ans - 15)}`
-      ];
+      const typeVar = Math.floor(Math.random() * 6);
+      if (typeVar === 0) {
+        // Direct percentage: X% of Y
+        const percentages = [5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75];
+        const p = percentages[Math.floor(Math.random() * percentages.length)];
+        const base = (Math.floor(Math.random() * 30) + 4) * 100;
+        const ans = Math.round((p * base) / 100);
+        qText = `₹${base} का ${p}% कितना होगा?`;
+        qTextEn = `What is ${p}% of ₹${base}?`;
+        ansStr = `₹${ans}`;
+        explanation = `${p}% = ${p} ÷ 100। कुल मान = (${base} × ${p}) ÷ 100 = ₹${ans}।`;
+        explanationEn = `${p}% of ₹${base} = (${base} * ${p}) / 100 = ₹${ans}.`;
+        shortcut = `10% = ₹${base / 10}, 1% = ₹${base / 100} -> ₹${ans}`;
+        distractors = [`₹${ans + 20}`, `₹${Math.max(10, ans - 20)}`, `₹${ans + 50}`, `₹${Math.max(10, ans - 50)}`];
+      } else if (typeVar === 1) {
+        // Chained percentage: A% of B% of C
+        const p1 = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+        const p2 = [20, 40, 50][Math.floor(Math.random() * 3)];
+        const base = (Math.floor(Math.random() * 10) + 2) * 1000;
+        const ans = Math.round((p1 * p2 * base) / 10000);
+        qText = `₹${base} के ${p2}% का ${p1}% कितना होगा?`;
+        qTextEn = `What is ${p1}% of ${p2}% of ₹${base}?`;
+        ansStr = `₹${ans}`;
+        explanation = `चरण 1: ${base} का ${p2}% = ₹${(base * p2) / 100}\nचरण 2: ₹${(base * p2) / 100} का ${p1}% = ₹${ans}।`;
+        explanationEn = `Step 1: ${p2}% of ${base} = ${(base * p2) / 100}. Step 2: ${p1}% of that = ₹${ans}.`;
+        shortcut = `(${p1} × ${p2} × ${base}) ÷ 10000 = ₹${ans}`;
+        distractors = [`₹${ans + 10}`, `₹${Math.max(5, ans - 10)}`, `₹${ans + 25}`, `₹${Math.max(5, ans - 25)}`];
+      } else if (typeVar === 2) {
+        // Percentage Comparison: If A is P% more than B, B is how much % less than A?
+        const p = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+        const ans = Math.round((p / (100 + p)) * 100 * 10) / 10;
+        qText = `यदि A का वेतन B से ${p}% अधिक है, तो B का वेतन A से कितना प्रतिशत (%) कम होगा?`;
+        qTextEn = `If A's income is ${p}% more than B, by what % is B's income less than A?`;
+        ansStr = `${ans}%`;
+        explanation = `कम प्रतिशत सूत्र: [P ÷ (100 + P)] × 100%\n= [${p} ÷ ${100 + p}] × 100% = ${ans}%।`;
+        explanationEn = `Formula: [P / (100 + P)] * 100% = ${ans}%.`;
+        shortcut = `[${p} ÷ ${100 + p}] × 100% = ${ans}%`;
+        distractors = [`${p}%`, `${Math.round((ans + 2) * 10) / 10}%`, `${Math.round(Math.max(1, ans - 2) * 10) / 10}%`, `${p + 5}%`];
+      } else if (typeVar === 3) {
+        // Vedic Fractional Shortcut Percentages (14.28%, 37.5%, 16.66%, 62.5%)
+        const fracP = [
+          { name: '14.28%', frac: 1 / 7, mult: 700, str: '1/7' },
+          { name: '37.5%', frac: 3 / 8, mult: 640, str: '3/8' },
+          { name: '16.66%', frac: 1 / 6, mult: 540, str: '1/6' },
+          { name: '62.5%', frac: 5 / 8, mult: 800, str: '5/8' },
+          { name: '83.33%', frac: 5 / 6, mult: 360, str: '5/6' }
+        ];
+        const chosen = fracP[Math.floor(Math.random() * fracP.length)];
+        const k = Math.floor(Math.random() * 4) + 1;
+        const totalVal = chosen.mult * k;
+        const ans = Math.round(totalVal * chosen.frac);
+        qText = `स्पीड वैदिक प्रतिशत: ₹${totalVal} का ${chosen.name} कितना होगा?`;
+        qTextEn = `Vedic fraction speed percent: What is ${chosen.name} of ₹${totalVal}?`;
+        ansStr = `₹${ans}`;
+        explanation = `${chosen.name} की भिन्न शॉर्टकट = ${chosen.str}।\nकुल मान = ₹${totalVal} × ${chosen.str} = ₹${ans}।`;
+        explanationEn = `Fraction shortcut for ${chosen.name} = ${chosen.str}. ₹${totalVal} * ${chosen.str} = ₹${ans}.`;
+        shortcut = `वैदिक भिन्न सूत्र: ${chosen.str} × ₹${totalVal} = ₹${ans}`;
+        distractors = [`₹${ans + 30}`, `₹${Math.max(10, ans - 30)}`, `₹${ans + 60}`, `₹${Math.max(10, ans - 60)}`];
+      } else if (typeVar === 4) {
+        // Successive Percentage Change: P1 + P2 + (P1 x P2)/100
+        const p1 = [10, 20, 30][Math.floor(Math.random() * 3)];
+        const p2 = [10, 20, 25][Math.floor(Math.random() * 3)];
+        const ans = p1 + p2 + (p1 * p2) / 100;
+        qText = `क्रमिक वृद्धि (Successive Increase): यदि किसी संख्या में पहले ${p1}% और फिर ${p2}% की वृद्धि की जाए, तो कुल प्रभावी प्रतिशत वृद्धि कितनी होगी?`;
+        qTextEn = `Successive increase of ${p1}% and ${p2}% equals what total % increase?`;
+        ansStr = `${ans}%`;
+        explanation = `कुल प्रभावी प्रतिशत वृद्धि सूत्र: A + B + (A × B) ÷ 100\n= ${p1} + ${p2} + (${p1} × ${p2}) ÷ 100 = ${ans}%।`;
+        explanationEn = `Effective % change formula = A + B + (A * B) / 100 = ${ans}%.`;
+        shortcut = `${p1} + ${p2} + ${(p1 * p2) / 100} = ${ans}%`;
+        distractors = [`${p1 + p2}%`, `${ans + 2}%`, `${Math.max(1, ans - 2)}%`, `${p1 + p2 + 5}%`];
+      } else {
+        // Percentage increase/decrease on value
+        const base = Math.floor(Math.random() * 40) * 10 + 200;
+        const incP = [10, 15, 20, 25, 30, 50][Math.floor(Math.random() * 6)];
+        const ans = Math.round(base * (1 + incP / 100));
+        qText = `यदि संख्या ${base} में ${incP}% की वृद्धि की जाए, तो नई संख्या क्या होगी?`;
+        qTextEn = `If number ${base} is increased by ${incP}%, what is the new number?`;
+        ansStr = `${ans}`;
+        explanation = `वृद्धि = (${base} × ${incP}) ÷ 100 = ${Math.round((base * incP) / 100)}।\nनई संख्या = ${base} + ${Math.round((base * incP) / 100)} = ${ans}।`;
+        explanationEn = `New number = ${base} * (1 + ${incP}/100) = ${ans}.`;
+        shortcut = `${base} × ${100 + incP}% = ${ans}`;
+        distractors = [`${ans + 20}`, `${ans - 20}`, `${ans + 40}`, `${Math.max(1, ans - 40)}`];
+      }
     }
-    // 9. वर्ग व वर्गमूल (Squares & Roots)
+    // 10. वर्ग व वर्गमूल (Squares & Roots)
     else if (chosenTopic.includes('वर्ग व वर्गमूल') || chosenTopic.includes('वर्ग')) {
-      const isRoot = Math.random() > 0.5;
-      const num = Math.floor(Math.random() * 32) + 12; // 12 to 43
-      const sq = num * num;
-
-      if (isRoot) {
+      const typeVar = Math.floor(Math.random() * 6);
+      if (typeVar === 0) {
+        // Square Root of Perfect Squares
+        const num = Math.floor(Math.random() * 75) + 25; // 25 to 99
+        const sq = num * num;
         qText = `√${sq} का सटीक मान क्या होगा?`;
         qTextEn = `What is the exact square root of √${sq}?`;
         ansStr = `${num}`;
-        explanation = `क्योंकि ${num} × ${num} = ${sq}, अतः √${sq} = ${num}।`;
-        explanationEn = `Since ${num} * ${num} = ${sq}, square root of ${sq} is ${num}.`;
-        shortcut = `इकाई अंक विधि: अंतिम अंक से पहचानें -> √${sq} = ${num}`;
-        distractors = [`${num + 2}`, `${num - 2}`, `${num + 1}`, `${num - 1}`];
-      } else {
+        explanation = `क्योंकि (${num})² = ${sq}, अतः √${sq} = ${num}।`;
+        explanationEn = `Since (${num})² = ${sq}, √${sq} = ${num}.`;
+        shortcut = `इकाई अंक विधि: अंतिम अंकों से त्वरित पहचान -> √${sq} = ${num}`;
+        distractors = [`${num + 2}`, `${num - 2}`, `${num + 4}`, `${Math.max(1, num - 4)}`];
+      } else if (typeVar === 1) {
+        // Direct Square
+        const num = Math.floor(Math.random() * 60) + 15;
+        const sq = num * num;
         qText = `(${num})² का सटीक मान क्या होगा?`;
         qTextEn = `What is the exact value of (${num})²?`;
         ansStr = `${sq}`;
         explanation = `(${num})² = ${num} × ${num} = ${sq}।`;
         explanationEn = `(${num})² = ${num} * ${num} = ${sq}.`;
-        shortcut = `वैदिक आधार विधि: ${num} का वर्ग = ${sq}`;
+        shortcut = `द्वंद्व योग (Duplex) या आधार विधि से वर्ग = ${sq}`;
         distractors = [`${sq + 20}`, `${sq - 20}`, `${(num + 1) * (num + 1)}`, `${(num - 1) * (num - 1)}`];
+      } else if (typeVar === 2) {
+        // Square Root Equation: √X + A = B
+        const ansX = Math.floor(Math.random() * 30) + 10;
+        const sqX = ansX * ansX;
+        const a = Math.floor(Math.random() * 30) + 10;
+        const b = ansX + a;
+        qText = `समीकरण में 'X' का मान ज्ञात कीजिए: √X + ${a} = ${b}`;
+        qTextEn = `Solve for 'X' in equation: √X + ${a} = ${b}`;
+        ansStr = `${sqX}`;
+        explanation = `1. √X = ${b} - ${a} = ${ansX}\n2. दोनों तरफ वर्ग करने पर: X = (${ansX})² = ${sqX}।`;
+        explanationEn = `√X = ${b} - ${a} = ${ansX}. Squaring both sides: X = (${ansX})² = ${sqX}.`;
+        shortcut = `X = (${b} - ${a})² = (${ansX})² = ${sqX}`;
+        distractors = [`${sqX + 25}`, `${Math.max(1, sqX - 25)}`, `${(ansX + 1) * (ansX + 1)}`, `${Math.max(1, (ansX - 1) * (ansX - 1))}`];
+      } else if (typeVar === 3) {
+        // Pythagorean Triplets: A² + B² = C²
+        const triplets = [
+          [3, 4, 5], [5, 12, 13], [6, 8, 10], [8, 15, 17],
+          [9, 12, 15], [12, 16, 20], [7, 24, 25], [20, 21, 29]
+        ];
+        const trip = triplets[Math.floor(Math.random() * triplets.length)];
+        const k = Math.floor(Math.random() * 3) + 1;
+        const a = trip[0] * k;
+        const b = trip[1] * k;
+        const c = trip[2] * k;
+        qText = `पाइथागोरस प्रमेय: √( (${a})² + (${b})² ) का मान क्या होगा?`;
+        qTextEn = `Pythagoras identity: √( (${a})² + (${b})² ) = ?`;
+        ansStr = `${c}`;
+        explanation = `(${a})² + (${b})² = ${a * a} + ${b * b} = ${c * c}।\n√(${c * c}) = ${c}।`;
+        explanationEn = `√(${a * a} + ${b * b}) = √${c * c} = ${c}.`;
+        shortcut = `पाइथागोरस त्रिक (Pythagorean Triplet) = ${c}`;
+        distractors = [`${c + 2}`, `${Math.max(1, c - 2)}`, `${c + 5}`, `${Math.max(1, c - 5)}`];
+      } else if (typeVar === 4) {
+        // Algebraic Identity Square: (a + b)² - (a - b)² = 4ab
+        const a = Math.floor(Math.random() * 80) + 20;
+        const b = Math.floor(Math.random() * 50) + 10;
+        const ans = 4 * a * b;
+        qText = `बीजगणितीय सूत्र [(A + B)² - (A - B)²] का प्रयोग कर हल करें: (${a} + ${b})² - (${a} - ${b})² = ?`;
+        qTextEn = `Evaluate using [(A + B)² - (A - B)² = 4AB]: (${a} + ${b})² - (${a} - ${b})² = ?`;
+        ansStr = `${ans}`;
+        explanation = `सूत्र: (A + B)² - (A - B)² = 4 × A × B\n= 4 × ${a} × ${b} = ${ans}।`;
+        explanationEn = `Formula: (A + B)² - (A - B)² = 4 * A * B = 4 * ${a} * ${b} = ${ans}.`;
+        shortcut = `4 × ${a} × ${b} = ${ans}`;
+        distractors = [`${2 * a * b}`, `${ans + 100}`, `${Math.max(1, ans - 100)}`, `${ans + 200}`];
+      } else {
+        // Non-perfect square root approximation
+        const nearBase = Math.floor(Math.random() * 12) + 6; // 6 to 17
+        const approxNum = nearBase * nearBase + 2; // e.g. 51
+        ansStr = `लगभग ${nearBase}`;
+        qText = `√${approxNum} का निकटतम मान (Approximate Value) क्या होगा?`;
+        qTextEn = `What is the approximate value of √${approxNum}?`;
+        explanation = `क्योंकि (${nearBase})² = ${nearBase * nearBase}, अतः √${approxNum} का मान लगभग ${nearBase} के बराबर होगा।`;
+        explanationEn = `Since (${nearBase})² = ${nearBase * nearBase}, √${approxNum} ≈ ${nearBase}.`;
+        shortcut = `निकटतम पूर्ण वर्ग विधि से उत्तर = लगभग ${nearBase}`;
+        distractors = [`लगभग ${nearBase + 2}`, `लगभग ${Math.max(1, nearBase - 2)}`, `लगभग ${nearBase + 3}`, `लगभग ${Math.max(1, nearBase - 3)}`];
       }
     }
-    // 10. घन व घनमूल (Cubes & Roots)
+    // 11. घन व घनमूल (Cubes & Roots)
     else if (chosenTopic.includes('घन व घनमूल') || chosenTopic.includes('घन')) {
-      const isCubeRoot = Math.random() > 0.5;
-      const num = Math.floor(Math.random() * 12) + 5; // 5 to 16
-      const cube = num * num * num;
-
-      if (isCubeRoot) {
+      const typeVar = Math.floor(Math.random() * 4);
+      if (typeVar === 0) {
+        // Perfect Cube Root
+        const num = Math.floor(Math.random() * 35) + 5; // 5 to 40
+        const cube = num * num * num;
         qText = `∛${cube} (घनमूल) का मान क्या होगा?`;
-        qTextEn = `What is the cube root of ∛${cube}?`;
+        qTextEn = `What is the cube root ∛${cube}?`;
         ansStr = `${num}`;
-        explanation = `क्योंकि ${num}³ = ${num} × ${num} × ${num} = ${cube}, अतः ∛${cube} = ${num}।`;
-        explanationEn = `Since ${num}³ = ${cube}, cube root of ${cube} is ${num}.`;
-        shortcut = `इकाई अंक मिलान विधि से 2 सेकंड में उत्तर = ${num}`;
-        distractors = [`${num + 1}`, `${num - 1}`, `${num + 2}`, `${num - 2}`];
-      } else {
+        explanation = `क्योंकि (${num})³ = ${num} × ${num} × ${num} = ${cube}, अतः ∛${cube} = ${num}।`;
+        explanationEn = `Since (${num})³ = ${cube}, ∛${cube} = ${num}.`;
+        shortcut = `इकाई अंक मिलान वैदिक तकनीक = ${num}`;
+        distractors = [`${num + 1}`, `${Math.max(1, num - 1)}`, `${num + 2}`, `${Math.max(1, num - 2)}`];
+      } else if (typeVar === 1) {
+        // Direct Cube
+        const num = Math.floor(Math.random() * 20) + 5;
+        const cube = num * num * num;
         qText = `(${num})³ का सटीक मान क्या होगा?`;
         qTextEn = `What is the exact value of (${num})³?`;
         ansStr = `${cube}`;
         explanation = `(${num})³ = ${num} × ${num} × ${num} = ${cube}।`;
         explanationEn = `(${num})³ = ${num} * ${num} * ${num} = ${cube}.`;
         shortcut = `${num} का घन = ${cube}`;
-        distractors = [`${cube + 50}`, `${cube - 50}`, `${(num + 1) * (num + 1) * (num + 1)}`, `${(num - 1) * (num - 1) * (num - 1)}`];
-      }
-    }
-    // 11. औसत (Average)
-    else if (chosenTopic.includes('औसत')) {
-      const start = Math.floor(Math.random() * 30) + 12;
-      const diff = Math.floor(Math.random() * 4) + 2;
-      const nums = [start, start + diff, start + 2 * diff, start + 3 * diff, start + 4 * diff];
-      const sum = nums.reduce((acc, curr) => acc + curr, 0);
-      const avg = nums[2];
-
-      qText = `संख्याओं ${nums.join(', ')} का औसत (Average) क्या होगा?`;
-      qTextEn = `What is the average of numbers ${nums.join(', ')}?`;
-      ansStr = `${avg}`;
-      explanation = `औसत = कुल योग ÷ कुल संख्याएँ = (${nums.join(' + ')}) ÷ 5 = ${sum} ÷ 5 = ${avg}।`;
-      explanationEn = `Average = Sum / Count = ${sum} / 5 = ${avg}.`;
-      shortcut = `समानांतर श्रेणी (AP) में औसत सदैव मध्य पद होता है = ${avg}`;
-      distractors = [`${avg + diff}`, `${avg - diff}`, `${avg + 1}`, `${avg - 1}`];
-    }
-    // 12. अनुपात व समानुपात (Ratio & Proportion)
-    else if (chosenTopic.includes('अनुपात व समानुपात')) {
-      const r1 = Math.floor(Math.random() * 3) + 2;
-      const r2 = Math.floor(Math.random() * 3) + 3;
-      const unitVal = (Math.floor(Math.random() * 15) + 5) * 50;
-      const totalAmount = (r1 + r2) * unitVal;
-      const ansA = r1 * unitVal;
-
-      qText = `₹${totalAmount} की राशि को A और B में ${r1} : ${r2} के अनुपात में बांटा जाता है। A का हिस्सा कितना होगा?`;
-      qTextEn = `₹${totalAmount} is divided between A and B in ratio ${r1} : ${r2}. What is A's share?`;
-      ansStr = `₹${ansA}`;
-      explanation = `अनुपातों का योग = ${r1} + ${r2} = ${r1 + r2} यूनिट।\n1 यूनिट = ₹${totalAmount} ÷ ${r1 + r2} = ₹${unitVal}।\nA का हिस्सा = ${r1} × ${unitVal} = ₹${ansA}।`;
-      explanationEn = `Total ratio = ${r1 + r2}. 1 unit = ₹${unitVal}. A's share = ₹${ansA}.`;
-      shortcut = `A का हिस्सा = [${r1} ÷ (${r1} + ${r2})] × ₹${totalAmount} = ₹${ansA}`;
-      distractors = [`₹${r2 * unitVal}`, `₹${ansA + 100}`, `₹${Math.max(50, ansA - 100)}`, `₹${ansA + 200}`];
-    }
-    // 13. साधारण ब्याज (Simple Interest)
-    else if (chosenTopic.includes('साधारण ब्याज')) {
-      const principals = [1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000];
-      const p = principals[Math.floor(Math.random() * principals.length)];
-      const rates = [4, 5, 6, 8, 10];
-      const r = rates[Math.floor(Math.random() * rates.length)];
-      const times = [2, 3, 4, 5];
-      const t = times[Math.floor(Math.random() * times.length)];
-      const si = Math.round((p * r * t) / 100);
-
-      qText = `₹${p} पर ${r}% वार्षिक दर से ${t} वर्ष का साधारण ब्याज (SI) क्या होगा?`;
-      qTextEn = `What is the Simple Interest on ₹${p} at ${r}% per annum for ${t} years?`;
-      ansStr = `₹${si}`;
-      explanation = `साधारण ब्याज = (मूलधन × दर × समय) ÷ 100 = (${p} × ${r} × ${t}) ÷ 100 = ₹${si}।`;
-      explanationEn = `SI = (P * R * T) / 100 = (${p} * ${r} * ${t}) / 100 = ₹${si}.`;
-      shortcut = `सूत्र: SI = (P × R × T) ÷ 100 = ₹${si}`;
-      distractors = [`₹${si + 100}`, `₹${Math.max(50, si - 100)}`, `₹${si + 50}`, `₹${Math.max(20, si - 50)}`];
-    }
-    // 14. लाभ व हानि (Profit & Loss)
-    else if (chosenTopic.includes('लाभ व हानि')) {
-      const cps = [200, 300, 400, 500, 600, 800, 1000, 1200, 1500];
-      const cp = cps[Math.floor(Math.random() * cps.length)];
-      const rates = [10, 15, 20, 25, 30];
-      const rate = rates[Math.floor(Math.random() * rates.length)];
-      const isProfit = Math.random() > 0.45;
-
-      if (isProfit) {
-        const profit = Math.round((cp * rate) / 100);
-        const sp = cp + profit;
-        qText = `एक वस्तु का क्रय मूल्य ₹${cp} है। यदि इसे ${rate}% लाभ पर बेचा जाए, तो विक्रय मूल्य क्या होगा?`;
-        qTextEn = `Cost price is ₹${cp}. If sold at ${rate}% profit, what is the selling price?`;
-        ansStr = `₹${sp}`;
-        explanation = `लाभ = (${cp} × ${rate}) ÷ 100 = ₹${profit}। विक्रय मूल्य = ${cp} + ${profit} = ₹${sp}।`;
-        explanationEn = `Profit = ₹${profit}. SP = CP + Profit = ₹${sp}.`;
-        shortcut = `सूत्र: SP = CP × [(100 + ${rate}) ÷ 100] = ₹${sp}`;
-        distractors = [`₹${sp + 50}`, `₹${sp - 50}`, `₹${cp + profit * 2}`, `₹${sp + 20}`];
+        distractors = [`${cube + 50}`, `${Math.max(1, cube - 50)}`, `${(num + 1) * (num + 1) * (num + 1)}`, `${Math.max(1, (num - 1) * (num - 1) * (num - 1))}`];
+      } else if (typeVar === 2) {
+        // Cube Root Equation: ∛X x A = B
+        const xVal = Math.floor(Math.random() * 15) + 4;
+        const cubeX = xVal * xVal * xVal;
+        const a = Math.floor(Math.random() * 8) + 2;
+        const b = xVal * a;
+        qText = `समीकरण में 'X' का मान ज्ञात कीजिए: ∛X × ${a} = ${b}`;
+        qTextEn = `Solve for 'X' in equation: ∛X × ${a} = ${b}`;
+        ansStr = `${cubeX}`;
+        explanation = `1. ∛X = ${b} ÷ ${a} = ${xVal}\n2. दोनों तरफ घन करने पर: X = (${xVal})³ = ${cubeX}।`;
+        explanationEn = `∛X = ${b} / ${a} = ${xVal}. Cubing both sides: X = (${xVal})³ = ${cubeX}.`;
+        shortcut = `X = (${b} ÷ ${a})³ = (${xVal})³ = ${cubeX}`;
+        distractors = [`${cubeX + 50}`, `${Math.max(1, cubeX - 50)}`, `${(xVal + 1) * (xVal + 1) * (xVal + 1)}`, `${Math.max(1, (xVal - 1) * (xVal - 1) * (xVal - 1))}`];
       } else {
-        const loss = Math.round((cp * rate) / 100);
-        const sp = cp - loss;
-        qText = `एक वस्तु ₹${cp} में खरीदी गई। यदि इसे ${rate}% हानि पर बेचा जाए, तो विक्रय मूल्य क्या होगा?`;
-        qTextEn = `An item is bought for ₹${cp}. If sold at ${rate}% loss, what is the selling price?`;
-        ansStr = `₹${sp}`;
-        explanation = `हानि = (${cp} × ${rate}) ÷ 100 = ₹${loss}। विक्रय मूल्य = ${cp} - ${loss} = ₹${sp}।`;
-        explanationEn = `Loss = ₹${loss}. SP = CP - Loss = ₹${sp}.`;
-        shortcut = `सूत्र: SP = CP × [(100 - ${rate}) ÷ 100] = ₹${sp}`;
-        distractors = [`₹${sp + 40}`, `₹${sp - 40}`, `₹${sp + 60}`, `₹${sp - 20}`];
+        // Difference of Cubes: A³ - B³
+        const a = Math.floor(Math.random() * 10) + 5;
+        const b = a - 1;
+        const ans = a * a * a - b * b * b;
+        qText = `घन अंतर ज्ञात कीजिए: (${a})³ - (${b})³ = ?`;
+        qTextEn = `Difference of cubes: (${a})³ - (${b})³ = ?`;
+        ansStr = `${ans}`;
+        explanation = `(${a})³ = ${a * a * a}, (${b})³ = ${b * b * b}।\nअंतर = ${a * a * a} - ${b * b * b} = ${ans}।`;
+        explanationEn = `(${a})³ - (${b})³ = ${a * a * a} - ${b * b * b} = ${ans}.`;
+        shortcut = `क्रमागत घनों का अंतर: 1 + 3×${a}×${b} = ${ans}`;
+        distractors = [`${ans + 10}`, `${Math.max(1, ans - 10)}`, `${ans + 20}`, `${Math.max(1, ans - 20)}`];
       }
     }
-    // 15. समय व कार्य (Time & Work)
+    // 12. औसत (Average)
+    else if (chosenTopic.includes('औसत')) {
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // AP Consecutive Average
+        const start = Math.floor(Math.random() * 40) + 10;
+        const diff = Math.floor(Math.random() * 5) + 2;
+        const nums = [start, start + diff, start + 2 * diff, start + 3 * diff, start + 4 * diff];
+        const avg = nums[2];
+        qText = `समानांतर श्रेणी की संख्याओं (${nums.join(', ')}) का औसत (Average) क्या होगा?`;
+        qTextEn = `What is the average of numbers (${nums.join(', ')})?`;
+        ansStr = `${avg}`;
+        explanation = `समानांतर श्रेणी (AP) में औसत सदैव मध्य पद होता है।\nमध्य पद = ${avg}।`;
+        explanationEn = `In AP series, average is always the middle term = ${avg}.`;
+        shortcut = `AP का मध्य पद ही औसत होता है = ${avg}`;
+        distractors = [`${avg + diff}`, `${avg - diff}`, `${avg + 1}`, `${Math.max(1, avg - 1)}`];
+      } else if (typeVar === 1) {
+        // Average of first N natural, even, or odd numbers
+        const isOdd = Math.random() > 0.5;
+        const n = Math.floor(Math.random() * 50) + 20;
+        if (isOdd) {
+          ansStr = `${n}`;
+          qText = `प्रथम ${n} विषम (Odd) प्राकृत संख्याओं का औसत क्या होगा?`;
+          qTextEn = `What is the average of first ${n} odd numbers?`;
+          explanation = `प्रथम N विषम संख्याओं का औसत सूत्र = N\nअतः प्रथम ${n} विषम संख्याओं का औसत = ${n}।`;
+          explanationEn = `Average of first N odd numbers = N = ${n}.`;
+          shortcut = `प्रथम N विषम संख्याओं का औसत = N = ${n}`;
+          distractors = [`${n + 1}`, `${Math.max(1, n - 1)}`, `${n + 2}`, `${Math.max(1, n - 2)}`];
+        } else {
+          const ans = n + 1;
+          qText = `प्रथम ${n} सम (Even) प्राकृत संख्याओं का औसत क्या होगा?`;
+          qTextEn = `What is the average of first ${n} even numbers?`;
+          ansStr = `${ans}`;
+          explanation = `प्रथम N सम संख्याओं का औसत सूत्र = (N + 1)\nअतः ${n} + 1 = ${ans}।`;
+          explanationEn = `Average of first N even numbers = N + 1 = ${n + 1} = ${ans}.`;
+          shortcut = `सूत्र: N + 1 = ${n} + 1 = ${ans}`;
+          distractors = [`${n}`, `${ans + 2}`, `${Math.max(1, ans - 2)}`, `${ans + 5}`];
+        }
+      } else if (typeVar === 2) {
+        // Inclusion of member in average
+        const count = 5;
+        const oldAvg = Math.floor(Math.random() * 30) + 20;
+        const newMember = Math.floor(Math.random() * 40) + 40;
+        const newAvg = Math.round(((count * oldAvg + newMember) / (count + 1)) * 10) / 10;
+        qText = `${count} विद्यार्थियों का औसत वजन ${oldAvg} किग्रा है। यदि शिक्षक का वजन ${newMember} किग्रा जोड़ दिया जाए, तो नया औसत क्या होगा?`;
+        qTextEn = `Average weight of ${count} students is ${oldAvg} kg. If teacher weighing ${newMember} kg is added, new average?`;
+        ansStr = `${newAvg} किग्रा`;
+        explanation = `कुल वजन = (${count} × ${oldAvg}) + ${newMember} = ${count * oldAvg + newMember} किग्रा।\nनया औसत = ${count * oldAvg + newMember} ÷ ${count + 1} = ${newAvg} किग्रा।`;
+        explanationEn = `Total weight = (${count} * ${oldAvg}) + ${newMember}. New average = ${newAvg} kg.`;
+        shortcut = `कुल योग ÷ (N + 1) = ${newAvg} किग्रा`;
+        distractors = [`${Math.round((newAvg + 2) * 10) / 10} किग्रा`, `${Math.round(Math.max(1, newAvg - 2) * 10) / 10} किग्रा`, `${Math.round((newAvg + 4) * 10) / 10} किग्रा`, `${Math.round(Math.max(1, newAvg - 4) * 10) / 10} किग्रा`];
+      } else if (typeVar === 3) {
+        // Weighted average
+        const n1 = 10;
+        const a1 = Math.floor(Math.random() * 20) + 40;
+        const n2 = 15;
+        const a2 = Math.floor(Math.random() * 20) + 60;
+        const ans = Math.round((n1 * a1 + n2 * a2) / (n1 + n2));
+        qText = `${n1} वस्तुओं का औसत मूल्य ₹${a1} है तथा ${n2} अन्य वस्तुओं का औसत मूल्य ₹${a2} है। सभी वस्तुओं का संयुक्त औसत मूल्य क्या होगा?`;
+        qTextEn = `${n1} items have average cost ₹${a1} and ${n2} items have average cost ₹${a2}. Combined average cost?`;
+        ansStr = `₹${ans}`;
+        explanation = `संयुक्त औसत = [(${n1} × ${a1}) + (${n2} × ${a2})] ÷ (${n1} + ${n2}) = [${n1 * a1} + ${n2 * a2}] ÷ ${n1 + n2} = ₹${ans}।`;
+        explanationEn = `Combined average = [(${n1} * ${a1}) + (${n2} * ${a2})] / (${n1} + ${n2}) = ₹${ans}.`;
+        shortcut = `कुल योग ÷ कुल संख्या = ₹${ans}`;
+        distractors = [`₹${ans + 5}`, `₹${Math.max(1, ans - 5)}`, `₹${ans + 10}`, `₹${Math.max(1, ans - 10)}`];
+      } else {
+        // Average Speed formula: 2*S1*S2 / (S1 + S2)
+        const s1 = 40;
+        const s2 = 60;
+        const ans = Math.round((2 * s1 * s2) / (s1 + s2));
+        qText = `एक कार A से B तक ${s1} किमी/घंटा की गति से जाती है तथा ${s2} किमी/घंटा की गति से वापस लौटती है। पूरी यात्रा में औसत चाल (Average Speed) क्या होगी?`;
+        qTextEn = `A car travels A to B at ${s1} km/h and returns at ${s2} km/h. What is average speed?`;
+        ansStr = `${ans} किमी/घंटा`;
+        explanation = `औसत चाल सूत्र (समान दूरी): (2 × S1 × S2) ÷ (S1 + S2)\n= (2 × ${s1} × ${s2}) ÷ (${s1} + ${s2}) = ${2 * s1 * s2} ÷ ${s1 + s2} = ${ans} किमी/घंटा।`;
+        explanationEn = `Average speed formula = (2 * S1 * S2) / (S1 + S2) = ${ans} km/h.`;
+        shortcut = `सूत्र: (2 × ${s1} × ${s2}) ÷ (${s1} + ${s2}) = ${ans} किमी/घंटा`;
+        distractors = [`${(s1 + s2) / 2} किमी/घंटा`, `${ans + 5} किमी/घंटा`, `${Math.max(1, ans - 5)} किमी/घंटा`, `${ans + 10} किमी/घंटा`];
+      }
+    }
+    // 13. अनुपात व समानुपात (Ratio & Proportion)
+    else if (chosenTopic.includes('अनुपात व समानुपात')) {
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // Share Division A : B
+        const r1 = Math.floor(Math.random() * 3) + 2;
+        const r2 = Math.floor(Math.random() * 3) + 3;
+        const unitVal = (Math.floor(Math.random() * 15) + 5) * 50;
+        const totalAmount = (r1 + r2) * unitVal;
+        const ansA = r1 * unitVal;
+        qText = `₹${totalAmount} की राशि को A और B में ${r1} : ${r2} के अनुपात में विभाजित किया गया। A का हिस्सा कितना होगा?`;
+        qTextEn = `Divide ₹${totalAmount} between A and B in ratio ${r1} : ${r2}. What is A's share?`;
+        ansStr = `₹${ansA}`;
+        explanation = `1 यूनिट = ₹${totalAmount} ÷ (${r1} + ${r2}) = ₹${unitVal}।\nA का हिस्सा = ${r1} × ₹${unitVal} = ₹${ansA}।`;
+        explanationEn = `1 unit = ₹${unitVal}. A's share = ${r1} * ₹${unitVal} = ₹${ansA}.`;
+        shortcut = `[${r1} ÷ (${r1} + ${r2})] × ₹${totalAmount} = ₹${ansA}`;
+        distractors = [`₹${r2 * unitVal}`, `₹${ansA + 100}`, `₹${Math.max(50, ansA - 100)}`, `₹${ansA + 200}`];
+      } else if (typeVar === 1) {
+        // Mean Proportional (√ab) or Third Proportional (b²/a)
+        const isMean = Math.random() > 0.5;
+        if (isMean) {
+          const a = [4, 9, 16, 25, 36][Math.floor(Math.random() * 5)];
+          const b = [9, 16, 25, 36, 49][Math.floor(Math.random() * 5)];
+          const ans = Math.round(Math.sqrt(a * b));
+          qText = `${a} और ${b} का मध्यानुपाती (Mean Proportional) क्या होगा?`;
+          qTextEn = `What is the Mean Proportional of ${a} and ${b}?`;
+          ansStr = `${ans}`;
+          explanation = `मध्यानुपाती सूत्र = √(A × B)\n= √(${a} × ${b}) = √${a * b} = ${ans}।`;
+          explanationEn = `Mean Proportional = √(A * B) = √(${a} * ${b}) = ${ans}.`;
+          shortcut = `सूत्र: √(A × B) = ${ans}`;
+          distractors = [`${ans + 2}`, `${Math.max(1, ans - 2)}`, `${ans + 4}`, `${Math.max(1, ans - 4)}`];
+        } else {
+          // Third Proportional: b²/a
+          const a = 12;
+          const b = 18;
+          const ans = (b * b) / a;
+          qText = `${a} तथा ${b} का तृतीयानुपाती (Third Proportional) क्या होगा?`;
+          qTextEn = `What is the Third Proportional of ${a} and ${b}?`;
+          ansStr = `${ans}`;
+          explanation = `तृतीयानुपाती सूत्र = B² ÷ A\n= (${b})² ÷ ${a} = ${b * b} ÷ ${a} = ${ans}।`;
+          explanationEn = `Third Proportional = B² / A = ${b * b} / ${a} = ${ans}.`;
+          shortcut = `सूत्र: B² ÷ A = ${ans}`;
+          distractors = [`${ans + 3}`, `${Math.max(1, ans - 3)}`, `${ans + 6}`, `${Math.max(1, ans - 6)}`];
+        }
+      } else if (typeVar === 2) {
+        // Combine Ratios: A:B = x:y and B:C = p:q -> A:B:C
+        const x = 2;
+        const y = 3;
+        const p = 4;
+        const q = 5;
+        // A:B = 2:3, B:C = 4:5 -> A:B:C = (2x4) : (3x4) : (3x5) = 8 : 12 : 15
+        ansStr = `8 : 12 : 15`;
+        qText = `यदि A : B = ${x} : ${y} तथा B : C = ${p} : ${q} है, तो संयुक्त अनुपात A : B : C का मान क्या होगा?`;
+        qTextEn = `If A : B = ${x} : ${y} and B : C = ${p} : ${q}, find A : B : C?`;
+        explanation = `B का मान समान बनाएं:\nA : B = (${x} × ${p}) : (${y} × ${p}) = 8 : 12\nB : C = (${p} × ${y}) : (${q} × ${y}) = 12 : 15\nसंयुक्त अनुपात = 8 : 12 : 15।`;
+        explanationEn = `Combine ratios by equating B: A : B : C = 8 : 12 : 15.`;
+        shortcut = `(x×p) : (y×p) : (y×q) = 8 : 12 : 15`;
+        distractors = [`2 : 3 : 5`, `8 : 10 : 15`, `6 : 12 : 15`, `8 : 12 : 20`];
+      } else if (typeVar === 3) {
+        // Duplicate Ratio
+        const a = Math.floor(Math.random() * 5) + 2;
+        const b = Math.floor(Math.random() * 5) + 6;
+        ansStr = `${a * a} : ${b * b}`;
+        qText = `अनुपात ${a} : ${b} का वर्गानुपात (Duplicate Ratio) क्या होगा?`;
+        qTextEn = `What is the Duplicate Ratio of ${a} : ${b}?`;
+        explanation = `वर्गानुपात का सूत्र = (A)² : (B)²\n= (${a})² : (${b})² = ${a * a} : ${b * b}।`;
+        explanationEn = `Duplicate ratio formula = A² : B² = ${a * a} : ${b * b}.`;
+        shortcut = `${a}² : ${b}² = ${a * a} : ${b * b}`;
+        distractors = [`${a * 2} : ${b * 2}`, `${a * a + 1} : ${b * b}`, `${a * a} : ${b * b + 2}`, `${a * 3} : ${b * 3}`];
+      } else {
+        // Direct Fourth Proportional: (b x c) / a
+        const a = 6;
+        const b = 14;
+        const c = 15;
+        const ans = (b * c) / a;
+        qText = `${a}, ${b} तथा ${c} का चतुर्थानुपाती (Fourth Proportional) क्या होगा?`;
+        qTextEn = `What is the Fourth Proportional of ${a}, ${b} and ${c}?`;
+        ansStr = `${ans}`;
+        explanation = `चतुर्थानुपाती सूत्र = (B × C) ÷ A\n= (${b} × ${c}) ÷ ${a} = ${b * c} ÷ ${a} = ${ans}।`;
+        explanationEn = `Fourth Proportional = (B * C) / A = ${b * c} / ${a} = ${ans}.`;
+        shortcut = `सूत्र: (B × C) ÷ A = ${ans}`;
+        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+      }
+    }
+    // 14. साधारण ब्याज (Simple Interest)
+    else if (chosenTopic.includes('साधारण ब्याज')) {
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // Direct SI = P*R*T / 100
+        const principals = [2000, 3000, 4000, 5000, 6000, 8000, 10000];
+        const p = principals[Math.floor(Math.random() * principals.length)];
+        const r = [5, 6, 8, 10, 12][Math.floor(Math.random() * 5)];
+        const t = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+        const si = Math.round((p * r * t) / 100);
+        qText = `₹${p} की राशि पर ${r}% वार्षिक साधारण ब्याज दर से ${t} वर्ष का ब्याज (SI) कितना होगा?`;
+        qTextEn = `Calculate Simple Interest on ₹${p} at ${r}% per annum for ${t} years?`;
+        ansStr = `₹${si}`;
+        explanation = `साधारण ब्याज (SI) = (P × R × T) ÷ 100\n= (${p} × ${r} × ${t}) ÷ 100 = ₹${si}।`;
+        explanationEn = `SI = (P * R * T) / 100 = ₹${si}.`;
+        shortcut = `सूत्र: (P × R × T) ÷ 100 = ₹${si}`;
+        distractors = [`₹${si + 100}`, `₹${Math.max(50, si - 100)}`, `₹${si + 200}`, `₹${Math.max(50, si - 200)}`];
+      } else if (typeVar === 1) {
+        // Find Principal P
+        const r = 10;
+        const t = 3;
+        const si = (Math.floor(Math.random() * 15) + 5) * 100;
+        const p = (si * 100) / (r * t);
+        qText = `वह मूलधन (Principal) ज्ञात कीजिए जिस पर ${r}% वार्षिक दर से ${t} वर्षों में ₹${si} का साधारण ब्याज प्राप्त होता है?`;
+        qTextEn = `Find principal that earns ₹${si} simple interest at ${r}% in ${t} years?`;
+        ansStr = `₹${p}`;
+        explanation = `मूलधन सूत्र P = (SI × 100) ÷ (R × T)\n= (${si} × 100) ÷ (${r} × ${t}) = ₹${p}।`;
+        explanationEn = `P = (SI * 100) / (R * T) = ₹${p}.`;
+        shortcut = `P = (${si} × 100) ÷ ${r * t} = ₹${p}`;
+        distractors = [`₹${p + 500}`, `₹${Math.max(500, p - 500)}`, `₹${p + 1000}`, `₹${Math.max(500, p - 1000)}`];
+      } else if (typeVar === 2) {
+        // Money doubling rule: T = 100 / R
+        const r = [5, 8, 10, 12.5, 20][Math.floor(Math.random() * 5)];
+        const ansT = Math.round((100 / r) * 10) / 10;
+        qText = `कितने वर्षों में कोई राशि ${r}% वार्षिक साधारण ब्याज की दर से स्वयं की दोगुनी (Double) हो जाएगी?`;
+        qTextEn = `In how many years will a sum double itself at ${r}% simple interest per annum?`;
+        ansStr = `${ansT} वर्ष`;
+        explanation = `राशि दोगुनी होने का शॉर्टकट सूत्र: समय (T) = 100 ÷ R\n= 100 ÷ ${r} = ${ansT} वर्ष।`;
+        explanationEn = `Doubling formula: Time = 100 / R = ${ansT} years.`;
+        shortcut = `शॉर्टकट सूत्र: T = 100 ÷ R = ${ansT} वर्ष`;
+        distractors = [`${ansT + 2} वर्ष`, `${Math.max(1, ansT - 2)} वर्ष`, `${ansT + 5} वर्ष`, `${Math.max(1, ansT - 5)} वर्ष`];
+      } else if (typeVar === 3) {
+        // Total Amount A = P + SI
+        const p = 5000;
+        const r = 8;
+        const t = 3;
+        const si = (p * r * t) / 100;
+        const a = p + si;
+        qText = `₹${p} का ${r}% वार्षिक ब्याज दर से ${t} वर्ष पश्चात मिश्रधन (Total Amount) कितना होगा?`;
+        qTextEn = `What is total amount on ₹${p} at ${r}% for ${t} years?`;
+        ansStr = `₹${a}`;
+        explanation = `ब्याज = (${p} × ${r} × ${t}) ÷ 100 = ₹${si}।\nमिश्रधन A = P + SI = ${p} + ${si} = ₹${a}।`;
+        explanationEn = `SI = ₹${si}. Amount = P + SI = ₹${a}.`;
+        shortcut = `मिश्रधन = ${p} + ${si} = ₹${a}`;
+        distractors = [`₹${si}`, `₹${a + 200}`, `₹${Math.max(500, a - 200)}`, `₹${a + 500}`];
+      } else {
+        // Difference in SI
+        const p = 8000;
+        const t = 2;
+        const r1 = 6;
+        const r2 = 9;
+        const diffRate = r2 - r1;
+        const diffSI = (p * diffRate * t) / 100;
+        qText = `₹${p} पर 2 वर्ष के लिए साधारण ब्याज दर ${r1}% से बढ़ाकर ${r2}% कर दी जाती है। ब्याज में कितने रुपयों की वृद्धि (Increase) होगी?`;
+        qTextEn = `On ₹${p} for 2 years, rate increases from ${r1}% to ${r2}%. Find increase in SI?`;
+        ansStr = `₹${diffSI}`;
+        explanation = `दरों का अंतर = ${r2}% - ${r1}% = ${diffRate}%।\nब्याज वृद्धि = (P × दर अंतर × T) ÷ 100 = (${p} × ${diffRate} × ${t}) ÷ 100 = ₹${diffSI}।`;
+        explanationEn = `Rate diff = ${diffRate}%. SI diff = (${p} * ${diffRate} * ${t}) / 100 = ₹${diffSI}.`;
+        shortcut = `(${p} × ${diffRate} × ${t}) ÷ 100 = ₹${diffSI}`;
+        distractors = [`₹${diffSI + 80}`, `₹${Math.max(20, diffSI - 80)}`, `₹${diffSI + 160}`, `₹${Math.max(20, diffSI - 160)}`];
+      }
+    }
+    // 15. लाभ व हानि (Profit & Loss)
+    else if (chosenTopic.includes('लाभ व हानि')) {
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // SP = CP * (1 + Profit%/100)
+        const cp = (Math.floor(Math.random() * 15) + 5) * 100; // e.g. 1200
+        const profitP = [10, 15, 20, 25, 30][Math.floor(Math.random() * 5)];
+        const profit = (cp * profitP) / 100;
+        const sp = cp + profit;
+        qText = `एक वस्तु का क्रय मूल्य (CP) ₹${cp} है। इसे ${profitP}% लाभ पर बेचने पर विक्रय मूल्य (SP) क्या होगा?`;
+        qTextEn = `Cost price is ₹${cp}. Selling price at ${profitP}% profit?`;
+        ansStr = `₹${sp}`;
+        explanation = `लाभ = (${cp} × ${profitP}) ÷ 100 = ₹${profit}।\nविक्रय मूल्य (SP) = ${cp} + ${profit} = ₹${sp}।`;
+        explanationEn = `Profit = ₹${profit}. SP = CP + Profit = ₹${sp}.`;
+        shortcut = `SP = ${cp} × (${100 + profitP} ÷ 100) = ₹${sp}`;
+        distractors = [`₹${sp + 50}`, `₹${Math.max(50, sp - 50)}`, `₹${sp + 100}`, `₹${Math.max(50, sp - 100)}`];
+      } else if (typeVar === 1) {
+        // Finding CP when SP & Loss % given
+        const lossP = 20;
+        const cp = (Math.floor(Math.random() * 10) + 4) * 100;
+        const sp = cp * (1 - lossP / 100);
+        qText = `एक वस्तु को ₹${sp} में बेचने पर ${lossP}% की हानि होती है। वस्तु का क्रय मूल्य (CP) क्या था?`;
+        qTextEn = `Item sold for ₹${sp} at ${lossP}% loss. Find cost price (CP)?`;
+        ansStr = `₹${cp}`;
+        explanation = `क्रय मूल्य सूत्र CP = (SP × 100) ÷ (100 - Loss%)\n= (${sp} × 100) ÷ 80 = ₹${cp}।`;
+        explanationEn = `CP = (SP * 100) / (100 - Loss%) = (${sp} * 100) / 80 = ₹${cp}.`;
+        shortcut = `CP = (${sp} × 100) ÷ 80 = ₹${cp}`;
+        distractors = [`₹${cp + 100}`, `₹${Math.max(100, cp - 100)}`, `₹${cp + 200}`, `₹${Math.max(100, cp - 200)}`];
+      } else if (typeVar === 2) {
+        // Discount & Marked Price
+        const mp = 2000;
+        const discP = 15;
+        const disc = (mp * discP) / 100;
+        const sp = mp - disc;
+        qText = `एक वस्तु का अंकित मूल्य (Marked Price) ₹${mp} है। यदि इस पर ${discP}% की छूट (Discount) दी जाए, तो विक्रय मूल्य क्या होगा?`;
+        qTextEn = `Marked Price is ₹${mp}. Selling price after ${discP}% discount?`;
+        ansStr = `₹${sp}`;
+        explanation = `छूट = (${mp} × ${discP}) ÷ 100 = ₹${disc}।\nविक्रय मूल्य = ${mp} - ${disc} = ₹${sp}।`;
+        explanationEn = `Discount = ₹${disc}. SP = MP - Discount = ₹${sp}.`;
+        shortcut = `SP = ${mp} × (${100 - discP} ÷ 100) = ₹${sp}`;
+        distractors = [`₹${sp + 50}`, `₹${Math.max(50, sp - 50)}`, `₹${sp + 100}`, `₹${Math.max(50, sp - 100)}`];
+      } else if (typeVar === 3) {
+        // Article ratio rule: CP of X articles = SP of Y articles
+        const x = 15;
+        const y = 12;
+        // Profit % = (15 - 12) / 12 * 100 = 25%
+        ansStr = `25% लाभ`;
+        qText = `यदि 15 वस्तुओं का क्रय मूल्य 12 वस्तुओं के विक्रय मूल्य के बराबर है, तो प्रतिशत लाभ या हानि ज्ञात कीजिए?`;
+        qTextEn = `If CP of 15 articles = SP of 12 articles, find profit or loss %?`;
+        explanation = `प्रतिशत लाभ सूत्र = [(X - Y) ÷ Y] × 100%\n= [(15 - 12) ÷ 12] × 100% = (3 ÷ 12) × 100% = 25% लाभ।`;
+        explanationEn = `Profit % = [(15 - 12) / 12] * 100% = 25% profit.`;
+        shortcut = `[(15 - 12) ÷ 12] × 100% = 25% लाभ`;
+        distractors = [`20% लाभ`, `25% हानि`, `20% हानि`, `30% लाभ`];
+      } else {
+        // Equal SP shortcut: Two items at same SP, one at P% profit, one at P% loss -> overall loss P²/100 %
+        const p = 10;
+        const lossP = (p * p) / 100;
+        qText = `दो वस्तुओं में से प्रत्येक को ₹1200 में बेचा जाता है। एक पर ${p}% का लाभ तथा दूसरी पर ${p}% की हानि होती है। पूरे सौदे में कुल कितने प्रतिशत लाभ या हानि होगी?`;
+        qTextEn = `Two items sold for ₹1200 each, one at ${p}% profit and one at ${p}% loss. Overall outcome?`;
+        ansStr = `${lossP}% हानि`;
+        explanation = `समान विक्रय मूल्य पर समान लाभ-हानि का सदाबहार सूत्र:\nसदैव हानि% = (P)² ÷ 100 = (${p})² ÷ 100 = ${lossP}% हानि।`;
+        explanationEn = `Always loss = (P)² / 100 = ${lossP}% loss.`;
+        shortcut = `सदैव हानि = (${p})² ÷ 100 = ${lossP}% हानि`;
+        distractors = [`कोई लाभ या हानि नहीं`, `1% लाभ`, `2% हानि`, `0.5% लाभ`];
+      }
+    }
+    // 16. समय व कार्य (Time & Work)
     else if (chosenTopic.includes('समय व कार्य')) {
-      const workPairs: [number, number, number][] = [
-        [10, 15, 6], [12, 24, 8], [20, 30, 12], [15, 30, 10],
-        [12, 60, 10], [10, 40, 8], [6, 12, 4], [20, 20, 10],
-        [8, 24, 6], [15, 60, 12], [9, 18, 6], [16, 48, 12],
-        [30, 60, 20], [40, 60, 24]
-      ];
-      const pair = workPairs[Math.floor(Math.random() * workPairs.length)];
-      const aDays = pair[0];
-      const bDays = pair[1];
-      const totalDays = pair[2];
-
-      qText = `A किसी कार्य को ${aDays} दिन में तथा B उसे ${bDays} दिन में करता है। दोनों मिलकर इसे कितने दिन में करेंगे?`;
-      qTextEn = `A does a work in ${aDays} days and B in ${bDays} days. In how many days will both finish it together?`;
-      ansStr = `${totalDays} दिन`;
-      explanation = `ल.स.प. (LCM) विधि:\nकुल दिन = (A × B) ÷ (A + B) = (${aDays} × ${bDays}) ÷ (${aDays + bDays}) = ${totalDays} दिन।`;
-      explanationEn = `Total days = (A * B) / (A + B) = ${totalDays} days.`;
-      shortcut = `त्वरित सूत्र: (A × B) ÷ (A + B) = ${totalDays} दिन`;
-      distractors = [`${totalDays + 2} दिन`, `${Math.max(1, totalDays - 2)} दिन`, `${totalDays + 4} दिन`, `${Math.max(2, totalDays - 1)} दिन`];
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // A & B together: (A x B) / (A + B)
+        const workPairs: [number, number, number][] = [
+          [10, 15, 6], [12, 24, 8], [20, 30, 12], [15, 30, 10],
+          [12, 60, 10], [10, 40, 8], [6, 12, 4], [20, 20, 10],
+          [8, 24, 6], [15, 60, 12]
+        ];
+        const pair = workPairs[Math.floor(Math.random() * workPairs.length)];
+        const aDays = pair[0];
+        const bDays = pair[1];
+        const ans = pair[2];
+        qText = `A किसी कार्य को ${aDays} दिन में तथा B उसे ${bDays} दिन में पूरा करता है। दोनों मिलकर उस कार्य को कितने दिन में करेंगे?`;
+        qTextEn = `A does a work in ${aDays} days, B in ${bDays} days. In how many days together?`;
+        ansStr = `${ans} दिन`;
+        explanation = `कुल समय = (A × B) ÷ (A + B) = (${aDays} × ${bDays}) ÷ (${aDays + bDays}) = ${ans} दिन।`;
+        explanationEn = `Time together = (A * B) / (A + B) = ${ans} days.`;
+        shortcut = `(A × B) ÷ (A + B) = ${ans} दिन`;
+        distractors = [`${ans + 2} दिन`, `${Math.max(1, ans - 2)} दिन`, `${ans + 4} दिन`, `${Math.max(1, ans - 3)} दिन`];
+      } else if (typeVar === 1) {
+        // Finding B alone when A+B and A given: (T1 x T2) / (T2 - T1)
+        const tTogether = 6;
+        const aAlone = 10;
+        const bAlone = (tTogether * aAlone) / (aAlone - tTogether); // 15
+        qText = `A और B मिलकर एक कार्य को ${tTogether} दिन में समाप्त करते हैं। यदि A अकेला इसे ${aAlone} दिन में करता है, तो B अकेला इसे कितने दिन में करेगा?`;
+        qTextEn = `A and B together finish in ${tTogether} days. A alone takes ${aAlone} days. How many days for B alone?`;
+        ansStr = `${bAlone} दिन`;
+        explanation = `अकेले B का समय = (A+B समय × A समय) ÷ (A समय - A+B समय)\n= (${tTogether} × ${aAlone}) ÷ (${aAlone} - ${tTogether}) = 60 ÷ 4 = ${bAlone} दिन।`;
+        explanationEn = `B alone = (T1 * T2) / (T2 - T1) = ${bAlone} days.`;
+        shortcut = `(6 × 10) ÷ (10 - 6) = ${bAlone} दिन`;
+        distractors = [`${bAlone + 3} दिन`, `${Math.max(1, bAlone - 3)} दिन`, `${bAlone + 5} दिन`, `${Math.max(1, bAlone - 5)} दिन`];
+      } else if (typeVar === 2) {
+        // Efficiency ratio: A is twice as efficient as B
+        const bDays = 30;
+        const aDays = bDays / 2; // 15
+        const together = (aDays * bDays) / (aDays + bDays); // 10
+        qText = `A की कार्यक्षमता B से दोगुनी (Twice) है। यदि B अकेला कार्य को ${bDays} दिन में करता है, तो दोनों मिलकर इसे कितने दिन में पूरा करेंगे?`;
+        qTextEn = `A is twice as efficient as B. If B takes ${bDays} days alone, how many days together?`;
+        ansStr = `${together} दिन`;
+        explanation = `B का समय = ${bDays} दिन -> A का समय = ${aDays} दिन।\nदोनों मिलकर = (${aDays} × ${bDays}) ÷ (${aDays} + ${bDays}) = ${together} दिन।`;
+        explanationEn = `A's time = ${aDays} days. Together = ${together} days.`;
+        shortcut = `${bDays} ÷ 3 = ${together} दिन`;
+        distractors = [`${together + 2} दिन`, `${Math.max(1, together - 2)} दिन`, `${together + 4} दिन`, `${Math.max(1, together - 4)} दिन`];
+      } else if (typeVar === 3) {
+        // Pipes & Cisterns: Inlet and Outlet
+        const inTime = 12;
+        const outTime = 20;
+        const netTime = (inTime * outTime) / (outTime - inTime); // 30
+        qText = `एक नल A टंकी को ${inTime} घंटे में भरता है तथा नल B इसे ${outTime} घंटे में खाली कर देता है। दोनों नल एक साथ खोलने पर टंकी कितने घंटे में भरेगी?`;
+        qTextEn = `Pipe A fills tank in ${inTime} hrs, Pipe B empties in ${outTime} hrs. Time to fill if both open?`;
+        ansStr = `${netTime} घंटे`;
+        explanation = `कुल समय = (A × B) ÷ (B - A) = (${inTime} × ${outTime}) ÷ (${outTime} - ${inTime}) = 240 ÷ 8 = ${netTime} घंटे।`;
+        explanationEn = `Net time = (A * B) / (B - A) = ${netTime} hours.`;
+        shortcut = `(12 × 20) ÷ (20 - 12) = ${netTime} घंटे`;
+        distractors = [`${netTime + 5} घंटे`, `${Math.max(1, netTime - 5)} घंटे`, `${netTime + 10} घंटे`, `${Math.max(1, netTime - 10)} घंटे`];
+      } else {
+        // Three persons A, B, C together
+        const a = 12;
+        const b = 15;
+        const c = 20;
+        // 1/12 + 1/15 + 1/20 = (5 + 4 + 3)/60 = 12/60 = 1/5 -> 5 days
+        const ans = 5;
+        qText = `A, B तथा C किसी कार्य को क्रमशः ${a}, ${b} तथा ${c} दिन में करते हैं। तीनों मिलकर इसे कितने दिन में पूरा करेंगे?`;
+        qTextEn = `A, B and C do work in ${a}, ${b} and ${c} days respectively. Time together?`;
+        ansStr = `${ans} दिन`;
+        explanation = `ल.स.प. (LCM) ऑफ (${a}, ${b}, ${c}) = 60 यूनिट।\nA क्षमता = 5, B क्षमता = 4, C क्षमता = 3। कुल क्षमता = 12।\nसमय = 60 ÷ 12 = ${ans} दिन।`;
+        explanationEn = `LCM = 60. Efficiency sum = 12. Time = 60 / 12 = ${ans} days.`;
+        shortcut = `60 ÷ (5 + 4 + 3) = ${ans} दिन`;
+        distractors = [`${ans + 2} दिन`, `${Math.max(1, ans - 2)} दिन`, `${ans + 3} दिन`, `${Math.max(1, ans - 3)} दिन`];
+      }
     }
-    // 16. समय, चाल व दूरी (Time & Distance)
+    // 17. समय, चाल व दूरी (Time & Distance)
     else if (chosenTopic.includes('समय, चाल व दूरी')) {
-      const speeds = [36, 45, 54, 60, 72, 80, 90, 100];
-      const speed = speeds[Math.floor(Math.random() * speeds.length)];
-      const hours = Math.floor(Math.random() * 5) + 2;
-      const distance = speed * hours;
-
-      qText = `एक रेलगाड़ी ${speed} किमी/घंटा की गति से चल रही है। ${distance} किमी की दूरी तय करने में उसे कितना समय लगेगा?`;
-      qTextEn = `A train moves at speed of ${speed} km/h. How much time will it take to cover ${distance} km?`;
-      ansStr = `${hours} घंटे`;
-      explanation = `समय = दूरी ÷ चाल = ${distance} ÷ ${speed} = ${hours} घंटे।`;
-      explanationEn = `Time = Distance / Speed = ${distance} / ${speed} = ${hours} hours.`;
-      shortcut = `सूत्र: T = D ÷ S = ${distance} ÷ ${speed} = ${hours} घंटे`;
-      distractors = [`${hours + 1} घंटे`, `${Math.max(1, hours - 1)} घंटे`, `${hours + 2} घंटे`, `${hours + 3} घंटे`];
+      const typeVar = Math.floor(Math.random() * 5);
+      if (typeVar === 0) {
+        // Time = Distance / Speed
+        const speed = [36, 45, 54, 60, 72, 80, 90][Math.floor(Math.random() * 7)];
+        const hours = Math.floor(Math.random() * 5) + 2;
+        const distance = speed * hours;
+        qText = `एक रेलगाड़ी ${speed} किमी/घंटा की गति से चल रही है। ${distance} किमी की दूरी तय करने में उसे कितना समय लगेगा?`;
+        qTextEn = `Train moves at ${speed} km/h. How long to cover ${distance} km?`;
+        ansStr = `${hours} घंटे`;
+        explanation = `समय = दूरी ÷ चाल = ${distance} ÷ ${speed} = ${hours} घंटे।`;
+        explanationEn = `Time = Distance / Speed = ${distance} / ${speed} = ${hours} hours.`;
+        shortcut = `${distance} ÷ ${speed} = ${hours} घंटे`;
+        distractors = [`${hours + 1} घंटे`, `${Math.max(1, hours - 1)} घंटे`, `${hours + 2} घंटे`, `${hours + 3} घंटे`];
+      } else if (typeVar === 1) {
+        // Speed Unit Conversion: km/h to m/s
+        const kmh = [36, 54, 72, 90, 108, 126, 144][Math.floor(Math.random() * 7)];
+        const ms = (kmh * 5) / 18;
+        qText = `चाल ${kmh} किमी/घंटा को मीटर/सेकंड (m/s) में बदलें:`;
+        qTextEn = `Convert speed ${kmh} km/h into m/s:`;
+        ansStr = `${ms} m/s`;
+        explanation = `किमी/घंटा से m/s में बदलने के लिए 5/18 से गुणा करें:\n${kmh} × (5 ÷ 18) = ${ms} m/s।`;
+        explanationEn = `Multiply by 5/18: ${kmh} * 5 / 18 = ${ms} m/s.`;
+        shortcut = `${kmh} × 5/18 = ${ms} m/s`;
+        distractors = [`${ms + 5} m/s`, `${Math.max(1, ms - 5)} m/s`, `${ms + 10} m/s`, `${Math.max(1, ms - 10)} m/s`];
+      } else if (typeVar === 2) {
+        // Train crossing a pole: Time = Train length / Speed
+        const speedKmh = 72; // 20 m/s
+        const speedMs = 20;
+        const lengthM = (Math.floor(Math.random() * 10) + 10) * 20; // e.g. 300m
+        const timeSec = lengthM / speedMs;
+        qText = `${lengthM} मीटर लंबी रेलगाड़ी ${speedKmh} किमी/घंटा की गति से एक खंभे (Pole) को कितने सेकंड में पार करेगी?`;
+        qTextEn = `A ${lengthM}m train at ${speedKmh} km/h crosses a pole in how many seconds?`;
+        ansStr = `${timeSec} सेकंड`;
+        explanation = `चाल m/s में = ${speedKmh} × (5/18) = ${speedMs} m/s।\nसमय = लंबाई ÷ चाल = ${lengthM} ÷ ${speedMs} = ${timeSec} सेकंड।`;
+        explanationEn = `Speed in m/s = ${speedMs}. Time = ${lengthM} / ${speedMs} = ${timeSec} sec.`;
+        shortcut = `${lengthM} ÷ 20 = ${timeSec} सेकंड`;
+        distractors = [`${timeSec + 3} सेकंड`, `${Math.max(1, timeSec - 3)} सेकंड`, `${timeSec + 5} सेकंड`, `${Math.max(1, timeSec - 5)} सेकंड`];
+      } else if (typeVar === 3) {
+        // Relative Speed in opposite direction
+        const s1 = 40;
+        const s2 = 50;
+        const relSpeed = s1 + s2; // 90 km/h = 25 m/s
+        const distKm = 180;
+        const timeHours = distKm / relSpeed;
+        qText = `दो स्थान A तथा B 180 किमी दूर हैं। दो कारें विपरीत दिशाओं में क्रमशः 40 किमी/घंटा तथा 50 किमी/घंटा से चलती हैं। वे कितने घंटे बाद मिलेंगी?`;
+        qTextEn = `Two cars 180 km apart move towards each other at 40 km/h and 50 km/h. Meeting time?`;
+        ansStr = `${timeHours} घंटे`;
+        explanation = `विपरीत दिशा में सापेक्ष चाल = S1 + S2 = 40 + 50 = 90 किमी/घंटा।\nसमय = दूरी ÷ सापेक्ष चाल = 180 ÷ 90 = ${timeHours} घंटे।`;
+        explanationEn = `Relative speed = 90 km/h. Time = 180 / 90 = ${timeHours} hours.`;
+        shortcut = `180 ÷ (40 + 50) = ${timeHours} घंटे`;
+        distractors = [`${timeHours + 1} घंटे`, `${Math.max(1, timeHours - 1)} घंटे`, `${timeHours + 2} घंटे`, `${Math.max(1, timeHours - 2)} घंटे`];
+      } else {
+        // Distance = Speed x Time
+        const speed = 65;
+        const time = 4;
+        const dist = speed * time;
+        qText = `एक बस 65 किमी/घंटा की गति से 4 घंटे चलती है। बस द्वारा तय की गई कुल दूरी (Distance) क्या होगी?`;
+        qTextEn = `A bus moves at 65 km/h for 4 hours. Total distance covered?`;
+        ansStr = `${dist} किमी`;
+        explanation = `दूरी = चाल × समय = 65 × 4 = ${dist} किमी।`;
+        explanationEn = `Distance = Speed * Time = 65 * 4 = ${dist} km.`;
+        shortcut = `65 × 4 = ${dist} किमी`;
+        distractors = [`${dist + 20} किमी`, `${dist - 20} किमी`, `${dist + 40} किमी`, `${dist - 40} किमी`];
+      }
     }
-    // 17. सरलीकरण (BODMAS - Fallback default)
+    // 18. सरलीकरण / Default Fallback
     else {
       const a = (Math.floor(Math.random() * 10) + 2) * 6;
       const b = [2, 3, 6][Math.floor(Math.random() * 3)];
       const c = Math.floor(Math.random() * 5) + 3;
       const d = Math.floor(Math.random() * 15) + 5;
-      const div = a / b;
-      const mul = div * c;
-      const res = mul + d;
+      const res = (a / b) * c + d;
 
       qText = `मान ज्ञात कीजिए: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
       qTextEn = `Evaluate: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
       ansStr = `${res}`;
-      explanation = `BODMAS नियम का पालन करें:\n1. भाग: ${a} ÷ ${b} = ${div}\n2. गुणा: ${div} × ${c} = ${mul}\n3. जोड़: ${mul} + ${d} = ${res}।`;
-      explanationEn = `Follow BODMAS: Division first (${a} / ${b} = ${div}), Multiplication (${div} * ${c} = ${mul}), then Addition = ${res}.`;
+      explanation = `BODMAS नियम का पालन करें:\n1. भाग: ${a} ÷ ${b} = ${a / b}\n2. गुणा: ${a / b} × ${c} = ${(a / b) * c}\n3. जोड़: ${(a / b) * c} + ${d} = ${res}।`;
+      explanationEn = `Follow BODMAS: Division first (${a} / ${b} = ${a / b}), Multiplication (${(a / b) * c}), then Addition = ${res}.`;
       shortcut = `चरण: ÷ फिर × फिर + = ${res}`;
       distractors = [`${res + 5}`, `${Math.max(1, res - 5)}`, `${res + 10}`, `${Math.max(2, res - 10)}`];
     }
@@ -1858,24 +2760,54 @@ export default function App() {
 
                       const childCount = Array.isArray(child.children) ? child.children.length : 0;
 
+                      if (isChildFolder) {
+                        return (
+                          <button
+                            key={child.id}
+                            onClick={handleChildClick}
+                            className="col-span-2 sm:col-span-2 md:col-span-3 group relative bg-gradient-to-r from-amber-50 via-amber-50/90 to-amber-100/80 rounded-2xl p-4 shadow-sm border-2 border-amber-300/90 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer flex items-center justify-between text-left overflow-hidden my-1 w-full active:scale-98"
+                          >
+                            <div className="flex items-center space-x-3.5 min-w-0">
+                              <div className="w-11 h-11 rounded-xl bg-amber-200/90 group-hover:bg-amber-300 text-amber-900 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 group-hover:scale-105 transform duration-150">
+                                {childIcon || '📂'}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-extrabold text-amber-950 group-hover:text-amber-900 transition-colors text-base sm:text-lg tracking-tight truncate">
+                                    {childTitle}
+                                  </h3>
+                                  <span className="px-2 py-0.5 bg-amber-200/90 text-amber-900 text-[10px] font-extrabold rounded-md uppercase tracking-wider shrink-0 border border-amber-300/80 shadow-2xs">
+                                    📁 {langHindi ? 'फोल्डर' : 'Folder'}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-amber-800/90 font-medium truncate mt-0.5">
+                                  {childSubtitle || (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items inside`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder'))}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                              <span className="px-2.5 py-1 bg-amber-200/80 text-amber-900 font-bold text-xs rounded-lg border border-amber-300/70 shadow-2xs hidden sm:inline-block">
+                                {childCount} {langHindi ? 'आइटम' : 'items'}
+                              </span>
+                              <ChevronRight className="w-5 h-5 text-amber-700 group-hover:translate-x-0.5 transition-transform" />
+                            </div>
+                          </button>
+                        );
+                      }
+
                       return (
                         <button
                           key={child.id}
                           onClick={handleChildClick}
-                          className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100 hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
+                          className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                         >
                           <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                            {isChildFolder ? (
-                              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-md shadow-2xs">
-                                Folder
-                              </span>
-                            ) : (
-                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
-                            )}
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
                           </div>
 
-                          <div className={`w-12 h-12 rounded-2xl transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2 ${isChildFolder ? 'bg-amber-50 group-hover:bg-amber-100' : 'bg-blue-50 group-hover:bg-blue-100'}`}>
-                            {childIcon || (isChildFolder ? '📁' : '⚡')}
+                          <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
+                            {childIcon || '⚡'}
                           </div>
 
                           <div className="w-full">
@@ -1883,7 +2815,7 @@ export default function App() {
                               {childTitle}
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
-                              {childSubtitle || (isChildFolder ? (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder')) : (childCount > 0 ? (langHindi ? `${childCount} बटन मौजूद` : `${childCount} sub-buttons`) : ''))}
+                              {childSubtitle || (langHindi ? 'पेज खोलें' : 'Open Page')}
                             </p>
                           </div>
                         </button>
@@ -2162,24 +3094,54 @@ export default function App() {
                         // 2. UNIFORM BLOCK GRID CARD (Used for both Folders and regular buttons)
                         const childCount = Array.isArray(btn.children) ? btn.children.length : 0;
 
+                        if (isFolder) {
+                          return (
+                            <button
+                              key={btn.id}
+                              onClick={handleNodeClick}
+                              className="col-span-2 sm:col-span-2 md:col-span-3 group relative bg-gradient-to-r from-amber-50 via-amber-50/90 to-amber-100/80 rounded-2xl p-4 shadow-sm border-2 border-amber-300/90 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer flex items-center justify-between text-left overflow-hidden my-1 w-full active:scale-98"
+                            >
+                              <div className="flex items-center space-x-3.5 min-w-0">
+                                <div className="w-11 h-11 rounded-xl bg-amber-200/90 group-hover:bg-amber-300 text-amber-900 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 group-hover:scale-105 transform duration-150">
+                                  {displayIcon || '📂'}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <h3 className="font-extrabold text-amber-950 group-hover:text-amber-900 transition-colors text-base sm:text-lg tracking-tight truncate">
+                                      {displayTitle}
+                                    </h3>
+                                    <span className="px-2 py-0.5 bg-amber-200/90 text-amber-900 text-[10px] font-extrabold rounded-md uppercase tracking-wider shrink-0 border border-amber-300/80 shadow-2xs">
+                                      📁 {langHindi ? 'फोल्डर' : 'Folder'}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-amber-800/90 font-medium truncate mt-0.5">
+                                    {displaySubtitle || (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items inside`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder'))}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 shrink-0 ml-2">
+                                <span className="px-2.5 py-1 bg-amber-200/80 text-amber-900 font-bold text-xs rounded-lg border border-amber-300/70 shadow-2xs hidden sm:inline-block">
+                                  {childCount} {langHindi ? 'आइटम' : 'items'}
+                                </span>
+                                <ChevronRight className="w-5 h-5 text-amber-700 group-hover:translate-x-0.5 transition-transform" />
+                              </div>
+                            </button>
+                          );
+                        }
+
                         return (
                           <button
                             key={btn.id}
                             onClick={handleNodeClick}
-                            className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100 hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
+                            className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                           >
                             <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                              {isFolder ? (
-                                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-md shadow-2xs">
-                                  Folder
-                                </span>
-                              ) : (
-                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
-                              )}
+                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
                             </div>
 
-                            <div className={`w-12 h-12 rounded-2xl transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2 ${isFolder ? 'bg-amber-50 group-hover:bg-amber-100' : 'bg-blue-50 group-hover:bg-blue-100'}`}>
-                              {displayIcon || (isFolder ? '📁' : '⚡')}
+                            <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
+                              {displayIcon || '⚡'}
                             </div>
 
                             <div className="w-full">
@@ -2187,7 +3149,7 @@ export default function App() {
                                 {displayTitle}
                               </h3>
                               <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
-                                {displaySubtitle || (isFolder ? (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder')) : '')}
+                                {displaySubtitle || (langHindi ? 'बटन खोलें' : 'Open Button')}
                               </p>
                             </div>
                           </button>
