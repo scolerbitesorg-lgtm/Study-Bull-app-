@@ -4,7 +4,8 @@ import {
   CheckCircle2, XCircle, Clock, 
   RotateCcw, Sparkles, Calculator, Flame, Sun, Moon, Copy, ChevronRight, Award, Zap,
   Check, BookOpen, ChevronDown, ChevronUp, ExternalLink,
-  Code, Eye, Maximize2, Minimize2, RefreshCw, Play
+  Code, Eye, Maximize2, Minimize2, RefreshCw, Play,
+  Plus, Edit3, Trash2, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -418,321 +419,575 @@ function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
 
+// Comprehensive Math Subjects List for Speed Calculation
+export const ALL_MATH_TOPICS: string[] = [
+  'मिश्रित (सभी विषय)',
+  'जोड़ (Addition)',
+  'घटाव (Subtraction)',
+  'गुणा (Multiplication)',
+  'भाग (Division)',
+  'जोड़ व घटाव (Add & Subtract)',
+  'गुणा व भाग (Multiply & Divide)',
+  'सरलीकरण (BODMAS)',
+  'प्रतिशत (Percentage)',
+  'वर्ग व वर्गमूल (Squares & Roots)',
+  'घन व घनमूल (Cubes & Roots)',
+  'भिन्न व दशमलव (Fractions & Decimals)',
+  'औसत (Average)',
+  'अनुपात व समानुपात (Ratio & Proportion)',
+  'साधारण ब्याज (Simple Interest)',
+  'लाभ व हानि (Profit & Loss)',
+  'समय व कार्य (Time & Work)',
+  'समय, चाल व दूरी (Time & Distance)'
+];
+
 // 100% Mathematically Proven Unlimited Question Generator Across All Topics
-// Generates unique, non-repeating questions with genuine formulas and explanations
-function generateUnlimitedMathQuestion(topic: string, indexSeed: number): QuizQuestion {
-  const topicsList = [
-    'प्रतिशत (Percentage)',
-    'लाभ व हानि (Profit & Loss)',
-    'समय व कार्य (Time & Work)',
-    'समय, चाल व दूरी (Time & Distance)',
-    'औसत (Average)',
-    'सरलीकरण (BODMAS)',
-    'अनुपात व समानुपात (Ratio & Proportion)',
-    'साधारण ब्याज (Simple Interest)',
-    'वर्ग व वर्गमूल (Squares)',
-    'घन व घनमूल (Cubes)'
-  ];
+// Generates unique, non-repeating questions with genuine formulas, zero errors, and authentic Vedic/mental math shortcuts
+function generateUnlimitedMathQuestion(
+  topic: string,
+  indexSeed: number,
+  difficulty: 'सरल' | 'मध्यम' | 'कठिन' | 'प्रो' = 'मध्यम',
+  seenSignatures?: Set<string>
+): QuizQuestion {
+  const baseTopics = ALL_MATH_TOPICS.filter(t => !t.includes('मिश्रित'));
 
-  let chosenTopic = topic;
-  if (topic.includes('मिश्रित')) {
-    chosenTopic = topicsList[Math.floor(Math.random() * topicsList.length)];
-  }
+  let attempts = 0;
+  let finalQ: QuizQuestion | null = null;
 
-  let qText = '';
-  let qTextEn = '';
-  let ansStr = '';
-  let explanation = '';
-  let explanationEn = '';
-  let shortcut = '';
-  let distractors: string[] = [];
+  while (attempts < 60) {
+    attempts++;
+    let chosenTopic = topic;
+    if (topic.includes('मिश्रित')) {
+      chosenTopic = baseTopics[Math.floor(Math.random() * baseTopics.length)];
+    }
 
-  if (chosenTopic.includes('प्रतिशत')) {
-    // Type: X% of Y
-    const percentages = [5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75];
-    const p = percentages[Math.floor(Math.random() * percentages.length)];
-    const baseMultiplier = Math.floor(Math.random() * 25) + 3;
-    const base = baseMultiplier * 100; // Multiples of 100 ensure exact integer result
-    const ans = Math.round((p * base) / 100);
+    let qText = '';
+    let qTextEn = '';
+    let ansStr = '';
+    let explanation = '';
+    let explanationEn = '';
+    let shortcut = '';
+    let distractors: string[] = [];
 
-    qText = `₹${base} का ${p}% कितना होगा?`;
-    qTextEn = `What is ${p}% of ₹${base}?`;
-    ansStr = `₹${ans}`;
-    explanation = `${p}% = ${p} ÷ 100। कुल मान = (${base} × ${p}) ÷ 100 = ₹${ans}।`;
-    explanationEn = `${p}% = ${p} / 100. Total value = (${base} * ${p}) / 100 = ₹${ans}.`;
-    shortcut = `शॉर्टकट: 10% = ₹${base / 10}, 1% = ₹${base / 100}। मान निकालें = ₹${ans}`;
+    // 1. जोड़ (Addition)
+    if (chosenTopic.includes('जोड़ (Addition)')) {
+      if (difficulty === 'सरल') {
+        const a = Math.floor(Math.random() * 80) + 15;
+        const b = Math.floor(Math.random() * 80) + 12;
+        const ans = a + b;
+        qText = `मान ज्ञात कीजिए: ${a} + ${b} = ?`;
+        qTextEn = `Evaluate: ${a} + ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `इकाई और दहाई जोड़ें:\n${a} + ${b} = ${ans}।`;
+        explanationEn = `Step-by-step addition: ${a} + ${b} = ${ans}.`;
+        shortcut = `मानसिक जोड़: (${Math.floor(a / 10) * 10} + ${Math.floor(b / 10) * 10}) + (${a % 10} + ${b % 10}) = ${ans}`;
+        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 2}`, `${ans - 2}`];
+      } else if (difficulty === 'मध्यम') {
+        const isThree = Math.random() > 0.5;
+        if (isThree) {
+          const a = Math.floor(Math.random() * 85) + 25;
+          const b = Math.floor(Math.random() * 85) + 25;
+          const c = Math.floor(Math.random() * 85) + 15;
+          const ans = a + b + c;
+          qText = `तीनों संख्याओं का योग क्या होगा: ${a} + ${b} + ${c} = ?`;
+          qTextEn = `Calculate the sum: ${a} + ${b} + ${c} = ?`;
+          ansStr = `${ans}`;
+          explanation = `चरण 1: ${a} + ${b} = ${a + b}\nचरण 2: ${a + b} + ${c} = ${ans}।`;
+          explanationEn = `Step 1: ${a} + ${b} = ${a + b}. Step 2: ${a + b} + ${c} = ${ans}.`;
+          shortcut = `जोड़ विधि: समूह बनाकर तेजी से जोड़ें = ${ans}`;
+          distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 5}`, `${ans - 5}`];
+        } else {
+          const a = Math.floor(Math.random() * 800) + 120;
+          const b = Math.floor(Math.random() * 800) + 120;
+          const ans = a + b;
+          qText = `मान ज्ञात कीजिए: ${a} + ${b} = ?`;
+          qTextEn = `Evaluate: ${a} + ${b} = ?`;
+          ansStr = `${ans}`;
+          explanation = `सैकड़ा, दहाई व इकाई का योग:\n${a} + ${b} = ${ans}।`;
+          explanationEn = `Place-value addition: ${a} + ${b} = ${ans}.`;
+          shortcut = `निकटतम पूर्णांक विधि: ${a} + ${b} = ${ans}`;
+          distractors = [`${ans + 20}`, `${ans - 20}`, `${ans + 10}`, `${ans - 10}`];
+        }
+      } else if (difficulty === 'कठिन') {
+        const a = Math.floor(Math.random() * 7500) + 1500;
+        const b = Math.floor(Math.random() * 7500) + 1500;
+        const ans = a + b;
+        qText = `मान ज्ञात कीजिए: ${a} + ${b} = ?`;
+        qTextEn = `Evaluate: ${a} + ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `स्तम्भ जोड़ (Column Addition):\n  ${a}\n+ ${b}\n= ${ans}।`;
+        explanationEn = `Standard column addition: ${a} + ${b} = ${ans}.`;
+        shortcut = `हजारों और सैकड़ों को अलग-अलग जोड़कर त्वरित हल = ${ans}`;
+        distractors = [`${ans + 100}`, `${ans - 100}`, `${ans + 50}`, `${ans - 50}`];
+      } else {
+        // प्रो (Pro)
+        const a = Math.floor(Math.random() * 65000) + 15000;
+        const b = Math.floor(Math.random() * 65000) + 15000;
+        const ans = a + b;
+        qText = `त्वरित गणना: ${a} + ${b} = ?`;
+        qTextEn = `Speed addition: ${a} + ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `बड़ी संख्याओं का योग:\n${a} + ${b} = ${ans}।`;
+        explanationEn = `Large number addition: ${a} + ${b} = ${ans}.`;
+        shortcut = `बाएं से दाएं (Left-to-right) वैदिक विधि = ${ans}`;
+        distractors = [`${ans + 200}`, `${ans - 200}`, `${ans + 100}`, `${ans - 100}`];
+      }
+    }
+    // 2. घटाव (Subtraction)
+    else if (chosenTopic.includes('घटाव (Subtraction)')) {
+      if (difficulty === 'सरल') {
+        const a = Math.floor(Math.random() * 70) + 30;
+        const b = Math.floor(Math.random() * (a - 15)) + 10;
+        const ans = a - b;
+        qText = `मान ज्ञात कीजिए: ${a} - ${b} = ?`;
+        qTextEn = `Evaluate: ${a} - ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `घटाव प्रक्रिया:\n${a} - ${b} = ${ans}।`;
+        explanationEn = `Step subtraction: ${a} - ${b} = ${ans}.`;
+        shortcut = `उल्टा जोड़ (Counting up): ${b} में कितना जोड़ें कि ${a} आ जाए? उत्तर = ${ans}`;
+        distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 2}`, `${ans - 2}`];
+      } else if (difficulty === 'मध्यम') {
+        const isBase = Math.random() > 0.6;
+        if (isBase) {
+          const b = Math.floor(Math.random() * 750) + 120;
+          const ans = 1000 - b;
+          qText = `आधार विधि से हल करें: 1000 - ${b} = ?`;
+          qTextEn = `Evaluate using base method: 1000 - ${b} = ?`;
+          ansStr = `${ans}`;
+          explanation = `1000 में से घटाव:\n1000 - ${b} = ${ans}।`;
+          explanationEn = `Subtracting from 1000: 1000 - ${b} = ${ans}.`;
+          shortcut = `वैदिक सूत्र (निखिलं नवतश्चरमं दशतः): सभी अंकों को 9 से और अंतिम को 10 से घटाएं = ${ans}`;
+          distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 100}`, `${ans - 100}`];
+        } else {
+          const a = Math.floor(Math.random() * 750) + 250;
+          const b = Math.floor(Math.random() * (a - 60)) + 45;
+          const ans = a - b;
+          qText = `मान ज्ञात कीजिए: ${a} - ${b} = ?`;
+          qTextEn = `Evaluate: ${a} - ${b} = ?`;
+          ansStr = `${ans}`;
+          explanation = `घटाव चरण:\n${a} - ${b} = ${ans}।`;
+          explanationEn = `3-digit subtraction: ${a} - ${b} = ${ans}.`;
+          shortcut = `निकटतम सैकड़े पर तोड़कर घटाव = ${ans}`;
+          distractors = [`${ans + 20}`, `${ans - 20}`, `${ans + 10}`, `${ans - 10}`];
+        }
+      } else if (difficulty === 'कठिन') {
+        const a = Math.floor(Math.random() * 7500) + 2500;
+        const b = Math.floor(Math.random() * (a - 300)) + 200;
+        const ans = a - b;
+        qText = `मान ज्ञात कीजिए: ${a} - ${b} = ?`;
+        qTextEn = `Evaluate: ${a} - ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `4-अंकीय घटाव:\n${a} - ${b} = ${ans}।`;
+        explanationEn = `4-digit subtraction: ${a} - ${b} = ${ans}.`;
+        shortcut = `वैदिक पूरक (Complement) तकनीक = ${ans}`;
+        distractors = [`${ans + 100}`, `${ans - 100}`, `${ans + 50}`, `${ans - 50}`];
+      } else {
+        // प्रो (Pro)
+        const b = Math.floor(Math.random() * 8500) + 1200;
+        const ans = 10000 - b;
+        qText = `मानसिक गणना: 10000 - ${b} = ?`;
+        qTextEn = `Mental calculation: 10000 - ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `10000 में से घटाव:\n10000 - ${b} = ${ans}।`;
+        explanationEn = `Subtracting from 10000: 10000 - ${b} = ${ans}.`;
+        shortcut = `निखिलं नवतश्चरमं दशतः: 9 से सभी तथा इकाई को 10 से = ${ans}`;
+        distractors = [`${ans + 100}`, `${ans - 100}`, `${ans + 10}`, `${ans - 10}`];
+      }
+    }
+    // 3. गुणा (Multiplication)
+    else if (chosenTopic.includes('गुणा (Multiplication)')) {
+      const trickType = Math.floor(Math.random() * 4);
+      if (trickType === 0) {
+        // Multiply by 11 trick
+        const num = Math.floor(Math.random() * 85) + 14;
+        const ans = num * 11;
+        qText = `वैदिक विधि से हल करें: ${num} × 11 = ?`;
+        qTextEn = `Solve using Vedic trick: ${num} × 11 = ?`;
+        ansStr = `${ans}`;
+        const d1 = Math.floor(num / 10);
+        const d2 = num % 10;
+        explanation = `${num} × 11 की शॉर्ट ट्रिक:\nप्रथम अंक: ${d1}, मध्य अंक: (${d1} + ${d2}), अंतिम अंक: ${d2}।\nकुल मान = ${ans}।`;
+        explanationEn = `${num} * 11 trick: Sandwich the sum of digits (${d1} + ${d2} = ${d1 + d2}) between ${d1} and ${d2} = ${ans}.`;
+        shortcut = `11 का वैदिक जादू: दोनों अंकों को फैलाकर उनका योग बीच में रखें = ${ans}`;
+        distractors = [`${ans + 11}`, `${ans - 11}`, `${ans + 22}`, `${ans - 22}`];
+      } else if (trickType === 1) {
+        // Multiply by 25 trick
+        const multiplier = Math.floor(Math.random() * 22) + 4;
+        const num = multiplier * 4; // guarantees divisible by 4
+        const ans = num * 25;
+        qText = `त्वरित गुणा ट्रिक: ${num} × 25 = ?`;
+        qTextEn = `Fast multiply trick: ${num} × 25 = ?`;
+        ansStr = `${ans}`;
+        explanation = `25 से गुणा करने का नियम:\nसंख्या को 4 से भाग देकर 100 से गुणा करें।\n(${num} ÷ 4) × 100 = ${multiplier} × 100 = ${ans}।`;
+        explanationEn = `Rule for multiplying by 25: Divide by 4 and multiply by 100: (${num} / 4) * 100 = ${ans}.`;
+        shortcut = `(${num} ÷ 4) × 100 = ${multiplier} × 100 = ${ans}`;
+        distractors = [`${ans + 50}`, `${ans - 50}`, `${ans + 100}`, `${ans - 100}`];
+      } else if (trickType === 2) {
+        // Multiply by 99 trick
+        const num = Math.floor(Math.random() * 65) + 15;
+        const ans = num * 99;
+        qText = `शॉर्टकट से मान निकालें: ${num} × 99 = ?`;
+        qTextEn = `Evaluate using shortcut: ${num} × 99 = ?`;
+        ansStr = `${ans}`;
+        explanation = `99 से गुणा करने का सूत्र:\n${num} × (100 - 1) = (${num} × 100) - ${num} = ${num * 100} - ${num} = ${ans}।`;
+        explanationEn = `${num} * (100 - 1) = ${num * 100} - ${num} = ${ans}.`;
+        shortcut = `${num * 100} - ${num} = ${ans}`;
+        distractors = [`${ans + 99}`, `${ans - 99}`, `${ans + 100}`, `${ans - 100}`];
+      } else {
+        // Standard 2-digit multiplication
+        const a = Math.floor(Math.random() * 45) + 12;
+        const b = [12, 14, 15, 16, 18, 20, 24, 25][Math.floor(Math.random() * 8)];
+        const ans = a * b;
+        qText = `मान ज्ञात कीजिए: ${a} × ${b} = ?`;
+        qTextEn = `Evaluate: ${a} × ${b} = ?`;
+        ansStr = `${ans}`;
+        explanation = `गुणा की विधि:\n${a} × ${b} = ${ans}।`;
+        explanationEn = `Multiplication: ${a} * ${b} = ${ans}.`;
+        shortcut = `दहाई में तोड़ें: (${a} × ${Math.floor(b / 10) * 10}) + (${a} × ${b % 10}) = ${ans}`;
+        distractors = [`${ans + b}`, `${ans - b}`, `${ans + 20}`, `${ans - 20}`];
+      }
+    }
+    // 4. भाग (Division)
+    else if (chosenTopic.includes('भाग (Division)')) {
+      const divisors = difficulty === 'सरल' ? [3, 4, 5, 6, 8, 9, 10] : [12, 14, 15, 16, 18, 24, 25, 36];
+      const div = divisors[Math.floor(Math.random() * divisors.length)];
+      const quotient = Math.floor(Math.random() * 50) + (difficulty === 'सरल' ? 12 : 25);
+      const dividend = div * quotient; // 100% exact integer division guaranteed
 
-    distractors = [
-      `₹${ans + Math.max(10, Math.round(ans * 0.1))}`,
-      `₹${Math.max(10, ans - Math.max(10, Math.round(ans * 0.1)))}`,
-      `₹${ans + 25}`,
-      `₹${Math.max(5, ans - 15)}`
-    ];
-  } 
-  else if (chosenTopic.includes('लाभ व हानि')) {
-    const cps = [200, 300, 400, 500, 600, 800, 1000, 1200, 1500, 2000];
-    const cp = cps[Math.floor(Math.random() * cps.length)];
-    const rates = [10, 15, 20, 25, 30];
-    const rate = rates[Math.floor(Math.random() * rates.length)];
-    const isProfit = Math.random() > 0.45;
+      qText = `भाग दीजिए: ${dividend} ÷ ${div} = ?`;
+      qTextEn = `Divide: ${dividend} ÷ ${div} = ?`;
+      ansStr = `${quotient}`;
+      explanation = `भागफल = भाज्य ÷ भाजक\n${dividend} ÷ ${div} = ${quotient}।`;
+      explanationEn = `Quotient = Dividend / Divisor: ${dividend} / ${div} = ${quotient}.`;
+      shortcut = `उभयनिष्ठ गुणनखंड काटकर छोटा करें: ${dividend} ÷ ${div} = ${quotient}`;
+      distractors = [`${quotient + 2}`, `${quotient - 2}`, `${quotient + 5}`, `${Math.max(1, quotient - 5)}`];
+    }
+    // 5. जोड़ व घटाव (Add & Subtract)
+    else if (chosenTopic.includes('जोड़ व घटाव')) {
+      const a = Math.floor(Math.random() * 250) + 100;
+      const b = Math.floor(Math.random() * 200) + 50;
+      const c = Math.floor(Math.random() * (a + b - 50)) + 30;
+      const ans = a + b - c;
 
-    if (isProfit) {
-      const profit = Math.round((cp * rate) / 100);
-      const sp = cp + profit;
-      qText = `एक वस्तु का क्रय मूल्य (CP) ₹${cp} है। यदि इसे ${rate}% लाभ पर बेचा जाए, तो विक्रय मूल्य (SP) क्या होगा?`;
-      qTextEn = `Cost price of an item is ₹${cp}. If sold at ${rate}% profit, what is the selling price (SP)?`;
-      ansStr = `₹${sp}`;
-      explanation = `लाभ = (${cp} × ${rate}) ÷ 100 = ₹${profit}। विक्रय मूल्य (SP) = CP + लाभ = ${cp} + ${profit} = ₹${sp}।`;
-      explanationEn = `Profit = (${cp} * ${rate}) / 100 = ₹${profit}. SP = CP + Profit = ₹${sp}.`;
-      shortcut = `सूत्र: SP = CP × [(100 + ${rate}) ÷ 100] = ${cp} × ${(100 + rate) / 100} = ₹${sp}`;
-      distractors = [`₹${sp + 50}`, `₹${sp - 50}`, `₹${cp + profit * 2}`, `₹${sp + 20}`];
-    } else {
-      const loss = Math.round((cp * rate) / 100);
-      const sp = cp - loss;
-      qText = `एक वस्तु ₹${cp} में खरीदी गई। यदि इसे ${rate}% हानि पर बेचा जाए, तो विक्रय मूल्य (SP) क्या होगा?`;
-      qTextEn = `An item is bought for ₹${cp}. If sold at ${rate}% loss, what is the selling price (SP)?`;
-      ansStr = `₹${sp}`;
-      explanation = `हानि = (${cp} × ${rate}) ÷ 100 = ₹${loss}। विक्रय मूल्य (SP) = CP - हानि = ${cp} - ${loss} = ₹${sp}।`;
-      explanationEn = `Loss = (${cp} * ${rate}) / 100 = ₹${loss}. SP = CP - Loss = ₹${sp}.`;
-      shortcut = `सूत्र: SP = CP × [(100 - ${rate}) ÷ 100] = ${cp} × ${(100 - rate) / 100} = ₹${sp}`;
-      distractors = [`₹${sp + 40}`, `₹${sp - 40}`, `₹${sp + 60}`, `₹${sp - 20}`];
+      qText = `सरल कीजिए: ${a} + ${b} - ${c} = ?`;
+      qTextEn = `Simplify: ${a} + ${b} - ${c} = ?`;
+      ansStr = `${ans}`;
+      explanation = `चरण 1: पहले जोड़ें -> ${a} + ${b} = ${a + b}।\nचरण 2: फिर घटाएं -> ${a + b} - ${c} = ${ans}।`;
+      explanationEn = `Step 1: Add first -> ${a} + ${b} = ${a + b}. Step 2: Then subtract -> ${a + b} - ${c} = ${ans}.`;
+      shortcut = `BODMAS नियम: जोड़ पहले, घटाव बाद में = ${ans}`;
+      distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 20}`, `${Math.max(5, ans - 20)}`];
+    }
+    // 6. गुणा व भाग (Multiply & Divide)
+    else if (chosenTopic.includes('गुणा व भाग')) {
+      // (A * B) / C where (A * B) is cleanly divisible by C
+      const c = [4, 6, 8, 12, 15][Math.floor(Math.random() * 5)];
+      const k1 = Math.floor(Math.random() * 5) + 2;
+      const a = c * k1; // a is multiple of c
+      const b = Math.floor(Math.random() * 15) + 3;
+      const ans = (a * b) / c;
+
+      qText = `मान ज्ञात कीजिए: (${a} × ${b}) ÷ ${c} = ?`;
+      qTextEn = `Evaluate: (${a} × ${b}) ÷ ${c} = ?`;
+      ansStr = `${ans}`;
+      explanation = `काटने का नियम:\n(${a} ÷ ${c}) × ${b} = ${k1} × ${b} = ${ans}।`;
+      explanationEn = `Cancellation rule: (${a} / ${c}) * ${b} = ${k1} * ${b} = ${ans}.`;
+      shortcut = `गुणा करने से पहले काटें: ${a} ÷ ${c} = ${k1}, फिर ${k1} × ${b} = ${ans}`;
+      distractors = [`${ans + b}`, `${Math.max(1, ans - b)}`, `${ans + 5}`, `${ans - 5}`];
+    }
+    // 7. भिन्न व दशमलव (Fractions & Decimals)
+    else if (chosenTopic.includes('भिन्न व दशमलव')) {
+      const denoms = [2, 3, 4, 5, 6, 8, 10];
+      const d1 = denoms[Math.floor(Math.random() * denoms.length)];
+      let d2 = denoms[Math.floor(Math.random() * denoms.length)];
+      while (d2 === d1) {
+        d2 = denoms[Math.floor(Math.random() * denoms.length)];
+      }
+      const n1 = Math.floor(Math.random() * (d1 - 1)) + 1;
+      const n2 = Math.floor(Math.random() * (d2 - 1)) + 1;
+
+      // Common denominator LCM
+      const commonLcm = (d1 * d2) / gcd(d1, d2);
+      const numSum = n1 * (commonLcm / d1) + n2 * (commonLcm / d2);
+      const finalGcd = gcd(numSum, commonLcm);
+      const simpNum = numSum / finalGcd;
+      const simpDen = commonLcm / finalGcd;
+
+      ansStr = simpDen === 1 ? `${simpNum}` : `${simpNum}/${simpDen}`;
+      qText = `भिन्नों का योग ज्ञात कीजिए: (${n1}/${d1}) + (${n2}/${d2}) = ?`;
+      qTextEn = `Calculate sum of fractions: (${n1}/${d1}) + (${n2}/${d2}) = ?`;
+      explanation = `ल.स.प. (LCM) ऑफ (${d1}, ${d2}) = ${commonLcm}।\n= [(${n1} × ${commonLcm / d1}) + (${n2} × ${commonLcm / d2})] ÷ ${commonLcm}\n= (${n1 * (commonLcm / d1)} + ${n2 * (commonLcm / d2)}) ÷ ${commonLcm} = ${numSum}/${commonLcm} = ${ansStr}।`;
+      explanationEn = `LCM of denominators = ${commonLcm}. Sum = ${ansStr}.`;
+      shortcut = `तिर्यक गुणा (Cross multiply): (${n1}×${d2} + ${n2}×${d1}) ÷ (${d1}×${d2}) = ${ansStr}`;
+
+      distractors = [
+        `${simpNum + 1}/${simpDen}`,
+        simpDen > 2 ? `${simpNum}/${simpDen + 1}` : `${simpNum + 2}/${simpDen}`,
+        `${simpNum + 2}/${simpDen}`,
+        simpNum > 1 ? `${simpNum - 1}/${simpDen}` : `${simpNum + 3}/${simpDen}`
+      ];
+    }
+    // 8. प्रतिशत (Percentage)
+    else if (chosenTopic.includes('प्रतिशत')) {
+      const percentages = [5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75];
+      const p = percentages[Math.floor(Math.random() * percentages.length)];
+      const baseMultiplier = Math.floor(Math.random() * 25) + 3;
+      const base = baseMultiplier * 100;
+      const ans = Math.round((p * base) / 100);
+
+      qText = `₹${base} का ${p}% कितना होगा?`;
+      qTextEn = `What is ${p}% of ₹${base}?`;
+      ansStr = `₹${ans}`;
+      explanation = `${p}% = ${p} ÷ 100। कुल मान = (${base} × ${p}) ÷ 100 = ₹${ans}।`;
+      explanationEn = `${p}% = ${p} / 100. Total value = (${base} * ${p}) / 100 = ₹${ans}.`;
+      shortcut = `शॉर्टकट: 10% = ₹${base / 10}, 1% = ₹${base / 100}। मान निकालें = ₹${ans}`;
+      distractors = [
+        `₹${ans + Math.max(10, Math.round(ans * 0.1))}`,
+        `₹${Math.max(10, ans - Math.max(10, Math.round(ans * 0.1)))}`,
+        `₹${ans + 25}`,
+        `₹${Math.max(5, ans - 15)}`
+      ];
+    }
+    // 9. वर्ग व वर्गमूल (Squares & Roots)
+    else if (chosenTopic.includes('वर्ग व वर्गमूल') || chosenTopic.includes('वर्ग')) {
+      const isRoot = Math.random() > 0.5;
+      const num = Math.floor(Math.random() * 32) + 12; // 12 to 43
+      const sq = num * num;
+
+      if (isRoot) {
+        qText = `√${sq} का सटीक मान क्या होगा?`;
+        qTextEn = `What is the exact square root of √${sq}?`;
+        ansStr = `${num}`;
+        explanation = `क्योंकि ${num} × ${num} = ${sq}, अतः √${sq} = ${num}।`;
+        explanationEn = `Since ${num} * ${num} = ${sq}, square root of ${sq} is ${num}.`;
+        shortcut = `इकाई अंक विधि: अंतिम अंक से पहचानें -> √${sq} = ${num}`;
+        distractors = [`${num + 2}`, `${num - 2}`, `${num + 1}`, `${num - 1}`];
+      } else {
+        qText = `(${num})² का सटीक मान क्या होगा?`;
+        qTextEn = `What is the exact value of (${num})²?`;
+        ansStr = `${sq}`;
+        explanation = `(${num})² = ${num} × ${num} = ${sq}।`;
+        explanationEn = `(${num})² = ${num} * ${num} = ${sq}.`;
+        shortcut = `वैदिक आधार विधि: ${num} का वर्ग = ${sq}`;
+        distractors = [`${sq + 20}`, `${sq - 20}`, `${(num + 1) * (num + 1)}`, `${(num - 1) * (num - 1)}`];
+      }
+    }
+    // 10. घन व घनमूल (Cubes & Roots)
+    else if (chosenTopic.includes('घन व घनमूल') || chosenTopic.includes('घन')) {
+      const isCubeRoot = Math.random() > 0.5;
+      const num = Math.floor(Math.random() * 12) + 5; // 5 to 16
+      const cube = num * num * num;
+
+      if (isCubeRoot) {
+        qText = `∛${cube} (घनमूल) का मान क्या होगा?`;
+        qTextEn = `What is the cube root of ∛${cube}?`;
+        ansStr = `${num}`;
+        explanation = `क्योंकि ${num}³ = ${num} × ${num} × ${num} = ${cube}, अतः ∛${cube} = ${num}।`;
+        explanationEn = `Since ${num}³ = ${cube}, cube root of ${cube} is ${num}.`;
+        shortcut = `इकाई अंक मिलान विधि से 2 सेकंड में उत्तर = ${num}`;
+        distractors = [`${num + 1}`, `${num - 1}`, `${num + 2}`, `${num - 2}`];
+      } else {
+        qText = `(${num})³ का सटीक मान क्या होगा?`;
+        qTextEn = `What is the exact value of (${num})³?`;
+        ansStr = `${cube}`;
+        explanation = `(${num})³ = ${num} × ${num} × ${num} = ${cube}।`;
+        explanationEn = `(${num})³ = ${num} * ${num} * ${num} = ${cube}.`;
+        shortcut = `${num} का घन = ${cube}`;
+        distractors = [`${cube + 50}`, `${cube - 50}`, `${(num + 1) * (num + 1) * (num + 1)}`, `${(num - 1) * (num - 1) * (num - 1)}`];
+      }
+    }
+    // 11. औसत (Average)
+    else if (chosenTopic.includes('औसत')) {
+      const start = Math.floor(Math.random() * 30) + 12;
+      const diff = Math.floor(Math.random() * 4) + 2;
+      const nums = [start, start + diff, start + 2 * diff, start + 3 * diff, start + 4 * diff];
+      const sum = nums.reduce((acc, curr) => acc + curr, 0);
+      const avg = nums[2];
+
+      qText = `संख्याओं ${nums.join(', ')} का औसत (Average) क्या होगा?`;
+      qTextEn = `What is the average of numbers ${nums.join(', ')}?`;
+      ansStr = `${avg}`;
+      explanation = `औसत = कुल योग ÷ कुल संख्याएँ = (${nums.join(' + ')}) ÷ 5 = ${sum} ÷ 5 = ${avg}।`;
+      explanationEn = `Average = Sum / Count = ${sum} / 5 = ${avg}.`;
+      shortcut = `समानांतर श्रेणी (AP) में औसत सदैव मध्य पद होता है = ${avg}`;
+      distractors = [`${avg + diff}`, `${avg - diff}`, `${avg + 1}`, `${avg - 1}`];
+    }
+    // 12. अनुपात व समानुपात (Ratio & Proportion)
+    else if (chosenTopic.includes('अनुपात व समानुपात')) {
+      const r1 = Math.floor(Math.random() * 3) + 2;
+      const r2 = Math.floor(Math.random() * 3) + 3;
+      const unitVal = (Math.floor(Math.random() * 15) + 5) * 50;
+      const totalAmount = (r1 + r2) * unitVal;
+      const ansA = r1 * unitVal;
+
+      qText = `₹${totalAmount} की राशि को A और B में ${r1} : ${r2} के अनुपात में बांटा जाता है। A का हिस्सा कितना होगा?`;
+      qTextEn = `₹${totalAmount} is divided between A and B in ratio ${r1} : ${r2}. What is A's share?`;
+      ansStr = `₹${ansA}`;
+      explanation = `अनुपातों का योग = ${r1} + ${r2} = ${r1 + r2} यूनिट।\n1 यूनिट = ₹${totalAmount} ÷ ${r1 + r2} = ₹${unitVal}।\nA का हिस्सा = ${r1} × ${unitVal} = ₹${ansA}।`;
+      explanationEn = `Total ratio = ${r1 + r2}. 1 unit = ₹${unitVal}. A's share = ₹${ansA}.`;
+      shortcut = `A का हिस्सा = [${r1} ÷ (${r1} + ${r2})] × ₹${totalAmount} = ₹${ansA}`;
+      distractors = [`₹${r2 * unitVal}`, `₹${ansA + 100}`, `₹${Math.max(50, ansA - 100)}`, `₹${ansA + 200}`];
+    }
+    // 13. साधारण ब्याज (Simple Interest)
+    else if (chosenTopic.includes('साधारण ब्याज')) {
+      const principals = [1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000];
+      const p = principals[Math.floor(Math.random() * principals.length)];
+      const rates = [4, 5, 6, 8, 10];
+      const r = rates[Math.floor(Math.random() * rates.length)];
+      const times = [2, 3, 4, 5];
+      const t = times[Math.floor(Math.random() * times.length)];
+      const si = Math.round((p * r * t) / 100);
+
+      qText = `₹${p} पर ${r}% वार्षिक दर से ${t} वर्ष का साधारण ब्याज (SI) क्या होगा?`;
+      qTextEn = `What is the Simple Interest on ₹${p} at ${r}% per annum for ${t} years?`;
+      ansStr = `₹${si}`;
+      explanation = `साधारण ब्याज = (मूलधन × दर × समय) ÷ 100 = (${p} × ${r} × ${t}) ÷ 100 = ₹${si}।`;
+      explanationEn = `SI = (P * R * T) / 100 = (${p} * ${r} * ${t}) / 100 = ₹${si}.`;
+      shortcut = `सूत्र: SI = (P × R × T) ÷ 100 = ₹${si}`;
+      distractors = [`₹${si + 100}`, `₹${Math.max(50, si - 100)}`, `₹${si + 50}`, `₹${Math.max(20, si - 50)}`];
+    }
+    // 14. लाभ व हानि (Profit & Loss)
+    else if (chosenTopic.includes('लाभ व हानि')) {
+      const cps = [200, 300, 400, 500, 600, 800, 1000, 1200, 1500];
+      const cp = cps[Math.floor(Math.random() * cps.length)];
+      const rates = [10, 15, 20, 25, 30];
+      const rate = rates[Math.floor(Math.random() * rates.length)];
+      const isProfit = Math.random() > 0.45;
+
+      if (isProfit) {
+        const profit = Math.round((cp * rate) / 100);
+        const sp = cp + profit;
+        qText = `एक वस्तु का क्रय मूल्य ₹${cp} है। यदि इसे ${rate}% लाभ पर बेचा जाए, तो विक्रय मूल्य क्या होगा?`;
+        qTextEn = `Cost price is ₹${cp}. If sold at ${rate}% profit, what is the selling price?`;
+        ansStr = `₹${sp}`;
+        explanation = `लाभ = (${cp} × ${rate}) ÷ 100 = ₹${profit}। विक्रय मूल्य = ${cp} + ${profit} = ₹${sp}।`;
+        explanationEn = `Profit = ₹${profit}. SP = CP + Profit = ₹${sp}.`;
+        shortcut = `सूत्र: SP = CP × [(100 + ${rate}) ÷ 100] = ₹${sp}`;
+        distractors = [`₹${sp + 50}`, `₹${sp - 50}`, `₹${cp + profit * 2}`, `₹${sp + 20}`];
+      } else {
+        const loss = Math.round((cp * rate) / 100);
+        const sp = cp - loss;
+        qText = `एक वस्तु ₹${cp} में खरीदी गई। यदि इसे ${rate}% हानि पर बेचा जाए, तो विक्रय मूल्य क्या होगा?`;
+        qTextEn = `An item is bought for ₹${cp}. If sold at ${rate}% loss, what is the selling price?`;
+        ansStr = `₹${sp}`;
+        explanation = `हानि = (${cp} × ${rate}) ÷ 100 = ₹${loss}। विक्रय मूल्य = ${cp} - ${loss} = ₹${sp}।`;
+        explanationEn = `Loss = ₹${loss}. SP = CP - Loss = ₹${sp}.`;
+        shortcut = `सूत्र: SP = CP × [(100 - ${rate}) ÷ 100] = ₹${sp}`;
+        distractors = [`₹${sp + 40}`, `₹${sp - 40}`, `₹${sp + 60}`, `₹${sp - 20}`];
+      }
+    }
+    // 15. समय व कार्य (Time & Work)
+    else if (chosenTopic.includes('समय व कार्य')) {
+      const workPairs: [number, number, number][] = [
+        [10, 15, 6], [12, 24, 8], [20, 30, 12], [15, 30, 10],
+        [12, 60, 10], [10, 40, 8], [6, 12, 4], [20, 20, 10],
+        [8, 24, 6], [15, 60, 12], [9, 18, 6], [16, 48, 12],
+        [30, 60, 20], [40, 60, 24]
+      ];
+      const pair = workPairs[Math.floor(Math.random() * workPairs.length)];
+      const aDays = pair[0];
+      const bDays = pair[1];
+      const totalDays = pair[2];
+
+      qText = `A किसी कार्य को ${aDays} दिन में तथा B उसे ${bDays} दिन में करता है। दोनों मिलकर इसे कितने दिन में करेंगे?`;
+      qTextEn = `A does a work in ${aDays} days and B in ${bDays} days. In how many days will both finish it together?`;
+      ansStr = `${totalDays} दिन`;
+      explanation = `ल.स.प. (LCM) विधि:\nकुल दिन = (A × B) ÷ (A + B) = (${aDays} × ${bDays}) ÷ (${aDays + bDays}) = ${totalDays} दिन।`;
+      explanationEn = `Total days = (A * B) / (A + B) = ${totalDays} days.`;
+      shortcut = `त्वरित सूत्र: (A × B) ÷ (A + B) = ${totalDays} दिन`;
+      distractors = [`${totalDays + 2} दिन`, `${Math.max(1, totalDays - 2)} दिन`, `${totalDays + 4} दिन`, `${Math.max(2, totalDays - 1)} दिन`];
+    }
+    // 16. समय, चाल व दूरी (Time & Distance)
+    else if (chosenTopic.includes('समय, चाल व दूरी')) {
+      const speeds = [36, 45, 54, 60, 72, 80, 90, 100];
+      const speed = speeds[Math.floor(Math.random() * speeds.length)];
+      const hours = Math.floor(Math.random() * 5) + 2;
+      const distance = speed * hours;
+
+      qText = `एक रेलगाड़ी ${speed} किमी/घंटा की गति से चल रही है। ${distance} किमी की दूरी तय करने में उसे कितना समय लगेगा?`;
+      qTextEn = `A train moves at speed of ${speed} km/h. How much time will it take to cover ${distance} km?`;
+      ansStr = `${hours} घंटे`;
+      explanation = `समय = दूरी ÷ चाल = ${distance} ÷ ${speed} = ${hours} घंटे।`;
+      explanationEn = `Time = Distance / Speed = ${distance} / ${speed} = ${hours} hours.`;
+      shortcut = `सूत्र: T = D ÷ S = ${distance} ÷ ${speed} = ${hours} घंटे`;
+      distractors = [`${hours + 1} घंटे`, `${Math.max(1, hours - 1)} घंटे`, `${hours + 2} घंटे`, `${hours + 3} घंटे`];
+    }
+    // 17. सरलीकरण (BODMAS - Fallback default)
+    else {
+      const a = (Math.floor(Math.random() * 10) + 2) * 6;
+      const b = [2, 3, 6][Math.floor(Math.random() * 3)];
+      const c = Math.floor(Math.random() * 5) + 3;
+      const d = Math.floor(Math.random() * 15) + 5;
+      const div = a / b;
+      const mul = div * c;
+      const res = mul + d;
+
+      qText = `मान ज्ञात कीजिए: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
+      qTextEn = `Evaluate: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
+      ansStr = `${res}`;
+      explanation = `BODMAS नियम का पालन करें:\n1. भाग: ${a} ÷ ${b} = ${div}\n2. गुणा: ${div} × ${c} = ${mul}\n3. जोड़: ${mul} + ${d} = ${res}।`;
+      explanationEn = `Follow BODMAS: Division first (${a} / ${b} = ${div}), Multiplication (${div} * ${c} = ${mul}), then Addition = ${res}.`;
+      shortcut = `चरण: ÷ फिर × फिर + = ${res}`;
+      distractors = [`${res + 5}`, `${Math.max(1, res - 5)}`, `${res + 10}`, `${Math.max(2, res - 10)}`];
+    }
+
+    // Build unique options list
+    const optionSet = new Set<string>();
+    optionSet.add(ansStr);
+
+    for (const dist of distractors) {
+      if (dist && dist !== ansStr && !optionSet.has(dist)) {
+        optionSet.add(dist);
+      }
+      if (optionSet.size >= 4) break;
+    }
+
+    let fallbackStep = 1;
+    while (optionSet.size < 4) {
+      const fallbackVal = ansStr.startsWith('₹')
+        ? `₹${parseInt(ansStr.replace('₹', ''), 10) + fallbackStep * 15}`
+        : ansStr.includes('दिन')
+          ? `${parseInt(ansStr, 10) + fallbackStep * 3} दिन`
+          : ansStr.includes('घंटे')
+            ? `${parseInt(ansStr, 10) + fallbackStep * 2} घंटे`
+            : ansStr.includes('/')
+              ? `${parseInt(ansStr.split('/')[0], 10) + fallbackStep}/${ansStr.split('/')[1]}`
+              : `${parseInt(ansStr, 10) + fallbackStep * 7}`;
+
+      if (!optionSet.has(fallbackVal)) {
+        optionSet.add(fallbackVal);
+      }
+      fallbackStep++;
+    }
+
+    const shuffledOptions = Array.from(optionSet).sort(() => Math.random() - 0.5);
+    const correctIndex = shuffledOptions.indexOf(ansStr);
+
+    const questionCandidate: QuizQuestion = {
+      id: indexSeed,
+      question: qText,
+      questionEn: qTextEn,
+      options: shuffledOptions,
+      optionsEn: shuffledOptions,
+      correct: correctIndex >= 0 ? correctIndex : 0,
+      explanation,
+      explanationEn,
+      shortcut,
+      category: chosenTopic
+    };
+
+    const signature = `${chosenTopic}:::${qText}`;
+
+    // Anti-repetition check: If we have seen this question before, keep trying to get a unique one
+    if (!seenSignatures || !seenSignatures.has(signature) || attempts >= 55) {
+      if (seenSignatures) {
+        seenSignatures.add(signature);
+      }
+      finalQ = questionCandidate;
+      break;
     }
   }
-  else if (chosenTopic.includes('समय व कार्य')) {
-    // Mathematically clean work pairs where (A*B)/(A+B) is an exact integer
-    const workPairs: [number, number, number][] = [
-      [10, 15, 6],
-      [12, 24, 8],
-      [20, 30, 12],
-      [15, 30, 10],
-      [12, 60, 10],
-      [10, 40, 8],
-      [6, 12, 4],
-      [20, 20, 10],
-      [8, 24, 6],
-      [15, 60, 12],
-      [9, 18, 6],
-      [16, 48, 12],
-      [30, 60, 20],
-      [40, 60, 24]
-    ];
-    const pair = workPairs[Math.floor(Math.random() * workPairs.length)];
-    const aDays = pair[0];
-    const bDays = pair[1];
-    const totalDays = pair[2];
-    const totalWorkUnits = (aDays * bDays) / gcd(aDays, bDays);
-    const effA = totalWorkUnits / aDays;
-    const effB = totalWorkUnits / bDays;
 
-    qText = `A किसी कार्य को ${aDays} दिन में तथा B उसे ${bDays} दिन में पूरा करता है। दोनों मिलकर उस कार्य को कितने दिन में पूरा करेंगे?`;
-    qTextEn = `A does a work in ${aDays} days and B in ${bDays} days. In how many days will both together finish the work?`;
-    ansStr = `${totalDays} दिन`;
-    explanation = `कुल कार्य = LCM(${aDays}, ${bDays}) = ${totalWorkUnits} यूनिट।\nA की कार्यक्षमता = ${totalWorkUnits} ÷ ${aDays} = ${effA} यूनिट/दिन।\nB की कार्यक्षमता = ${totalWorkUnits} ÷ ${bDays} = ${effB} यूनिट/दिन।\nदोनों की कुल क्षमता = ${effA} + ${effB} = ${effA + effB} यूनिट/दिन।\nकुल दिन = ${totalWorkUnits} ÷ ${effA + effB} = ${totalDays} दिन।`;
-    explanationEn = `Total Days = (A * B) / (A + B) = (${aDays} * ${bDays}) / (${aDays + bDays}) = ${totalDays} days.`;
-    shortcut = `त्वरित सूत्र: (A × B) ÷ (A + B) = (${aDays} × ${bDays}) ÷ ${aDays + bDays} = ${totalDays} दिन`;
-
-    distractors = [
-      `${totalDays + 2} दिन`,
-      `${Math.max(1, totalDays - 2)} दिन`,
-      `${totalDays + 4} दिन`,
-      `${Math.max(2, totalDays - 1)} दिन`
-    ];
-  }
-  else if (chosenTopic.includes('समय, चाल व दूरी')) {
-    // Distance = Speed * Time
-    const speeds = [36, 45, 54, 60, 72, 80, 90, 100];
-    const speed = speeds[Math.floor(Math.random() * speeds.length)];
-    const hours = Math.floor(Math.random() * 5) + 2;
-    const distance = speed * hours;
-
-    qText = `एक रेलगाड़ी ${speed} किमी/घंटा की नियत चाल से चल रही है। ${distance} किमी की दूरी तय करने में उसे कितना समय लगेगा?`;
-    qTextEn = `A train moves at a uniform speed of ${speed} km/h. How much time will it take to travel ${distance} km?`;
-    ansStr = `${hours} घंटे`;
-    explanation = `समय = दूरी ÷ चाल = ${distance} ÷ ${speed} = ${hours} घंटे।`;
-    explanationEn = `Time = Distance / Speed = ${distance} / ${speed} = ${hours} hours.`;
-    shortcut = `सूत्र: T = D ÷ S = ${distance} ÷ ${speed} = ${hours} घंटे`;
-
-    distractors = [
-      `${hours + 1} घंटे`,
-      `${Math.max(1, hours - 1)} घंटे`,
-      `${hours + 2} घंटे`,
-      `${hours + 3} घंटे`
-    ];
-  }
-  else if (chosenTopic.includes('औसत')) {
-    // Arithmetic progression numbers guarantees middle number is exact average
-    const start = Math.floor(Math.random() * 30) + 12;
-    const diff = Math.floor(Math.random() * 4) + 2;
-    const nums = [start, start + diff, start + 2 * diff, start + 3 * diff, start + 4 * diff];
-    const sum = nums.reduce((acc, curr) => acc + curr, 0);
-    const avg = nums[2]; // middle term
-
-    qText = `संख्याओं ${nums.join(', ')} का औसत (Average) क्या होगा?`;
-    qTextEn = `What is the average of numbers ${nums.join(', ')}?`;
-    ansStr = `${avg}`;
-    explanation = `औसत = कुल योग ÷ कुल संख्याएँ = (${nums.join(' + ')}) ÷ 5 = ${sum} ÷ 5 = ${avg}।`;
-    explanationEn = `Average = Sum / Count = ${sum} / 5 = ${avg}.`;
-    shortcut = `समानांतर श्रेणी (AP) में औसत सदैव मध्य पद होता है = ${avg}`;
-
-    distractors = [
-      `${avg + diff}`,
-      `${avg - diff}`,
-      `${avg + 1}`,
-      `${avg - 1}`
-    ];
-  }
-  else if (chosenTopic.includes('अनुपात व समानुपात')) {
-    // Ratio distribution
-    const r1 = Math.floor(Math.random() * 3) + 2; // e.g. 2, 3, 4
-    const r2 = Math.floor(Math.random() * 3) + 3; // e.g. 3, 4, 5
-    const unitVal = (Math.floor(Math.random() * 15) + 5) * 50; // e.g. 500
-    const totalAmount = (r1 + r2) * unitVal;
-    const ansA = r1 * unitVal;
-
-    qText = `₹${totalAmount} की राशि को A और B में ${r1} : ${r2} के अनुपात में बांटा जाता है। A का हिस्सा कितना होगा?`;
-    qTextEn = `₹${totalAmount} is divided between A and B in ratio ${r1} : ${r2}. What is A's share?`;
-    ansStr = `₹${ansA}`;
-    explanation = `अनुपातों का योग = ${r1} + ${r2} = ${r1 + r2} यूनिट।\n1 यूनिट का मान = ₹${totalAmount} ÷ ${r1 + r2} = ₹${unitVal}।\nA का हिस्सा (${r1} यूनिट) = ${r1} × ${unitVal} = ₹${ansA}।`;
-    explanationEn = `Total Ratio = ${r1} + ${r2} = ${r1 + r2}. 1 unit = ${totalAmount} / ${r1 + r2} = ${unitVal}. A's share = ${r1} * ${unitVal} = ₹${ansA}.`;
-    shortcut = `A का हिस्सा = [${r1} ÷ (${r1} + ${r2})] × ₹${totalAmount} = ₹${ansA}`;
-
-    distractors = [
-      `₹${r2 * unitVal}`,
-      `₹${ansA + 100}`,
-      `₹${Math.max(50, ansA - 100)}`,
-      `₹${ansA + 200}`
-    ];
-  }
-  else if (chosenTopic.includes('साधारण ब्याज')) {
-    // SI = (P * R * T) / 100
-    const principals = [1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000];
-    const p = principals[Math.floor(Math.random() * principals.length)];
-    const rates = [4, 5, 6, 8, 10];
-    const r = rates[Math.floor(Math.random() * rates.length)];
-    const times = [2, 3, 4, 5];
-    const t = times[Math.floor(Math.random() * times.length)];
-    const si = Math.round((p * r * t) / 100);
-
-    qText = `₹${p} पर ${r}% वार्षिक दर से ${t} वर्ष का साधारण ब्याज (SI) क्या होगा?`;
-    qTextEn = `What is the Simple Interest on ₹${p} at ${r}% per annum for ${t} years?`;
-    ansStr = `₹${si}`;
-    explanation = `साधारण ब्याज = (मूलधन × दर × समय) ÷ 100 = (${p} × ${r} × ${t}) ÷ 100 = ₹${si}।`;
-    explanationEn = `SI = (P * R * T) / 100 = (${p} * ${r} * ${t}) / 100 = ₹${si}.`;
-    shortcut = `सूत्र: SI = (P × R × T) ÷ 100 = ₹${si}`;
-
-    distractors = [
-      `₹${si + 100}`,
-      `₹${Math.max(50, si - 100)}`,
-      `₹${si + 50}`,
-      `₹${Math.max(20, si - 50)}`
-    ];
-  }
-  else if (chosenTopic.includes('वर्ग')) {
-    // Squares of 12 to 45
-    const num = Math.floor(Math.random() * 30) + 14;
-    const sq = num * num;
-
-    qText = `(${num})² का सटीक मान क्या होगा?`;
-    qTextEn = `What is the exact value of (${num})²?`;
-    ansStr = `${sq}`;
-    explanation = `(${num})² = ${num} × ${num} = ${sq}।`;
-    explanationEn = `(${num})² = ${num} * ${num} = ${sq}.`;
-    shortcut = `वैदिक विधि / आधार विधि: ${num} × ${num} = ${sq}`;
-
-    distractors = [
-      `${sq + 20}`,
-      `${sq - 20}`,
-      `${(num + 1) * (num + 1)}`,
-      `${(num - 1) * (num - 1)}`
-    ];
-  }
-  else if (chosenTopic.includes('घन')) {
-    // Cubes of 6 to 16
-    const num = Math.floor(Math.random() * 11) + 6;
-    const cube = num * num * num;
-
-    qText = `(${num})³ का सटीक मान क्या होगा?`;
-    qTextEn = `What is the exact value of (${num})³?`;
-    ansStr = `${cube}`;
-    explanation = `(${num})³ = ${num} × ${num} × ${num} = ${cube}।`;
-    explanationEn = `(${num})³ = ${num} * ${num} * ${num} = ${cube}.`;
-    shortcut = `${num} का घन = ${cube}`;
-
-    distractors = [
-      `${cube + 50}`,
-      `${cube - 50}`,
-      `${(num + 1) * (num + 1) * (num + 1)}`,
-      `${(num - 1) * (num - 1) * (num - 1)}`
-    ];
-  }
-  else {
-    // BODMAS Simplification
-    const a = (Math.floor(Math.random() * 10) + 2) * 6; // e.g. 24, 30, 36
-    const b = [2, 3, 6][Math.floor(Math.random() * 3)];
-    const c = Math.floor(Math.random() * 5) + 3;
-    const d = Math.floor(Math.random() * 15) + 5;
-    const div = a / b;
-    const mul = div * c;
-    const res = mul + d;
-
-    qText = `मान ज्ञात कीजिए: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
-    qTextEn = `Evaluate: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
-    ansStr = `${res}`;
-    explanation = `BODMAS नियम का पालन करें:\n1. भाग: ${a} ÷ ${b} = ${div}\n2. गुणा: ${div} × ${c} = ${mul}\n3. जोड़: ${mul} + ${d} = ${res}।`;
-    explanationEn = `Follow BODMAS: Division first (${a} / ${b} = ${div}), Multiplication (${div} * ${c} = ${mul}), then Addition = ${res}.`;
-    shortcut = `चरण: ÷ फिर × फिर + = ${res}`;
-
-    distractors = [
-      `${res + 5}`,
-      `${Math.max(1, res - 5)}`,
-      `${res + 10}`,
-      `${Math.max(2, res - 10)}`
-    ];
-  }
-
-  // Ensure 4 unique, valid options with correct answer guaranteed
-  const optionSet = new Set<string>();
-  optionSet.add(ansStr);
-
-  for (const dist of distractors) {
-    if (dist && dist !== ansStr && !optionSet.has(dist)) {
-      optionSet.add(dist);
-    }
-    if (optionSet.size >= 4) break;
-  }
-
-  // Fallback if needed
-  let fallbackStep = 1;
-  while (optionSet.size < 4) {
-    const fallbackVal = ansStr.startsWith('₹') 
-      ? `₹${parseInt(ansStr.replace('₹', ''), 10) + fallbackStep * 15}`
-      : ansStr.includes('दिन') 
-        ? `${parseInt(ansStr, 10) + fallbackStep * 3} दिन`
-        : ansStr.includes('घंटे')
-          ? `${parseInt(ansStr, 10) + fallbackStep * 2} घंटे`
-          : `${parseInt(ansStr, 10) + fallbackStep * 7}`;
-    
-    if (!optionSet.has(fallbackVal)) {
-      optionSet.add(fallbackVal);
-    }
-    fallbackStep++;
-  }
-
-  const shuffledOptions = Array.from(optionSet).sort(() => Math.random() - 0.5);
-  const correctIndex = shuffledOptions.indexOf(ansStr);
-
-  return {
-    id: indexSeed,
-    question: qText,
-    questionEn: qTextEn,
-    options: shuffledOptions,
-    optionsEn: shuffledOptions,
-    correct: correctIndex >= 0 ? correctIndex : 0,
-    explanation,
-    explanationEn,
-    shortcut,
-    category: chosenTopic
-  };
+  return finalQ!;
 }
 
 export default function App() {
@@ -780,6 +1035,22 @@ export default function App() {
   const [calcCorrectCount, setCalcCorrectCount] = useState(0);
   const [calcWrongCount, setCalcWrongCount] = useState(0);
   const [calcUserAnswers, setCalcUserAnswers] = useState<{ selected: number | null; correct: boolean }[]>([]);
+  // Persistent tracking of seen questions to eliminate repetitions 100%
+  const seenMathSignaturesRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('study_seen_math_questions_v2');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((item: string) => seenMathSignaturesRef.current.add(item));
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
 
   // Typing Test State
   const [typingDuration, setTypingDuration] = useState<number | 'Infinite'>(2);
@@ -791,6 +1062,22 @@ export default function App() {
   const [typingStarted, setTypingStarted] = useState(false);
   const [typingTimeLeft, setTypingTimeLeft] = useState(120);
   const typingScrollRef = useRef<HTMLDivElement>(null);
+
+  // Submit typing test (called on timeout or user finish)
+  const submitTypingTest = () => {
+    setTypingStarted(false);
+    playGentleSound('celebrate', soundMuted);
+    const words = typedInput.trim().split(/\s+/).filter(Boolean).length;
+    const totalAllowedSec = typeof typingDuration === 'number' ? typingDuration * 60 : 120;
+    const timeSpentSec = Math.max(1, totalAllowedSec - typingTimeLeft);
+    const finalWpm = Math.round((words / timeSpentSec) * 60);
+    recordUserAttempt('typing', {
+      wpm: finalWpm,
+      timeTaken: timeSpentSec,
+      characters: typedInput.length
+    });
+    navigateTo('typing_result');
+  };
 
   // Review accordions state for Results
   const [reviewExpanded, setReviewExpanded] = useState(false);
@@ -1014,24 +1301,34 @@ export default function App() {
     return () => clearInterval(interval);
   }, [calcTimerActive]);
 
-  // Typing Timer
+  // Typing Timer & Auto-Submit when time is over
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
-    if (typingStarted && typingTimeLeft > 0) {
-      interval = setInterval(() => {
-        setTypingTimeLeft(prev => {
-          if (prev <= 1) {
-            setTypingStarted(false);
-            playGentleSound('celebrate', soundMuted);
-            setCurrentView('typing_result');
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (typingStarted && typingDuration !== 'Infinite') {
+      if (typingTimeLeft > 0) {
+        interval = setInterval(() => {
+          setTypingTimeLeft(prev => {
+            if (prev <= 1) {
+              setTypingStarted(false);
+              playGentleSound('celebrate', soundMuted);
+              const words = typedInput.trim().split(/\s+/).filter(Boolean).length;
+              const durationSec = typeof typingDuration === 'number' ? typingDuration * 60 : 120;
+              const finalWpm = Math.round((words / (durationSec / 60))) || 0;
+              recordUserAttempt('typing', {
+                wpm: finalWpm,
+                timeTaken: durationSec,
+                characters: typedInput.length
+              });
+              setCurrentView('typing_result');
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      }
     }
     return () => clearInterval(interval);
-  }, [typingStarted, typingTimeLeft, soundMuted]);
+  }, [typingStarted, typingTimeLeft, typingDuration, soundMuted, typedInput]);
 
   // Smooth, stable auto-scroll strictly contained within the text box
   // NEVER scrolls the window or causes screen jumping when mobile keyboard is open
@@ -1094,37 +1391,23 @@ export default function App() {
 
   // Generate Calculation Questions
   const generateCalculationSet = () => {
-    const totalQ = calcCount === 'Infinite' ? 25 : Number(calcCount);
+    const totalQ = calcCount === 'Infinite' ? 20 : Number(calcCount);
     const generated: QuizQuestion[] = [];
-    const seenSignatures = new Set<string>();
 
-    // Retrieve previous questions from localStorage to prevent cross-session repetition
-    let persistentSeen: string[] = [];
-    try {
-      const stored = localStorage.getItem('study_seen_math_questions');
-      if (stored) persistentSeen = JSON.parse(stored);
-    } catch {
-      persistentSeen = [];
+    for (let i = 0; i < totalQ; i++) {
+      const q = generateUnlimitedMathQuestion(
+        calcTopic,
+        i + 1,
+        calcDifficulty,
+        seenMathSignaturesRef.current
+      );
+      generated.push(q);
     }
 
-    persistentSeen.forEach(s => seenSignatures.add(s));
-
-    let attempts = 0;
-    while (generated.length < totalQ && attempts < 200) {
-      attempts++;
-      const q = generateUnlimitedMathQuestion(calcTopic, generated.length + 1);
-      const signature = `${q.category}_${q.question}`;
-
-      if (!seenSignatures.has(signature) || attempts > 150) {
-        seenSignatures.add(signature);
-        generated.push(q);
-      }
-    }
-
-    // Save recent signatures to persistent storage (limit to last 500)
+    // Save recent signatures to persistent storage (limit to last 2000)
     try {
-      const arr = Array.from(seenSignatures).slice(-500);
-      localStorage.setItem('study_seen_math_questions', JSON.stringify(arr));
+      const arr = Array.from(seenMathSignaturesRef.current).slice(-2000);
+      localStorage.setItem('study_seen_math_questions_v2', JSON.stringify(arr));
     } catch {
       // Ignore
     }
@@ -1582,79 +1865,91 @@ export default function App() {
                     )}
                   </div>
                 )}
-                {adminNodes.length === 0 ? (
-                  // Clean skeleton shimmer when no nodes are cached or while first loading from database (prevents any old default flash)
+                <motion.div
+                  key="home-grid"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.16 }}
+                  className="space-y-4"
+                >
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {[1, 2, 3, 4, 5, 6].map((sk) => (
-                      <div
-                        key={sk}
-                        className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm h-36 flex flex-col justify-between animate-pulse"
-                      >
-                        <div className="w-12 h-12 rounded-2xl bg-slate-100" />
-                        <div className="space-y-2">
-                          <div className="h-4 bg-slate-100 rounded w-3/4" />
-                          <div className="h-3 bg-slate-50 rounded w-1/2" />
+                    {/* Empty State when no buttons are added yet from Admin Panel */}
+                    {adminNodes.length === 0 && (
+                      <div className="col-span-2 sm:col-span-2 md:col-span-3 border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center text-slate-400 select-none bg-slate-50/60 my-6">
+                        <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-2xl mb-3">
+                          📲
                         </div>
+                        <h3 className="text-base font-bold text-slate-800">
+                          {langHindi ? 'कोई बटन अभी नहीं है' : 'No Buttons Added Yet'}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                          {langHindi 
+                            ? 'अपने Admin Panel से Calculation, Typing Test, Quiz या Notes जोड़ें। वे तुरंत यहाँ दिखाई देंगे।'
+                            : 'Add Calculation, Typing Test, Quiz or Notes from your Admin Panel. They will appear here live.'}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <motion.div
-                    key="home-grid"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.16 }}
-                    className="space-y-4"
-                  >
-                    {/* Real-time Admin Nodes from Supabase & Cache without any old dummy buttons */}
-                    {/* Rendered according to the 3 Visual Types in the Image: FOLDER, SECTION, and BUTTON */}
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {adminNodes.map((btn: any) => {
-                        const target = String(btn.view || btn.target_view || btn.type || btn.id || '').toLowerCase();
-                        const hasCustomHtml = Boolean(
-                          btn.htmlContent || btn.html || btn.code || btn.rawHtml ||
-                          (typeof btn.content === 'string' && (btn.content.includes('<html') || btn.content.includes('<!DOCTYPE') || btn.content.includes('<script')))
-                        );
-                        const displayTitle = resolveNodeTitle(btn, langHindi);
-                        const displayIcon = resolveNodeIcon(btn);
-                        const displaySubtitle = resolveNodeSubtitle(btn, langHindi);
+                    )}
 
-                        const isSection = isSectionNode(btn);
-                        const isFolder = isFolderNode(btn);
+                    {/* All Buttons, Folders, and Sections Added via Admin Panel */}
+                    {adminNodes.map((btn: any) => {
+                      const target = String(btn.view || btn.target_view || btn.type || btn.id || '').toLowerCase();
+                      const isCalc = target.includes('calc') || 
+                        btn.kind === 'calc' || 
+                        String(btn.title || '').toLowerCase().includes('calc') || 
+                        String(btn.title || '').includes('कैलकुलेशन') || 
+                        String(btn.title || '').toLowerCase().includes('speed math');
+                      const isTyping = target.includes('typing') || 
+                        btn.kind === 'typing' || 
+                        String(btn.title || '').toLowerCase().includes('typing') || 
+                        String(btn.title || '').includes('टाइपिंग');
+                      const hasCustomHtml = Boolean(
+                        btn.htmlContent || btn.html || btn.code || btn.rawHtml ||
+                        (typeof btn.content === 'string' && (btn.content.includes('<html') || btn.content.includes('<!DOCTYPE') || btn.content.includes('<script')))
+                      );
+                      const displayTitle = resolveNodeTitle(btn, langHindi);
+                      const displayIcon = resolveNodeIcon(btn);
+                      const displaySubtitle = resolveNodeSubtitle(btn, langHindi);
 
-                        const handleNodeClick = () => {
-                          if (isSection) return; // Sections are visual dividers/headers
-                          if (btn.url) {
-                            window.open(btn.url, '_blank');
-                            return;
-                          }
-                          if (hasCustomHtml || (btn.kind === 'html' && btn.id !== 'calc' && btn.id !== 'typing')) {
-                            setActiveCustomNode(btn);
-                            setHtmlIsFullscreen(false);
-                            navigateTo('custom_node');
-                            return;
-                          }
-                          if (target.includes('mock')) {
-                            setMockIndex(0);
-                            setUserMockAnswers(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
-                            setMockTimer(600);
-                            setMockTimerActive(true);
-                            navigateTo('mock_play');
-                          } else if (target.includes('quiz')) {
-                            navigateTo('quiz_categories');
-                          } else if (target.includes('note') || target.includes('pdf')) {
-                            navigateTo('notes_lib');
-                          } else if (target.includes('calc')) {
-                            navigateTo('calc_setup');
-                          } else if (target.includes('typing')) {
-                            navigateTo('typing_setup');
-                          } else {
-                            setActiveCustomNode(btn);
-                            setHtmlIsFullscreen(false);
-                            navigateTo('custom_node');
-                          }
-                        };
+                      const isSection = isSectionNode(btn);
+                      const isFolder = isFolderNode(btn);
+
+                      const handleNodeClick = () => {
+                        if (isSection) return; // Sections are visual dividers/headers
+                        if (btn.url) {
+                          window.open(btn.url, '_blank');
+                          return;
+                        }
+                        if (isCalc) {
+                          navigateTo('calc_setup');
+                          return;
+                        }
+                        if (isTyping) {
+                          navigateTo('typing_setup');
+                          return;
+                        }
+                        if (hasCustomHtml || (btn.kind === 'html' && btn.id !== 'calc')) {
+                          setActiveCustomNode(btn);
+                          setHtmlIsFullscreen(false);
+                          navigateTo('custom_node');
+                          return;
+                        }
+                        if (target.includes('mock')) {
+                          setMockIndex(0);
+                          setUserMockAnswers(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
+                          setMockTimer(600);
+                          setMockTimerActive(true);
+                          navigateTo('mock_play');
+                        } else if (target.includes('quiz')) {
+                          navigateTo('quiz_categories');
+                        } else if (target.includes('note') || target.includes('pdf')) {
+                          navigateTo('notes_lib');
+                        } else {
+                          setActiveCustomNode(btn);
+                          setHtmlIsFullscreen(false);
+                          navigateTo('custom_node');
+                        }
+                      };
 
                         // 1. SECTION (Image: Full-width horizontal title banner with tag badge)
                         if (isSection) {
@@ -1748,7 +2043,6 @@ export default function App() {
                       })}
                     </div>
                   </motion.div>
-                )}
               </>
             )}
 
@@ -2383,29 +2677,22 @@ export default function App() {
 
                 {/* Mathematics Subjects */}
                 <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                    <Calculator className="w-4 h-4 text-blue-600" /> विषय चुनें (Math Topics)
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {[
-                      'मिश्रित (सभी विषय)',
-                      'प्रतिशत (Percentage)',
-                      'लाभ व हानि (Profit & Loss)',
-                      'समय व कार्य (Time & Work)',
-                      'समय, चाल व दूरी (Time & Distance)',
-                      'औसत (Average)',
-                      'सरलीकरण (BODMAS)',
-                      'अनुपात व समानुपात (Ratio & Proportion)',
-                      'साधारण ब्याज (Simple Interest)',
-                      'वर्ग व वर्गमूल (Squares)',
-                      'घन व घनमूल (Cubes)'
-                    ].map((top) => (
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Calculator className="w-4 h-4 text-blue-600" /> विषय चुनें (Math Topics)
+                    </h3>
+                    <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                      {ALL_MATH_TOPICS.length} विषय उपलब्ध
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1">
+                    {ALL_MATH_TOPICS.map((top) => (
                       <button
                         key={top}
                         onClick={() => setCalcTopic(top)}
-                        className={"p-3 rounded-xl text-left font-bold text-xs sm:text-sm border transition flex items-center gap-2 active:scale-98 cursor-pointer " + (calcTopic === top ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100')}
+                        className={"p-3 rounded-xl text-left font-bold text-xs sm:text-sm border transition flex items-center gap-2.5 active:scale-98 cursor-pointer " + (calcTopic === top ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100')}
                       >
-                        <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                        <span className={"w-2.5 h-2.5 rounded-full shrink-0 " + (calcTopic === top ? 'bg-blue-600 ring-4 ring-blue-100' : 'bg-slate-300')}></span>
                         <span className="truncate">{top}</span>
                       </button>
                     ))}
@@ -2437,9 +2724,9 @@ export default function App() {
                   const currentCalcQ = calcQuestions[calcIndex] || calcQuestions[0];
                   return (
                     <>
-                      <div className="bg-white border border-slate-200 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-slate-700 shadow-sm">
-                        <span className="truncate max-w-[200px]">टॉपिक: {currentCalcQ.category || calcTopic}</span>
-                        <div className="flex items-center gap-4">
+                      <div className="bg-white border border-slate-200 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-slate-700 shadow-sm flex-wrap gap-2">
+                        <span className="truncate max-w-[180px] sm:max-w-[220px]">टॉपिक: {currentCalcQ.category || calcTopic}</span>
+                        <div className="flex items-center gap-3 sm:gap-4">
                           <span className="text-amber-600 flex items-center gap-1">
                             <Zap className="w-3.5 h-3.5" /> {calcScore}
                           </span>
@@ -2447,13 +2734,34 @@ export default function App() {
                             <Clock className="w-3.5 h-3.5" />
                             <span>{String(Math.floor(calcTimer / 60)).padStart(2, '0')}:{String(calcTimer % 60).padStart(2, '0')}</span>
                           </span>
-                          <span className="bg-slate-100 px-2.5 py-1 rounded-lg">Q {calcIndex + 1} / {calcQuestions.length}</span>
+                          <span className="bg-slate-100 px-2.5 py-1 rounded-lg">
+                            Q {calcIndex + 1} {calcCount === 'Infinite' ? '(∞ असीमित)' : `/ ${calcQuestions.length}`}
+                          </span>
+                          {calcCount === 'Infinite' && (
+                            <button
+                              onClick={() => {
+                                setCalcTimerActive(false);
+                                playGentleSound('celebrate', soundMuted);
+                                recordUserAttempt('calc', {
+                                  topic: calcTopic,
+                                  difficulty: calcDifficulty,
+                                  correct: calcCorrectCount,
+                                  wrong: calcWrongCount,
+                                  timeTaken: calcTimer
+                                });
+                                navigateTo('calc_result');
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold transition text-[11px] cursor-pointer"
+                            >
+                              समाप्त करें
+                            </button>
+                          )}
                         </div>
                       </div>
 
                       <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 text-center shadow-sm relative overflow-hidden">
                         <span className="absolute top-3 left-4 text-[10px] uppercase font-bold tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                          स्पीड कैलकुलेशन
+                          स्पीड कैलकुलेशन • {calcDifficulty}
                         </span>
                         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 my-6 leading-relaxed">
                           {langHindi ? currentCalcQ.question : currentCalcQ.questionEn}
@@ -2523,30 +2831,72 @@ export default function App() {
                       )}
 
                       {calcAnswered && (
-                        <button
-                          onClick={() => {
-                            if (calcIndex + 1 < calcQuestions.length) {
-                              setCalcIndex(prev => prev + 1);
-                              setCalcSelected(null);
-                              setCalcAnswered(false);
-                            } else {
-                              setCalcTimerActive(false);
-                              playGentleSound('celebrate', soundMuted);
-                              recordUserAttempt('calc', {
-                                topic: calcTopic,
-                                difficulty: calcDifficulty,
-                                correct: calcCorrectCount,
-                                wrong: calcWrongCount,
-                                timeTaken: calcTimer
-                              });
-                              navigateTo('calc_result');
-                            }
-                          }}
-                          className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
-                        >
-                          <span>{calcIndex + 1 < calcQuestions.length ? 'अगला प्रश्न' : 'रिजल्ट देखें'}</span>
-                          <ChevronRight className="w-5 h-5" />
-                        </button>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => {
+                              if (calcIndex + 1 < calcQuestions.length) {
+                                setCalcIndex(prev => prev + 1);
+                                setCalcSelected(null);
+                                setCalcAnswered(false);
+                              } else if (calcCount === 'Infinite') {
+                                // Dynamically generate a brand new unique question on the fly
+                                const nextQ = generateUnlimitedMathQuestion(
+                                  calcTopic,
+                                  calcQuestions.length + 1,
+                                  calcDifficulty,
+                                  seenMathSignaturesRef.current
+                                );
+                                setCalcQuestions(prev => [...prev, nextQ]);
+                                setCalcIndex(prev => prev + 1);
+                                setCalcSelected(null);
+                                setCalcAnswered(false);
+
+                                // Save updated signatures to localStorage
+                                try {
+                                  const arr = Array.from(seenMathSignaturesRef.current).slice(-2000);
+                                  localStorage.setItem('study_seen_math_questions_v2', JSON.stringify(arr));
+                                } catch {
+                                  // Ignore
+                                }
+                              } else {
+                                setCalcTimerActive(false);
+                                playGentleSound('celebrate', soundMuted);
+                                recordUserAttempt('calc', {
+                                  topic: calcTopic,
+                                  difficulty: calcDifficulty,
+                                  correct: calcCorrectCount,
+                                  wrong: calcWrongCount,
+                                  timeTaken: calcTimer
+                                });
+                                navigateTo('calc_result');
+                              }
+                            }}
+                            className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
+                          >
+                            <span>{calcCount === 'Infinite' || calcIndex + 1 < calcQuestions.length ? 'अगला प्रश्न' : 'रिजल्ट देखें'}</span>
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+
+                          {calcCount === 'Infinite' && (
+                            <button
+                              onClick={() => {
+                                setCalcTimerActive(false);
+                                playGentleSound('celebrate', soundMuted);
+                                recordUserAttempt('calc', {
+                                  topic: calcTopic,
+                                  difficulty: calcDifficulty,
+                                  correct: calcCorrectCount,
+                                  wrong: calcWrongCount,
+                                  timeTaken: calcTimer
+                                });
+                                navigateTo('calc_result');
+                              }}
+                              className="px-5 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-98 cursor-pointer text-sm"
+                            >
+                              समाप्त करें
+                            </button>
+                          )}
+                        </div>
                       )}
                     </>
                   );
@@ -2684,8 +3034,9 @@ export default function App() {
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                     {langHindi ? 'उपलब्ध टाइपिंग टेस्ट्स:' : 'Available Typing Tests:'}
                   </h3>
+
                   {(() => {
-                    // Check if Admin panel configured tests inside a Typing folder or children
+                    // Check if Admin panel configured tests inside a Typing folder, button, or children
                     const typingNode = adminNodes.find((n: any) => 
                       String(n.id || n.view || n.type || '').toLowerCase().includes('typing') ||
                       String(n.title || '').toLowerCase().includes('typing') ||
@@ -2695,7 +3046,7 @@ export default function App() {
                       ? typingNode.children
                       : [];
 
-                    const testList = adminTypingTests.length > 0 ? adminTypingTests : [
+                    const defaultTests = [
                       {
                         id: 'typing-pass-1',
                         title: 'SSC CHSL / CGL English Typing Test Passage #1',
@@ -2716,14 +3067,17 @@ export default function App() {
                       }
                     ];
 
+                    const testList = adminTypingTests.length > 0 ? adminTypingTests : defaultTests;
+
                     return testList.map((testItem: any, idx: number) => {
-                      const title = testItem.title || `टाइपिंग टेस्ट सेट #${idx + 1}`;
+                      const id = testItem.id || `typing-${idx}`;
+                      const title = testItem.title || testItem.name || `टाइपिंग टेस्ट सेट #${idx + 1}`;
                       const sub = testItem.subtitle || testItem.sub || 'SSC & State Exams Typing';
                       const text = testItem.passage || testItem.text || testItem.content || testItem.html || DEFAULT_TYPING_PASSAGE;
 
                       return (
                         <button
-                          key={testItem.id || idx}
+                          key={id}
                           onClick={() => {
                             setActiveTypingPassage(text);
                             setActiveTypingTitle(title);
@@ -2743,6 +3097,9 @@ export default function App() {
                                 {title}
                               </h4>
                               <p className="text-xs text-slate-500 mt-0.5 truncate">{sub}</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5 font-mono">
+                                {text.trim().split(/\s+/).filter(Boolean).length} शब्द • {text.length} अक्षर
+                              </p>
                             </div>
                           </div>
                           <div className="flex items-center space-x-2 shrink-0 ml-2">
@@ -2768,14 +3125,23 @@ export default function App() {
                 className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 max-w-2xl mx-auto space-y-6"
               >
                 <div className="bg-slate-900 text-white rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                  <div className="flex items-center gap-2 text-emerald-400 font-mono font-bold text-lg">
+                  <div className={"flex items-center gap-2 font-mono font-bold text-lg " + (typingTimeLeft <= 10 && typingDuration !== 'Infinite' ? 'text-rose-400 animate-pulse' : 'text-emerald-400')}>
                     <Clock className="w-5 h-5" />
-                    <span>{String(Math.floor(typingTimeLeft / 60)).padStart(2, '0')}:{String(typingTimeLeft % 60).padStart(2, '0')}</span>
+                    <span>
+                      {typingDuration === 'Infinite'
+                        ? '∞ Free'
+                        : `${String(Math.floor(typingTimeLeft / 60)).padStart(2, '0')}:${String(typingTimeLeft % 60).padStart(2, '0')}`}
+                    </span>
                   </div>
                   <div className="text-center font-mono">
                     <p className="text-[10px] text-slate-400 uppercase">WPM</p>
                     <p className="text-xl font-bold text-blue-400">
-                      {Math.round((typedInput.trim().split(/\s+/).filter(Boolean).length / Math.max(1, (120 - typingTimeLeft))) * 60) || 0}
+                      {(() => {
+                        const words = typedInput.trim().split(/\s+/).filter(Boolean).length;
+                        const totalAllowedSec = typeof typingDuration === 'number' ? typingDuration * 60 : 120;
+                        const elapsedSec = Math.max(1, totalAllowedSec - typingTimeLeft);
+                        return Math.round((words / elapsedSec) * 60) || 0;
+                      })()}
                     </p>
                   </div>
                   <div className="text-center font-mono">
@@ -2792,11 +3158,7 @@ export default function App() {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
-                      setTypingStarted(false);
-                      playGentleSound('celebrate', soundMuted);
-                      navigateTo('typing_result');
-                    }}
+                    onClick={submitTypingTest}
                     className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition shadow-sm active:scale-95 cursor-pointer"
                   >
                     समाप्त
@@ -2839,33 +3201,26 @@ export default function App() {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 px-1">
                     <span>टाइपिंग इनपुट (यहीं टाइप करें):</span>
-                    <span className="text-[11px] text-slate-400">2-3 पंक्तियों का कॉम्पैक्ट बॉक्स</span>
+                    <span className="text-[11px] text-slate-400">
+                      {typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? '⚠️ समय समाप्त (बंद)' : '2-3 पंक्तियों का कॉम्पैक्ट बॉक्स'}
+                    </span>
                   </div>
                   <textarea
                     rows={3}
+                    disabled={typingTimeLeft <= 0 && typingDuration !== 'Infinite'}
                     value={typedInput}
                     onChange={(e) => {
                       if (!typingStarted) setTypingStarted(true);
                       setTypedInput(e.target.value);
                       if (e.target.value.length >= passageText.length) {
-                        setTypingStarted(false);
-                        playGentleSound('celebrate', soundMuted);
-                        const words = e.target.value.trim().split(/\s+/).filter(Boolean).length;
-                        const timeTakenSec = Math.max(1, 120 - typingTimeLeft);
-                        const wpm = Math.round((words / timeTakenSec) * 60);
-                        recordUserAttempt('typing', {
-                          wpm,
-                          timeTaken: timeTakenSec,
-                          characters: e.target.value.length
-                        });
-                        navigateTo('typing_result');
+                        submitTypingTest();
                       }
                     }}
                     autoCapitalize="none"
                     autoCorrect="off"
                     spellCheck={false}
-                    placeholder="कीबोर्ड से यहाँ टाइप करना शुरू करें (2-3 पंक्तियाँ)..."
-                    className="w-full h-20 sm:h-22 p-3 rounded-2xl border-2 border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none font-mono text-sm sm:text-base leading-snug resize-none bg-white shadow-sm text-slate-900 overscroll-contain"
+                    placeholder={typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? "समय समाप्त हो चुका है।" : "कीबोर्ड से यहाँ टाइप करना शुरू करें (2-3 पंक्तियाँ)..."}
+                    className={"w-full h-20 sm:h-22 p-3 rounded-2xl border-2 font-mono text-sm sm:text-base leading-snug resize-none shadow-sm overscroll-contain transition-colors " + (typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' : 'border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none bg-white text-slate-900')}
                   />
                 </div>
               </motion.div>
@@ -2887,7 +3242,7 @@ export default function App() {
 
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 mb-1">टाइपिंग टेस्ट स्कोरकार्ड</h2>
-                  <p className="text-xs text-slate-500">SSC CHSL / CGL English Typing Test Passage #1</p>
+                  <p className="text-xs text-slate-600 font-semibold">{activeTypingTitle}</p>
                 </div>
 
                 {(() => {
