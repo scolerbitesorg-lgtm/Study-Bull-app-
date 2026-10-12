@@ -1207,7 +1207,7 @@ export default function App() {
     // 1. Initial background fetch & normalization from Supabase
     loadStudyBullApp().then((appData) => {
       if (!isMounted) return;
-      if (appData.nodes && appData.nodes.length > 0) {
+      if (Array.isArray(appData.nodes)) {
         applyLiveAdminData(appData.nodes, appData.settings || {});
       } else {
         setIsDbLoaded(true);
@@ -1227,7 +1227,7 @@ export default function App() {
     const timer = setInterval(() => {
       loadStudyBullApp().then((appData) => {
         if (!isMounted) return;
-        if (appData && Array.isArray(appData.nodes) && appData.nodes.length > 0) {
+        if (appData && Array.isArray(appData.nodes)) {
           applyLiveAdminData(appData.nodes, appData.settings || {});
         }
       }).catch(() => {});
@@ -3042,9 +3042,13 @@ export default function App() {
                       String(n.title || '').toLowerCase().includes('typing') ||
                       String(n.title || '').includes('टाइपिंग')
                     );
-                    const adminTypingTests = (typingNode && Array.isArray(typingNode.children) && typingNode.children.length > 0)
-                      ? typingNode.children
-                      : [];
+                    const adminTypingTests = (typingNode && Array.isArray(typingNode.passages) && typingNode.passages.length > 0)
+                      ? typingNode.passages
+                      : (typingNode && Array.isArray(typingNode.children) && typingNode.children.length > 0)
+                        ? typingNode.children
+                        : (typingNode && (typingNode.typingPassage || typingNode.passage))
+                          ? [{ id: 'single-passage', title: typingNode.title || 'Typing Test', passage: typingNode.typingPassage || typingNode.passage }]
+                          : [];
 
                     const defaultTests = [
                       {
@@ -3073,7 +3077,7 @@ export default function App() {
                       const id = testItem.id || `typing-${idx}`;
                       const title = testItem.title || testItem.name || `टाइपिंग टेस्ट सेट #${idx + 1}`;
                       const sub = testItem.subtitle || testItem.sub || 'SSC & State Exams Typing';
-                      const text = testItem.passage || testItem.text || testItem.content || testItem.html || DEFAULT_TYPING_PASSAGE;
+                      const text = testItem.passage || testItem.text || testItem.typingPassage || testItem.content || testItem.html || DEFAULT_TYPING_PASSAGE;
 
                       return (
                         <button

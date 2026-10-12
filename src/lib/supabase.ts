@@ -1,6 +1,10 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Get credentials from either Vite environment variables or localStorage (for easy setup)
+// Production Fallback Credentials (ensures app works on Vercel without manual env configuration)
+export const FALLBACK_SUPABASE_URL = "https://epsplspwdjjjjezxscer.supabase.co";
+export const FALLBACK_SUPABASE_ANON_KEY = "sb_publishable_X8IsGDLwK9fUliHih60dlg_vqyOiePl";
+
+// Get credentials from Vite environment variables, localStorage, or fallback
 export function getSupabaseCredentials(): { url: string; anonKey: string } {
   let envUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
   let envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
@@ -8,8 +12,8 @@ export function getSupabaseCredentials(): { url: string; anonKey: string } {
   let localUrl = (typeof window !== 'undefined' ? localStorage.getItem('studybull_supabase_url') || '' : '').trim();
   let localKey = (typeof window !== 'undefined' ? localStorage.getItem('studybull_supabase_key') || '' : '').trim();
 
-  let url = envUrl || localUrl;
-  let anonKey = envKey || localKey;
+  let url = envUrl || localUrl || FALLBACK_SUPABASE_URL;
+  let anonKey = envKey || localKey || FALLBACK_SUPABASE_ANON_KEY;
 
   // Clean and normalize URL (Supabase client requires base URL without /rest/v1/)
   if (url) {
@@ -124,15 +128,28 @@ export async function syncExistingContentToSupabase(): Promise<{ nodes: any[]; s
 
 // Normalize all item fields according to Study Bull node schema
 export function normalizeNode(n: any): StudyBullNode {
-  const isTool = n.id === 'calc' || n.id === 'typing' || n.view === 'calc_setup' || n.view === 'typing_setup';
+  const isCalcNode = String(n.id || '').startsWith('calc') || 
+    String(n.kind || '').toLowerCase() === 'calc' || 
+    String(n.view || '').toLowerCase() === 'calc_setup' || 
+    String(n.target_view || '').toLowerCase() === 'calc_setup' ||
+    String(n.title || '').toLowerCase().includes('calc') ||
+    String(n.title || '').includes('कैलकुलेशन');
+
+  const isTypingNode = String(n.id || '').startsWith('typing') || 
+    String(n.kind || '').toLowerCase() === 'typing' || 
+    String(n.view || '').toLowerCase() === 'typing_setup' || 
+    String(n.target_view || '').toLowerCase() === 'typing_setup' ||
+    String(n.title || '').toLowerCase().includes('typing') ||
+    String(n.title || '').includes('टाइपिंग');
+
+  const isTool = isCalcNode || isTypingNode;
   const rawKind = String(n.kind || '').toLowerCase();
   let resolvedKind: any = 'button';
-  if (['button', 'folder', 'section', 'mcq', 'mock', 'notes', 'html', 'tool', 'calc', 'typing'].includes(rawKind)) {
+
+  if (isCalcNode) resolvedKind = 'calc';
+  else if (isTypingNode) resolvedKind = 'typing';
+  else if (['button', 'folder', 'section', 'mcq', 'mock', 'notes', 'html', 'tool'].includes(rawKind)) {
     resolvedKind = rawKind;
-  }
-  // Standalone utilities (Calculation & Typing) must NEVER be container buttons so Admin doesn't show "Add Button" inside them
-  if (isTool && (resolvedKind === 'button' || resolvedKind === 'folder' || resolvedKind === 'section')) {
-    resolvedKind = 'html';
   }
 
   const resolvedHtml = n.htmlContent || n.html || n.code || n.rawHtml || 
@@ -144,11 +161,12 @@ export function normalizeNode(n: any): StudyBullNode {
     title: String(n.title || n.name || 'Untitled'),
     titleEn: n.titleEn || n.title_en || undefined,
     kind: resolvedKind,
-    icon: String(n.icon || '📌'),
+    icon: String(n.icon || (isCalcNode ? '⚡' : isTypingNode ? '⌨️' : '📌')),
     subtitle: String(n.subtitle || n.sub || n.subtitleEn || ''),
     subtitleEn: n.subtitleEn || n.subtitle_en || undefined,
     enabled: n.enabled !== false && n.enabled !== 'false' && n.enabled !== 0,
     children: isTool ? [] : (Array.isArray(n.children) ? n.children.map(normalizeNode) : []),
+    passages: Array.isArray(n.passages) ? n.passages : (n.passages ? [n.passages] : undefined),
     questions: Array.isArray(n.questions) ? n.questions : [],
     isLeaf: isTool ? true : (n.isLeaf !== undefined ? Boolean(n.isLeaf) : undefined),
     allowChildren: isTool ? false : (n.allowChildren !== undefined ? Boolean(n.allowChildren) : undefined),
@@ -158,8 +176,8 @@ export function normalizeNode(n: any): StudyBullNode {
     html: resolvedHtml,
     code: resolvedHtml,
     ...(n.content ? { content: n.content } : {}),
-    ...(n.view ? { view: n.view } : (isTool ? { view: n.id === 'calc' ? 'calc_setup' : 'typing_setup' } : {})),
-    ...(n.target_view ? { target_view: n.target_view } : (isTool ? { target_view: n.id === 'calc' ? 'calc_setup' : 'typing_setup' } : {})),
+    view: n.view || (isCalcNode ? 'calc_setup' : isTypingNode ? 'typing_setup' : undefined),
+    target_view: n.target_view || n.view || (isCalcNode ? 'calc_setup' : isTypingNode ? 'typing_setup' : undefined),
     ...(n.url ? { url: n.url } : {})
   };
 }
