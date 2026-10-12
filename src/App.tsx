@@ -152,268 +152,130 @@ interface Chapter {
   content: string;
 }
 
-// 1. Curated Real Exam MCQs for Subject Quiz
-const QUIZ_SUBJECTS = [
-  {
-    id: 'polity',
-    title: 'भारतीय राजव्यवस्था',
-    titleEn: 'Polity & Constitution',
-    subtitle: 'संविधान, अनुच्छेद, मौलिक अधिकार',
-    subtitleEn: 'Constitution, Articles & Rights',
-    icon: '⚖️',
-    questions: [
-      {
-        id: 1,
-        question: 'भारतीय संविधान सभा की प्रथम बैठक कब आयोजित की गई थी?',
-        questionEn: 'When was the first meeting of the Indian Constituent Assembly held?',
-        options: ['9 दिसंबर 1946', '11 दिसंबर 1946', '26 जनवरी 1950', '15 अगस्त 1947'],
-        optionsEn: ['9 December 1946', '11 December 1946', '26 January 1950', '15 August 1947'],
-        correct: 0,
-        explanation: 'संविधान सभा की प्रथम बैठक 9 दिसंबर 1946 को काउंसिल चैंबर, नई दिल्ली में हुई थी, जिसके अस्थायी अध्यक्ष डॉ. सच्चिदानंद सिन्हा थे।',
-        explanationEn: 'The first meeting was on 9 December 1946 presided by Dr. Sachchidananda Sinha.'
-      },
-      {
-        id: 2,
-        question: 'प्रस्तावना में "धर्मनिरपेक्ष", "समाजवादी" और "अखंडता" शब्द किस संशोधन द्वारा जोड़े गए?',
-        questionEn: 'By which constitutional amendment were "Secular", "Socialist" and "Integrity" added to the Preamble?',
-        options: ['42वां संशोधन (1976)', '44वां संशोधन (1978)', '86वां संशोधन (2002)', '103वां संशोधन (2019)'],
-        optionsEn: ['42nd Amendment (1976)', '44th Amendment (1978)', '86th Amendment (2002)', '103rd Amendment (2019)'],
-        correct: 0,
-        explanation: '42वें संविधान संशोधन अधिनियम (1976) जिसे "लघु संविधान" भी कहा जाता है, द्वारा प्रस्तावना में ये शब्द जोड़े गए।',
-        explanationEn: '42nd Amendment Act 1976 added these three terms to the Preamble.'
-      },
-      {
-        id: 3,
-        question: 'संविधान के किस अनुच्छेद को डॉ. बी.आर. अंबेडकर ने "संविधान का हृदय और आत्मा" कहा था?',
-        questionEn: 'Which Article was termed as the "Heart and Soul of the Constitution" by Dr. B.R. Ambedkar?',
-        options: ['अनुच्छेद 32 (संवैधानिक उपचारों का अधिकार)', 'अनुच्छेद 14 (समानता का अधिकार)', 'अनुच्छेद 19 (स्वतंत्रता का अधिकार)', 'अनुच्छेद 21 (प्राण व दैहिक स्वतंत्रता)'],
-        optionsEn: ['Article 32 (Constitutional Remedies)', 'Article 14 (Equality)', 'Article 19 (Freedom)', 'Article 21 (Life & Liberty)'],
-        correct: 0,
-        explanation: 'अनुच्छेद 32 के तहत सर्वोच्च न्यायालय मौलिक अधिकारों के प्रवर्तन के लिए 5 प्रकार की रिट ( बंदी प्रत्यक्षीकरण, परमादेश, आदि) जारी करता है।',
-        explanationEn: 'Article 32 provides the right to Constitutional Remedies and empowers the Supreme Court to issue writs.'
-      },
-      {
-        id: 4,
-        question: 'भारत के राष्ट्रपति को पद एवं गोपनीयता की शपथ कौन दिलाता है?',
-        questionEn: 'Who administers the oath of office to the President of India?',
-        options: ['भारत का मुख्य न्यायाधीश (CJI)', 'उपराष्ट्रपति', 'प्रधानमंत्री', 'लोकसभा अध्यक्ष'],
-        optionsEn: ['Chief Justice of India (CJI)', 'Vice President', 'Prime Minister', 'Lok Sabha Speaker'],
-        correct: 0,
-        explanation: 'अनुच्छेद 60 के अनुसार भारत के मुख्य न्यायाधीश या उनकी अनुपस्थिति में वरिष्ठतम न्यायाधीश राष्ट्रपति को शपथ दिलाते हैं।',
-        explanationEn: 'Under Article 60, the Chief Justice of India administers the oath to the President.'
-      },
-      {
-        id: 5,
-        question: 'मौलिक कर्तव्यों (Fundamental Duties) को किस समिति की सिफारिश पर संविधान में जोड़ा गया था?',
-        questionEn: 'On the recommendation of which committee were Fundamental Duties added to the Constitution?',
-        options: ['स्वर्ण सिंह समिति', 'सरकारिया आयोग', 'बलवंत राय मेहता समिति', 'वर्मा समिति'],
-        optionsEn: ['Swaran Singh Committee', 'Sarkaria Commission', 'Balwant Rai Mehta Committee', 'Verma Committee'],
-        correct: 0,
-        explanation: 'स्वर्ण सिंह समिति की सिफारिश पर 42वें संशोधन (1976) द्वारा भाग 4(A) और अनुच्छेद 51(A) में 10 मौलिक कर्तव्य जोड़े गए (वर्तमान में 11 हैं)।',
-        explanationEn: 'Swaran Singh Committee recommended Fundamental Duties, added via 42nd Amendment 1976.'
+// Dynamic Extractor Helpers - Extract Notes, Quiz Subjects, and Mock Questions purely from Admin Nodes
+function getNotesChaptersFromAdmin(nodes: any[]): Chapter[] {
+  const chapters: Chapter[] = [];
+  
+  function traverse(list: any[]) {
+    if (!Array.isArray(list)) return;
+    for (const item of list) {
+      const kind = String(item.kind || item.type || '').toLowerCase();
+      const target = String(item.view || item.target_view || '').toLowerCase();
+      const contentStr = typeof item.notesContent === 'string' ? item.notesContent : (typeof item.content === 'string' ? item.content : '');
+      const isHtml = contentStr.includes('<html') || contentStr.includes('<!DOCTYPE') || contentStr.includes('<script');
+      
+      const hasChapters = Array.isArray(item.chapters) && item.chapters.length > 0;
+      const isNotesType = kind === 'notes' || kind === 'pdf' || kind === 'note' || target.includes('note') || target.includes('pdf');
+      
+      if (hasChapters) {
+        for (const ch of item.chapters) {
+          chapters.push({
+            id: String(ch.id || `chap-${Math.random()}`),
+            title: String(ch.title || 'Untitled Note'),
+            titleEn: String(ch.titleEn || ch.title || 'Untitled Note'),
+            subtitle: String(ch.subtitle || 'Admin Notes'),
+            subtitleEn: String(ch.subtitleEn || ch.subtitle || 'Admin Notes'),
+            content: String(ch.content || '')
+          });
+        }
+      } else if ((isNotesType || (contentStr && !isHtml)) && contentStr.trim().length > 0) {
+        chapters.push({
+          id: String(item.id || `chap-${Math.random()}`),
+          title: String(item.title || item.name || 'Untitled Note'),
+          titleEn: String(item.titleEn || item.title || item.name || 'Untitled Note'),
+          subtitle: String(item.subtitle || item.sub || 'Admin Notes'),
+          subtitleEn: String(item.subtitleEn || item.subtitle || item.sub || 'Admin Notes'),
+          content: contentStr
+        });
       }
-    ]
-  },
-  {
-    id: 'history',
-    title: 'भारतीय इतिहास',
-    titleEn: 'Indian History',
-    subtitle: 'प्राचीन, मध्यकालीन एवं आधुनिक भारत',
-    subtitleEn: 'Ancient, Medieval & Modern India',
-    icon: '🏛️',
-    questions: [
-      {
-        id: 1,
-        question: 'हड़प्पा सभ्यता की खोज किस वर्ष और किसने की थी?',
-        questionEn: 'In which year and by whom was the Harappan civilization discovered?',
-        options: ['1921 में दयाराम साहनी', '1922 में राखालदास बनर्जी', '1924 में जॉन मार्शल', '1928 में कनिंघम'],
-        optionsEn: ['1921 by Dayaram Sahni', '1922 by R.D. Banerjee', '1924 by John Marshall', '1928 by Cunningham'],
-        correct: 0,
-        explanation: 'रायबहादुर दयाराम साहनी ने 1921 में रावी नदी के तट पर स्थित हड़प्पा स्थल का उत्खनन कार्य शुरू किया था।',
-        explanationEn: 'Dayaram Sahni discovered Harappa site in 1921 on the banks of river Ravi.'
-      },
-      {
-        id: 2,
-        question: '1857 के प्रथम स्वतंत्रता संग्राम की शुरुआत किस छावनी से हुई थी?',
-        questionEn: 'From which cantonment did the First War of Independence in 1857 start?',
-        options: ['मेरठ छावनी', 'बैरकपुर छावनी', 'झांसी', 'दिल्ली'],
-        optionsEn: ['Meerut Cantonment', 'Barrackpore Cantonment', 'Jhansi', 'Delhi'],
-        correct: 0,
-        explanation: '10 मई 1857 को मेरठ छावनी के भारतीय सैनिकों ने विद्रोह की औपचारिक शुरुआत की और दिल्ली कूच किया।',
-        explanationEn: 'The uprising formally broke out at Meerut on May 10, 1857.'
-      },
-      {
-        id: 3,
-        question: 'जलियांवाला बाग नरसंहार की घटना किस तारीख को घटित हुई थी?',
-        questionEn: 'On which date did the Jallianwala Bagh massacre take place?',
-        options: ['13 अप्रैल 1919', '10 मई 1919', '15 अगस्त 1920', '26 जनवरी 1919'],
-        optionsEn: ['13 April 1919', '10 May 1919', '15 August 1920', '26 January 1919'],
-        correct: 0,
-        explanation: '13 अप्रैल 1919 (बैसाखी के दिन) अमृतसर में जनरल डायर ने शांतिपूर्ण सभा पर गोलियां चलवाईं जिसमें सैकड़ों निर्दोष मारे गए।',
-        explanationEn: 'The massacre took place on 13 April 1919 on Baisakhi day in Amritsar.'
-      },
-      {
-        id: 4,
-        question: 'पानीपत की पहली लड़ाई (1526) किनके बीच लड़ी गई थी?',
-        questionEn: 'Between whom was the First Battle of Panipat (1526) fought?',
-        options: ['बाबर और इब्राहिम लोदी', 'अकबर और हेमू', 'अहमद शाह अब्दाली और मराठा', 'बाबर और राणा सांगा'],
-        optionsEn: ['Babar and Ibrahim Lodi', 'Akbar and Hemu', 'Ahmad Shah Abdali and Marathas', 'Babar and Rana Sanga'],
-        correct: 0,
-        explanation: '21 अप्रैल 1526 को बाबर ने इब्राहिम लोदी को पराजित कर भारत में मुगल साम्राज्य की नींव रखी।',
-        explanationEn: 'Babar defeated Ibrahim Lodi in 1526, laying the foundation of Mughal Empire.'
-      },
-      {
-        id: 5,
-        question: '"करो या मरो" का नारा महात्मा गांधी ने किस आंदोलन के दौरान दिया था?',
-        questionEn: 'During which movement did Mahatma Gandhi give the slogan "Do or Die"?',
-        options: ['भारत छोड़ो आंदोलन (1942)', 'असहयोग आंदोलन (1920)', 'सविनय अवज्ञा आंदोलन (1930)', 'चंपारण सत्याग्रह (1917)'],
-        optionsEn: ['Quit India Movement (1942)', 'Non-Cooperation Movement (1920)', 'Civil Disobedience (1930)', 'Champaran (1917)'],
-        correct: 0,
-        explanation: '8 अगस्त 1942 को बॉम्बे के ग्वालिया टैंक मैदान से भारत छोड़ो आंदोलन शुरू करते हुए गांधीजी ने यह नारा दिया था।',
-        explanationEn: 'Gandhi gave "Do or Die" call at the launch of Quit India Movement in August 1942.'
-      }
-    ]
-  },
-  {
-    id: 'geography',
-    title: 'भूगोल एवं पर्यावरण',
-    titleEn: 'Geography & Environment',
-    subtitle: 'नदियां, पर्वत, जलवायु व राष्ट्रीय उद्यान',
-    subtitleEn: 'Rivers, Mountains, Climate & Parks',
-    icon: '🌍',
-    questions: [
-      {
-        id: 1,
-        question: 'भारत की सबसे लंबी नदी कौन सी है?',
-        questionEn: 'Which is the longest river in India?',
-        options: ['गंगा (2525 किमी)', 'गोदावरी (1465 किमी)', 'ब्रह्मपुत्र', 'यमुना'],
-        optionsEn: ['Ganga (2525 km)', 'Godavari (1465 km)', 'Brahmaputra', 'Yamuna'],
-        correct: 0,
-        explanation: 'गंगा नदी भारत की सबसे लंबी नदी है जिसकी कुल लंबाई 2525 किमी है और यह भारत और बांग्लादेश से होकर बहती है।',
-        explanationEn: 'Ganga is the longest river in India with a length of 2525 km.'
-      },
-      {
-        id: 2,
-        question: 'भारत का एकमात्र सक्रिय ज्वालामुखी कहाँ स्थित है?',
-        questionEn: 'Where is the only active volcano of India located?',
-        options: ['बैरन द्वीप (अंडमान निकोबार)', 'नारकोंडम द्वीप', 'लक्षद्वीप', 'दीव'],
-        optionsEn: ['Barren Island (Andaman)', 'Narcondam Island', 'Lakshadweep', 'Diu'],
-        correct: 0,
-        explanation: 'बैरन द्वीप अंडमान सागर में स्थित भारत तथा दक्षिण एशिया का एकमात्र सक्रिय ज्वालामुखी है।',
-        explanationEn: 'Barren Island in Andaman Sea is the only active volcano in South Asia.'
-      },
-      {
-        id: 3,
-        question: 'कर्क रेखा (Tropic of Cancer) भारत के कितने राज्यों से होकर गुजरती है?',
-        questionEn: 'Through how many Indian states does the Tropic of Cancer pass?',
-        options: ['8 राज्य', '7 राज्य', '9 राज्य', '6 राज्य'],
-        optionsEn: ['8 States', '7 States', '9 States', '6 States'],
-        correct: 0,
-        explanation: 'कर्क रेखा (23.5° N) 8 राज्यों: गुजरात, राजस्थान, मध्य प्रदेश, छत्तीसगढ़, झारखंड, पश्चिम बंगाल, त्रिपुरा और मिजोरम से गुजरती है।',
-        explanationEn: 'Tropic of Cancer passes through 8 states in India.'
-      },
-      {
-        id: 4,
-        question: 'काजीरंगा राष्ट्रीय उद्यान किस राज्य में स्थित है और यह किसके लिए प्रसिद्ध है?',
-        questionEn: 'In which state is Kaziranga National Park located and what is it famous for?',
-        options: ['असम (एक सींग वाला गैंडा)', 'मध्य प्रदेश (बाघ)', 'गुजरात (एशियाई शेर)', 'केरल (हाथी)'],
-        optionsEn: ['Assam (One-horned Rhino)', 'Madhya Pradesh (Tiger)', 'Gujarat (Asiatic Lion)', 'Kerala (Elephant)'],
-        correct: 0,
-        explanation: 'काजीरंगा राष्ट्रीय उद्यान असम में स्थित है और यह विश्व प्रसिद्ध एक सींग वाले गैंडे (Great Indian One-horned Rhino) का प्राकृतिक आवास है।',
-        explanationEn: 'Kaziranga in Assam is world famous for the Great Indian One-horned Rhinoceros.'
-      },
-      {
-        id: 5,
-        question: 'भारत की मानक समय रेखा (IST) किस देशांतर से निर्धारित होती है?',
-        questionEn: 'From which longitude is the Indian Standard Time (IST) determined?',
-        options: ['82.5° पूर्वी देशांतर (मिर्जापुर/प्रयागराज)', '80.0° पूर्वी देशांतर', '75.5° पूर्वी देशांतर', '90.0° पूर्वी देशांतर'],
-        optionsEn: ['82.5° East Longitude (Prayagraj)', '80.0° East', '75.5° East', '90.0° East'],
-        correct: 0,
-        explanation: 'भारत का मानक समय 82°30\' पूर्वी देशांतर से लिया गया है जो ग्रीनविच समय (GMT) से 5 घंटे 30 मिनट आगे है।',
-        explanationEn: 'IST is calculated from 82.5° E longitude, which is UTC+05:30.'
-      }
-    ]
-  }
-];
 
-// 2. Full-Length Real Mock Test Series
-const MOCK_TEST_QUESTIONS: QuizQuestion[] = [
-  {
-    id: 1,
-    question: 'भारतीय संविधान में "मौलिक अधिकार" किस देश के संविधान से प्रेरित होकर लिए गए हैं?',
-    questionEn: 'From which country\'s constitution were "Fundamental Rights" adopted in India?',
-    options: ['संयुक्त राज्य अमेरिका (USA)', 'यूनाइटेड किंगडम (UK)', 'रूस (USSR)', 'आयरलैंड'],
-    optionsEn: ['United States (USA)', 'United Kingdom (UK)', 'Russia (USSR)', 'Ireland'],
-    correct: 0,
-    explanation: 'भारतीय संविधान में मौलिक अधिकार (भाग 3) अमेरिकी संविधान के "बिल ऑफ राइट्स" से प्रेरित हैं।',
-    explanationEn: 'Fundamental Rights in Part III were inspired by the US Bill of Rights.'
-  },
-  {
-    id: 2,
-    question: 'सौरमंडल का सबसे गर्म ग्रह कौन सा है?',
-    questionEn: 'Which is the hottest planet in the Solar System?',
-    options: ['शुक्र (Venus)', 'बुध (Mercury)', 'मंगल (Mars)', 'बृहस्पति (Jupiter)'],
-    optionsEn: ['Venus', 'Mercury', 'Mars', 'Jupiter'],
-    correct: 0,
-    explanation: 'शुक्र के वायुमंडल में 96% से अधिक कार्बन डाइऑक्साइड होने के कारण तीव्र ग्रीनहाउस प्रभाव से यह सबसे गर्म (लगभग 465°C) ग्रह है।',
-    explanationEn: 'Venus is the hottest planet due to dense CO2 atmosphere and runaway greenhouse effect.'
-  },
-  {
-    id: 3,
-    question: 'यदि 15 वस्तुओं का क्रय मूल्य (CP) 12 वस्तुओं के विक्रय मूल्य (SP) के बराबर हो, तो लाभ प्रतिशत क्या होगा?',
-    questionEn: 'If Cost Price of 15 articles equals Selling Price of 12 articles, what is the profit percentage?',
-    options: ['25%', '20%', '30%', '15%'],
-    optionsEn: ['25%', '20%', '30%', '15%'],
-    correct: 0,
-    explanation: 'लाभ % = [(15 - 12) ÷ 12] × 100 = (3 ÷ 12) × 100 = 25%।',
-    explanationEn: 'Profit % = [(15 - 12) / 12] * 100 = 25%.'
-  },
-  {
-    id: 4,
-    question: 'अंतर्राष्ट्रीय मुद्रा कोष (IMF) तथा विश्व बैंक का मुख्यालय कहाँ स्थित है?',
-    questionEn: 'Where are the headquarters of IMF and World Bank located?',
-    options: ['वॉशिंगटन डी.सी. (USA)', 'जिनेवा (स्विट्जरलैंड)', 'न्यूयॉर्क (USA)', 'पेरिस (फ्रांस)'],
-    optionsEn: ['Washington D.C. (USA)', 'Geneva (Switzerland)', 'New York (USA)', 'Paris (France)'],
-    correct: 0,
-    explanation: 'IMF और विश्व बैंक दोनों की स्थापना 1944 के ब्रेटन वुड्स सम्मेलन में हुई थी तथा दोनों का मुख्यालय वॉशिंगटन डी.सी. में है।',
-    explanationEn: 'Both institutions were established at Bretton Woods in 1944 with headquarters in Washington D.C.'
-  },
-  {
-    id: 5,
-    question: 'कंप्यूटर और स्मार्टफोन में मुख्य प्रोसेसिंग यूनिट (CPU) का प्रमुख घटक क्या होता है?',
-    questionEn: 'What is the primary component of a CPU (Central Processing Unit)?',
-    options: ['ALU और कंट्रोल यूनिट (CU)', 'रैम और रोम', 'हार्ड डिस्क', 'पावर सप्लाई'],
-    optionsEn: ['ALU and Control Unit (CU)', 'RAM and ROM', 'Hard Disk', 'Power Supply'],
-    correct: 0,
-    explanation: 'CPU में अंकगणितीय व तार्किक कार्यों के लिए ALU (Arithmetic Logic Unit) तथा नियंत्रण के लिए Control Unit (CU) मुख्य घटक हैं।',
-    explanationEn: 'CPU mainly consists of ALU and Control Unit.'
+      if (Array.isArray(item.children) && item.children.length > 0) {
+        traverse(item.children);
+      }
+    }
   }
-];
 
-// 3. Clear Notes Reading Library
-const NOTES_CHAPTERS: Chapter[] = [
-  {
-    id: 'ch-1',
-    title: 'मुद्रास्फीति, आरबीआई एवं मौद्रिक नीति',
-    titleEn: 'Inflation, RBI & Monetary Policy',
-    subtitle: 'भारतीय अर्थव्यवस्था • परीक्षा स्पेशल',
-    content: `# मुद्रास्फीति (Inflation) एवं भारतीय मौद्रिक नीति\n\n## 1. मुख्य अवधारणाएँ\n- **मुद्रास्फीति (Inflation)**: वस्तुओं एवं सेवाओं के सामान्य मूल्य स्तर में निरंतर होने वाली वृद्धि, जिससे मुद्रा की क्रय शक्ति घट जाती है।\n- **भारतीय रिजर्व बैंक (RBI)**: देश का सर्वोच्च केंद्रीय बैंक। स्थापना 1 अप्रैल 1935 (हिल्टन यंग आयोग की सिफारिश पर)। राष्ट्रीयकरण 1 जनवरी 1949।\n\n## 2. मौद्रिक नीति के प्रमुख उपकरण\n- **रेपो दर (Repo Rate)**: वह अल्पकालिक ब्याज दर जिस पर आरबीआई वाणिज्यिक बैंकों को उनकी आवश्यकता हेतु ऋण प्रदान करता है।\n- **रिवर्स रेपो दर (Reverse Repo Rate)**: वह दर जिस पर वाणिज्यिक बैंक अपनी अधिशेष नकदी आरबीआई के पास जमा करते हैं।\n- **CRR (नकद आरक्षित अनुपात)**: बैंकों को अपनी कुल जमा का एक निश्चित प्रतिशत अनिवार्य रूप से आरबीआई के पास नकद रखना पड़ता है।\n- **SLR (वैधानिक तरलता अनुपात)**: बैंकों को अपनी जमा का निश्चित अंश स्वर्ण, सरकारी प्रतिभूतियों या नकदी में सुरक्षित रखना होता है।\n\n💡 मास्टर ट्रिक: महँगाई (Inflation) को नियंत्रित करने के लिए आरबीआई रेपो रेट बढ़ाता है, जिससे बाजार में तरलता (Money Supply) कम हो जाती है।`
-  },
-  {
-    id: 'ch-2',
-    title: 'केंद्रीय बजट, प्रत्यक्ष एवं अप्रत्यक्ष कर (GST)',
-    titleEn: 'Union Budget, Direct & Indirect Taxes (GST)',
-    subtitle: 'वित्तीय प्रणाली • आवश्यक प्रावधान',
-    content: `# केंद्रीय बजट एवं भारतीय कर प्रणाली\n\n## 1. संवैधानिक प्रावधान (अनुच्छेद 112)\n- संविधान में 'बजट' शब्द का प्रयोग नहीं है, बल्कि इसे **"वार्षिक वित्तीय विवरण" (Annual Financial Statement)** कहा गया है।\n- बजट वित्त मंत्री द्वारा संसद में प्रस्तुत किया जाता है।\n\n## 2. करों का वर्गीकरण\n- **प्रत्यक्ष कर (Direct Tax)**: जिस व्यक्ति पर कर लगाया जाता है, वही उसका भुगतान करता है। उदाहरण: आयकर (Income Tax), निगम कर (Corporate Tax)।\n- **अप्रत्यक्ष कर (Indirect Tax)**: कर का भार अंतिम उपभोक्ता पर स्थानांतरित किया जाता है। उदाहरण: जीएसटी (GST), सीमा शुल्क (Customs Duty)।\n\n## 3. वस्तु एवं सेवा कर (GST)\n- लागू तिथि: 1 जुलाई 2017।\n- संवैधानिक संशोधन: 101वाँ संविधान संशोधन अधिनियम 2016।\n- GST परिषद के अध्यक्ष: केंद्रीय वित्त मंत्री (अनुच्छेद 279A)।\n\n💡 मास्टर ट्रिक: जीएसटी एक गंतव्य आधारित (Destination-based) अप्रत्यक्ष कर है जो "एक राष्ट्र, एक कर" के सिद्धांत पर आधारित है।`
-  },
-  {
-    id: 'ch-3',
-    title: 'संविधान सभा, मौलिक अधिकार एवं कर्तव्य',
-    titleEn: 'Constituent Assembly & Fundamental Rights',
-    subtitle: 'भारतीय राजव्यवस्था • त्वरित रिवीज़न',
-    content: `# संविधान सभा एवं मौलिक अधिकार\n\n## 1. संविधान निर्माण के ऐतिहासिक तथ्य\n- कुल समय: 2 वर्ष, 11 माह और 18 दिन।\n- प्रारूप समिति (Drafting Committee) के अध्यक्ष: डॉ. भीमराव अंबेडकर।\n- संविधान अंगीकृत: 26 नवंबर 1949 (विधि दिवस / संविधान दिवस)।\n- पूर्ण रूप से लागू: 26 जनवरी 1950 (गणतंत्र दिवस)।\n\n## 2. मौलिक अधिकार (भाग 3, अनुच्छेद 12 से 35)\n1. समानता का अधिकार (अनुच्छेद 14-18)\n2. स्वतंत्रता का अधिकार (अनुच्छेद 19-22)\n3. शोषण के विरुद्ध अधिकार (अनुच्छेद 23-24)\n4. धार्मिक स्वतंत्रता का अधिकार (अनुच्छेद 25-28)\n5. संस्कृति और शिक्षा संबंधी अधिकार (अनुच्छेद 29-30)\n6. संवैधानिक उपचारों का अधिकार (अनुच्छेद 32)\n\n💡 मास्टर ट्रिक: 44वें संविधान संशोधन (1978) द्वारा संपत्ति के अधिकार को मौलिक अधिकारों से हटाकर अनुच्छेद 300(A) के तहत केवल एक विधिक (कानूनी) अधिकार बना दिया गया।`
+  traverse(nodes);
+  return chapters;
+}
+
+function getQuizSubjectsFromAdmin(nodes: any[]): any[] {
+  const subjects: any[] = [];
+  
+  function traverse(list: any[]) {
+    if (!Array.isArray(list)) return;
+    for (const item of list) {
+      const questions = (Array.isArray(item.questions) && item.questions.length > 0 ? item.questions : null) ||
+        (Array.isArray(item.mcqs) && item.mcqs.length > 0 ? item.mcqs : null) ||
+        (Array.isArray(item.quiz) && item.quiz.length > 0 ? item.quiz : null);
+      
+      if (questions && questions.length > 0) {
+        const normalizedQs: QuizQuestion[] = questions.map((q: any, i: number) => ({
+          id: q.id || i + 1,
+          question: q.question || q.qText || q.title || 'Question',
+          questionEn: q.questionEn || q.question_en || q.question || 'Question',
+          options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+          optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
+          correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+          explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
+          explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+        }));
+
+        subjects.push({
+          id: item.id,
+          title: item.title || item.name || 'Quiz',
+          titleEn: item.titleEn || item.title_en || item.title || item.name || 'Quiz',
+          subtitle: item.subtitle || item.sub || 'Practice MCQs',
+          subtitleEn: item.subtitleEn || item.subtitle_en || 'Practice MCQs',
+          icon: item.icon || '📝',
+          questions: normalizedQs
+        });
+      }
+
+      if (Array.isArray(item.children) && item.children.length > 0) {
+        traverse(item.children);
+      }
+    }
   }
-];
+
+  traverse(nodes);
+  return subjects;
+}
+
+function getMockQuestionsFromAdmin(nodes: any[]): QuizQuestion[] {
+  let mockQs: QuizQuestion[] = [];
+  
+  function traverse(list: any[]) {
+    if (!Array.isArray(list)) return;
+    for (const item of list) {
+      const kind = String(item.kind || item.type || '').toLowerCase();
+      const target = String(item.view || item.target_view || '').toLowerCase();
+      const questions = (Array.isArray(item.questions) && item.questions.length > 0 ? item.questions : null) ||
+        (Array.isArray(item.mcqs) && item.mcqs.length > 0 ? item.mcqs : null);
+      
+      if ((kind === 'mock' || target.includes('mock')) && questions) {
+        const normalizedQs: QuizQuestion[] = questions.map((q: any, i: number) => ({
+          id: q.id || i + 1,
+          question: q.question || q.qText || q.title || 'Question',
+          questionEn: q.questionEn || q.question_en || q.question || 'Question',
+          options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+          optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
+          correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+          explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
+          explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+        }));
+        mockQs = mockQs.concat(normalizedQs);
+      }
+
+      if (Array.isArray(item.children) && item.children.length > 0) {
+        traverse(item.children);
+      }
+    }
+  }
+
+  traverse(nodes);
+  return mockQs;
+}
 
 // Helper to calculate greatest common divisor
 function gcd(a: number, b: number): number {
@@ -1113,22 +975,22 @@ export default function App() {
   }, [langHindi]);
 
   // Notes Reader
-  const [selectedChapter, setSelectedChapter] = useState<Chapter>(NOTES_CHAPTERS[0]);
+  const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [readerDarkMode, setReaderDarkMode] = useState(false);
   const [copiedNotification, setCopiedNotification] = useState(false);
 
   // Quiz State
-  const [selectedSubject, setSelectedSubject] = useState(QUIZ_SUBJECTS[0]);
-  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>(QUIZ_SUBJECTS[0].questions);
+  const [selectedSubject, setSelectedSubject] = useState<any>(null);
+  const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [quizIndex, setQuizIndex] = useState(0);
   const [userQuizAnswers, setUserQuizAnswers] = useState<(number | null)[]>([]);
   const [quizScore, setQuizScore] = useState(0);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
 
   // Mock Test State
-  const [mockQuestions] = useState<QuizQuestion[]>(MOCK_TEST_QUESTIONS);
+  const [mockQuestions, setMockQuestions] = useState<QuizQuestion[]>([]);
   const [mockIndex, setMockIndex] = useState(0);
-  const [userMockAnswers, setUserMockAnswers] = useState<(number | null)[]>(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
+  const [userMockAnswers, setUserMockAnswers] = useState<(number | null)[]>([]);
   const [mockTimer, setMockTimer] = useState(600);
   const [mockTimerActive, setMockTimerActive] = useState(false);
 
@@ -1167,10 +1029,9 @@ export default function App() {
 
   // Typing Test State
   const [typingDuration, setTypingDuration] = useState<number | 'Infinite'>(2);
-  const DEFAULT_TYPING_PASSAGE = "The Constitution of India guarantees fundamental rights to all citizens including freedom of speech equality before law and protection of life and personal liberty. Every officer shall uphold integrity honesty and public interest in discharge of official duties without bias or prejudice.";
-  const [activeTypingPassage, setActiveTypingPassage] = useState<string>(DEFAULT_TYPING_PASSAGE);
-  const [activeTypingTitle, setActiveTypingTitle] = useState<string>('SSC CHSL / CGL English Typing Test Passage #1');
-  const passageText = activeTypingPassage || DEFAULT_TYPING_PASSAGE;
+  const [activeTypingPassage, setActiveTypingPassage] = useState<string>('');
+  const [activeTypingTitle, setActiveTypingTitle] = useState<string>('');
+  const passageText = activeTypingPassage || '';
   const [typedInput, setTypedInput] = useState('');
   const [typingStarted, setTypingStarted] = useState(false);
   const [typingTimeLeft, setTypingTimeLeft] = useState(120);
@@ -1270,12 +1131,6 @@ export default function App() {
   // Node Type Helpers according to Admin schema and Image layout
   const isSectionNode = (item: any) => {
     if (!item) return false;
-    // If item has children, questions, mcqs, html or url, it is a container with sub-buttons/content, not a static section banner
-    if (Array.isArray(item.children) && item.children.length > 0) return false;
-    if (Array.isArray(item.questions) && item.questions.length > 0) return false;
-    if (Array.isArray(item.mcqs) && item.mcqs.length > 0) return false;
-    if (item.htmlContent || item.html || item.code || item.url || item.notesContent) return false;
-
     const kind = String(item?.kind || item?.type || '').toLowerCase();
     return kind === 'section' || kind === 'divider' || kind === 'heading' || kind === 'header';
   };
@@ -1283,9 +1138,7 @@ export default function App() {
   const isFolderNode = (item: any) => {
     if (!item) return false;
     const kind = String(item?.kind || item?.type || '').toLowerCase();
-    if (kind === 'folder' || kind === 'category' || kind === 'group' || kind === 'directory') return true;
-    if (Array.isArray(item?.children) && item.children.length > 0) return true;
-    return false;
+    return kind === 'folder' || kind === 'category' || kind === 'group' || kind === 'directory';
   };
 
   // Reusable universal handler for clicking ANY Admin node (MCQs, Notes, Folders, Pages)
@@ -1420,23 +1273,34 @@ export default function App() {
 
     // 5. MOCK TEST SAMPLE FALLBACK
     if (target.includes('mock')) {
-      setMockIndex(0);
-      setUserMockAnswers(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
-      setMockTimer(600);
-      setMockTimerActive(true);
-      navigateTo('mock_play');
+      const mockQs = getMockQuestionsFromAdmin(adminNodes);
+      if (mockQs.length > 0) {
+        setMockQuestions(mockQs);
+        setMockIndex(0);
+        setUserMockAnswers(new Array(mockQs.length).fill(null));
+        setMockTimer(600);
+        setMockTimerActive(true);
+        navigateTo('mock_play');
+      } else {
+        navigateTo('mock_play');
+      }
       return;
     }
 
     // 6. QUIZ SAMPLE FALLBACK
     if (target.includes('quiz')) {
-      setSelectedSubject(QUIZ_SUBJECTS[0]);
-      setQuizQuestions(QUIZ_SUBJECTS[0].questions);
-      setQuizIndex(0);
-      setUserQuizAnswers(new Array(QUIZ_SUBJECTS[0].questions.length).fill(null));
-      setQuizScore(0);
-      setIsAnswerRevealed(false);
-      navigateTo('quiz_play');
+      const quizSubjs = getQuizSubjectsFromAdmin(adminNodes);
+      if (quizSubjs.length > 0) {
+        setSelectedSubject(quizSubjs[0]);
+        setQuizQuestions(quizSubjs[0].questions);
+        setQuizIndex(0);
+        setUserQuizAnswers(new Array(quizSubjs[0].questions.length).fill(null));
+        setQuizScore(0);
+        setIsAnswerRevealed(false);
+        navigateTo('quiz_play');
+      } else {
+        navigateTo('quiz_categories');
+      }
       return;
     }
 
@@ -1823,13 +1687,6 @@ export default function App() {
 
             <div className="flex items-center space-x-2 shrink-0">
               <button
-                onClick={() => setLangHindi(!langHindi)}
-                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition border border-white/20 active:scale-95 cursor-pointer"
-              >
-                {langHindi ? 'EN' : 'हिंदी'}
-              </button>
-
-              <button
                 onClick={() => setSoundMuted(!soundMuted)}
                 className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition border border-white/20 active:scale-95 cursor-pointer"
                 title={soundMuted ? 'ध्वनि चालू करें' : 'ध्वनि बंद करें'}
@@ -1839,7 +1696,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Interactive Breadcrumb / Open Tab Path Banner */}
+          {/* Interactive Open Tab & Location Banner */}
           <div className="bg-slate-900 text-white text-xs px-4 py-2 flex items-center space-x-2 overflow-x-auto whitespace-nowrap border-b border-slate-800 shrink-0 shadow-inner">
             <button
               onClick={() => {
@@ -1847,7 +1704,7 @@ export default function App() {
                 setFolderStack([]);
                 setCurrentView('home');
               }}
-              className="hover:underline flex items-center gap-1 font-medium text-slate-300 hover:text-white transition cursor-pointer"
+              className="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 font-medium cursor-pointer border border-slate-700/80"
             >
               <span>🏠</span>
               <span>{langHindi ? 'मुख्य पृष्ठ' : 'Home'}</span>
@@ -1855,25 +1712,26 @@ export default function App() {
 
             {folderStack.map((parent, idx) => (
               <React.Fragment key={parent.id || idx}>
-                <span className="text-slate-500 font-bold">›</span>
+                <span className="text-slate-500 font-extrabold text-sm">›</span>
                 <button
                   onClick={() => {
                     setFolderStack(s => s.slice(0, idx));
                     setActiveCustomNode(parent);
                   }}
-                  className="hover:underline font-medium text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1"
+                  className="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 font-medium cursor-pointer border border-slate-700/80"
                 >
-                  <span>📁</span>
+                  <span>📌</span>
                   <span>{resolveNodeTitle(parent, langHindi)}</span>
                 </button>
               </React.Fragment>
             ))}
 
-            <span className="text-slate-500 font-bold">›</span>
-            <span className="font-bold text-amber-300 flex items-center gap-1 bg-amber-400/20 px-2.5 py-0.5 rounded-md border border-amber-400/30 text-xs">
-              <span>{featureIcon}</span>
+            <span className="text-slate-500 font-extrabold text-sm">›</span>
+            <div className="px-3 py-1 rounded-md bg-blue-600/30 text-blue-300 font-bold flex items-center gap-1.5 border border-blue-500/40 shadow-xs">
+              <span>{featureIcon || '📌'}</span>
               <span>{featureTitle}</span>
-            </span>
+              <span className="ml-1 px-1.5 py-0.2 bg-blue-500/20 text-[10px] text-blue-200 uppercase rounded tracking-wide border border-blue-400/30 font-extrabold">Open Tab</span>
+            </div>
           </div>
 
           {/* Pure 100% Full Viewport Output without frames, margins or bottom bars */}
@@ -2025,7 +1883,7 @@ export default function App() {
                               {childTitle}
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
-                              {childSubtitle || (isChildFolder ? (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder')) : '')}
+                              {childSubtitle || (isChildFolder ? (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder')) : (childCount > 0 ? (langHindi ? `${childCount} बटन मौजूद` : `${childCount} sub-buttons`) : ''))}
                             </p>
                           </div>
                         </button>
@@ -2150,13 +2008,6 @@ export default function App() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setLangHindi(!langHindi)}
-                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition border border-white/20 active:scale-95 cursor-pointer"
-              >
-                {langHindi ? 'EN' : 'हिंदी'}
-              </button>
-
               <button
                 onClick={() => setSoundMuted(!soundMuted)}
                 className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition border border-white/20 active:scale-95 cursor-pointer"
@@ -2366,36 +2217,58 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {QUIZ_SUBJECTS.map((subj) => (
-                    <button
-                      key={subj.id}
-                      onClick={() => {
-                        setSelectedSubject(subj);
-                        setQuizQuestions(subj.questions);
-                        setQuizIndex(0);
-                        setUserQuizAnswers(new Array(subj.questions.length).fill(null));
-                        setQuizScore(0);
-                        setIsAnswerRevealed(false);
-                        navigateTo('quiz_play');
-                      }}
-                      className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-300 cursor-pointer flex items-center space-x-4 text-left transition active:scale-98"
-                    >
-                      <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl flex-shrink-0">
-                        {subj.icon}
+                {(() => {
+                  const quizSubjects = getQuizSubjectsFromAdmin(adminNodes);
+                  if (quizSubjects.length === 0) {
+                    return (
+                      <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center text-slate-400 select-none bg-slate-50/60 my-6">
+                        <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-2xl mb-3">
+                          📝
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800">
+                          {langHindi ? 'कोई क्विज अभी उपलब्ध नहीं है' : 'No Quizzes Available'}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                          {langHindi 
+                            ? 'Admin Panel से नए MCQs या विषयवार क्विज जोड़ें। वे तुरंत यहाँ दिखाई देंगे।'
+                            : 'Add new MCQs or Subject Quizzes from your Admin Panel. They will appear here live.'}
+                        </p>
                       </div>
-                      <div>
-                        <h3 className="font-bold text-slate-900 text-base">{langHindi ? subj.title : subj.titleEn}</h3>
-                        <p className="text-xs text-slate-500 mt-0.5">{langHindi ? subj.subtitle : subj.subtitleEn}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                    );
+                  }
+                  return (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {quizSubjects.map((subj) => (
+                        <button
+                          key={subj.id}
+                          onClick={() => {
+                            setSelectedSubject(subj);
+                            setQuizQuestions(subj.questions);
+                            setQuizIndex(0);
+                            setUserQuizAnswers(new Array(subj.questions.length).fill(null));
+                            setQuizScore(0);
+                            setIsAnswerRevealed(false);
+                            navigateTo('quiz_play');
+                          }}
+                          className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-300 cursor-pointer flex items-center space-x-4 text-left transition active:scale-98"
+                        >
+                          <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl flex-shrink-0">
+                            {subj.icon || '📝'}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-slate-900 text-base">{langHindi ? subj.title : subj.titleEn}</h3>
+                            <p className="text-xs text-slate-500 mt-0.5">{langHindi ? subj.subtitle : subj.subtitleEn}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
               </motion.div>
             )}
 
             {/* 3. QUIZ PLAY (MCQ REAL EXPERIENCE WITH INSTANT GREEN/RED FEEDBACK) */}
-            {currentView === 'quiz_play' && quizQuestions && quizQuestions.length > 0 && (
+            {currentView === 'quiz_play' && (
               <motion.div
                 key="quiz-play"
                 initial={{ opacity: 0, scale: 0.98 }}
@@ -2405,7 +2278,30 @@ export default function App() {
                 className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 max-w-2xl mx-auto space-y-6"
               >
                 {(() => {
-                  const currentQ = quizQuestions[quizIndex] || quizQuestions[0];
+                  const currentQ = quizQuestions ? (quizQuestions[quizIndex] || quizQuestions[0]) : null;
+                  if (!currentQ) {
+                    return (
+                      <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center text-slate-400 select-none bg-slate-50/60 my-6">
+                        <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-2xl mb-3">
+                          📝
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800">
+                          {langHindi ? 'कोई प्रश्न उपलब्ध नहीं है' : 'No Questions Available'}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                          {langHindi 
+                            ? 'Admin Panel से इस क्विज के लिए प्रश्न जोड़ें।' 
+                            : 'Add questions for this quiz from Admin Panel.'}
+                        </p>
+                        <button
+                          onClick={() => setCurrentView('quiz_categories')}
+                          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+                        >
+                          {langHindi ? 'श्रेणियां देखें' : 'View Categories'}
+                        </button>
+                      </div>
+                    );
+                  }
                   return (
                     <>
                       <div className="flex items-center justify-between pb-4 border-b border-slate-100 text-xs font-bold text-slate-500">
@@ -2631,6 +2527,29 @@ export default function App() {
               >
                 {(() => {
                   const currentMockQ = mockQuestions[mockIndex] || mockQuestions[0];
+                  if (!currentMockQ) {
+                    return (
+                      <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center text-slate-400 select-none bg-slate-50/60 my-6">
+                        <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-2xl mb-3">
+                          📋
+                        </div>
+                        <h3 className="text-base font-bold text-slate-800">
+                          {langHindi ? 'कोई मॉक टेस्ट प्रश्न उपलब्ध नहीं है' : 'No Mock Test Questions Available'}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                          {langHindi 
+                            ? 'Admin Panel से नया मॉक टेस्ट या MCQs जोड़ें।' 
+                            : 'Add a new mock test or MCQs from Admin Panel.'}
+                        </p>
+                        <button
+                          onClick={() => setCurrentView('home')}
+                          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+                        >
+                          {langHindi ? 'होम पर वापस जाएं' : 'Back to Home'}
+                        </button>
+                      </div>
+                    );
+                  }
                   return (
                     <>
                       <div className="bg-slate-900 text-white rounded-2xl p-4 flex items-center justify-between shadow-sm flex-wrap gap-2">
@@ -2825,7 +2744,7 @@ export default function App() {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => {
-                      setUserMockAnswers(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
+                      setUserMockAnswers(new Array(mockQuestions.length).fill(null));
                       setMockIndex(0);
                       setMockTimer(600);
                       setMockTimerActive(true);
@@ -2860,29 +2779,51 @@ export default function App() {
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">{langHindi ? 'विषय चुनें और इन-ऐप PDF नोट्स पढ़ें' : 'Select subject to read in-app PDF notes'}</p>
                 </div>
 
-                <div className="space-y-3 max-w-2xl mx-auto">
-                  {NOTES_CHAPTERS.map((chap) => (
-                    <button
-                      key={chap.id}
-                      onClick={() => {
-                        setSelectedChapter(chap);
-                        navigateTo('notes_reader');
-                      }}
-                      className="w-full bg-white rounded-2xl p-4 shadow-sm border border-slate-200 hover:border-blue-300 cursor-pointer flex items-center justify-between text-left transition active:scale-98"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg flex-shrink-0">
-                          📄
+                {(() => {
+                  const notesChapters = getNotesChaptersFromAdmin(adminNodes);
+                  if (notesChapters.length === 0) {
+                    return (
+                      <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center text-slate-400 select-none bg-slate-50/60 my-6">
+                        <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-2xl mb-3">
+                          📚
                         </div>
-                        <div>
-                          <h3 className="font-bold text-slate-900 text-sm sm:text-base">{langHindi ? chap.title : (chap.titleEn || chap.title)}</h3>
-                          <p className="text-xs text-slate-500 mt-0.5">{langHindi ? chap.subtitle : (chap.subtitleEn || chap.subtitle)}</p>
-                        </div>
+                        <h3 className="text-base font-bold text-slate-800">
+                          {langHindi ? 'कोई नोट्स अभी उपलब्ध नहीं हैं' : 'No Notes Available'}
+                        </h3>
+                        <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                          {langHindi 
+                            ? 'Admin Panel से नए नोट्स या PDF जोड़ें। वे तुरंत यहाँ दिखाई देंगे।'
+                            : 'Add new Notes or PDF from your Admin Panel. They will appear here live.'}
+                        </p>
                       </div>
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    </button>
-                  ))}
-                </div>
+                    );
+                  }
+                  return (
+                    <div className="space-y-3 max-w-2xl mx-auto">
+                      {notesChapters.map((chap) => (
+                        <button
+                          key={chap.id}
+                          onClick={() => {
+                            setSelectedChapter(chap);
+                            navigateTo('notes_reader');
+                          }}
+                          className="w-full bg-white rounded-2xl p-4 shadow-sm border border-slate-200 hover:border-blue-300 cursor-pointer flex items-center justify-between text-left transition active:scale-98"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg flex-shrink-0">
+                              📄
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-slate-900 text-sm sm:text-base">{langHindi ? chap.title : (chap.titleEn || chap.title)}</h3>
+                              <p className="text-xs text-slate-500 mt-0.5">{langHindi ? chap.subtitle : (chap.subtitleEn || chap.subtitle)}</p>
+                            </div>
+                          </div>
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
               </motion.div>
             )}
 
@@ -2897,7 +2838,22 @@ export default function App() {
                 className={"rounded-3xl shadow-lg border p-6 sm:p-8 max-w-3xl mx-auto transition-colors " + (readerDarkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900')}
               >
                 {(() => {
-                  const chap = selectedChapter || NOTES_CHAPTERS[0];
+                  const chap = selectedChapter || getNotesChaptersFromAdmin(adminNodes)[0];
+                  if (!chap) {
+                    return (
+                      <div className="text-center py-12">
+                        <p className="text-sm font-bold text-slate-600 mb-4">
+                          {langHindi ? 'कोई नोट्स सामग्री उपलब्ध नहीं है' : 'No notes content available'}
+                        </p>
+                        <button
+                          onClick={() => navigateTo('home')}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                        >
+                          {langHindi ? 'मुख्य पृष्ठ पर लौटें' : 'Return to Home'}
+                        </button>
+                      </div>
+                    );
+                  }
                   return (
                     <>
                       <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-6 flex-wrap gap-3">
@@ -3373,34 +3329,29 @@ export default function App() {
                           ? [{ id: 'single-passage', title: typingNode.title || 'Typing Test', passage: typingNode.typingPassage || typingNode.passage }]
                           : [];
 
-                    const defaultTests = [
-                      {
-                        id: 'typing-pass-1',
-                        title: 'SSC CHSL / CGL English Typing Test Passage #1',
-                        subtitle: 'English Standard Exam Passage',
-                        passage: DEFAULT_TYPING_PASSAGE
-                      },
-                      {
-                        id: 'typing-pass-2',
-                        title: 'Delhi Police HC Typing Passage #2',
-                        subtitle: 'General Knowledge & Official Duty Rules',
-                        passage: 'Public administration requires accountability integrity and dedication to national service. The rule of law ensures that all individuals institutions and entities are responsible before the law that is equally enforced and independently adjudicated.'
-                      },
-                      {
-                        id: 'typing-pass-3',
-                        title: 'Court Clerk / Stenographer Practice Passage #3',
-                        subtitle: 'Legal Terminology & Precision Typing',
-                        passage: 'The judicial system safeguards constitutional principles and protects democratic freedoms. Every judgment delivered by the court serves as an instrument of justice equality and social welfare across all jurisdictions.'
-                      }
-                    ];
+                    if (adminTypingTests.length === 0) {
+                      return (
+                        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center text-slate-400 select-none bg-slate-50/60 my-2">
+                          <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-xl mb-2">
+                            ⌨️
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-800">
+                            {langHindi ? 'कोई टाइपिंग टेस्ट उपलब्ध नहीं है' : 'No Typing Tests Available'}
+                          </h4>
+                          <p className="text-xs text-slate-500 mt-1 max-w-sm">
+                            {langHindi 
+                              ? 'Admin Panel से नया टाइपिंग टेस्ट पैसेज जोड़ें। वह तुरंत यहाँ लाइव दिखाई देगा।' 
+                              : 'Add a new typing test passage from your Admin Panel. It will appear here live.'}
+                          </p>
+                        </div>
+                      );
+                    }
 
-                    const testList = adminTypingTests.length > 0 ? adminTypingTests : defaultTests;
-
-                    return testList.map((testItem: any, idx: number) => {
+                    return adminTypingTests.map((testItem: any, idx: number) => {
                       const id = testItem.id || `typing-${idx}`;
                       const title = testItem.title || testItem.name || `टाइपिंग टेस्ट सेट #${idx + 1}`;
                       const sub = testItem.subtitle || testItem.sub || 'SSC & State Exams Typing';
-                      const text = testItem.passage || testItem.text || testItem.typingPassage || testItem.content || testItem.html || DEFAULT_TYPING_PASSAGE;
+                      const text = testItem.passage || testItem.text || testItem.typingPassage || testItem.content || testItem.html || '';
 
                       return (
                         <button
@@ -3449,11 +3400,11 @@ export default function App() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.16 }}
-                className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 max-w-2xl mx-auto space-y-6"
+                className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 p-3.5 sm:p-6 max-w-2xl mx-auto space-y-3 sm:space-y-5"
               >
-                <div className="bg-slate-900 text-white rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                  <div className={"flex items-center gap-2 font-mono font-bold text-lg " + (typingTimeLeft <= 10 && typingDuration !== 'Infinite' ? 'text-rose-400 animate-pulse' : 'text-emerald-400')}>
-                    <Clock className="w-5 h-5" />
+                <div className="bg-slate-900 text-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex items-center justify-between shadow-sm">
+                  <div className={"flex items-center gap-1.5 sm:gap-2 font-mono font-bold text-sm sm:text-lg " + (typingTimeLeft <= 10 && typingDuration !== 'Infinite' ? 'text-rose-400 animate-pulse' : 'text-emerald-400')}>
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>
                       {typingDuration === 'Infinite'
                         ? '∞ Free'
@@ -3461,8 +3412,8 @@ export default function App() {
                     </span>
                   </div>
                   <div className="text-center font-mono">
-                    <p className="text-[10px] text-slate-400 uppercase">WPM</p>
-                    <p className="text-xl font-bold text-blue-400">
+                    <p className="text-[9px] sm:text-[10px] text-slate-400 uppercase">WPM</p>
+                    <p className="text-base sm:text-xl font-bold text-blue-400">
                       {(() => {
                         const words = typedInput.trim().split(/\s+/).filter(Boolean).length;
                         const totalAllowedSec = typeof typingDuration === 'number' ? typingDuration * 60 : 120;
@@ -3472,8 +3423,8 @@ export default function App() {
                     </p>
                   </div>
                   <div className="text-center font-mono">
-                    <p className="text-[10px] text-slate-400 uppercase">ACC</p>
-                    <p className="text-xl font-bold text-amber-400">
+                    <p className="text-[9px] sm:text-[10px] text-slate-400 uppercase">ACC</p>
+                    <p className="text-base sm:text-xl font-bold text-amber-400">
                       {(() => {
                         if (!typedInput) return '100%';
                         let correct = 0;
@@ -3486,23 +3437,23 @@ export default function App() {
                   </div>
                   <button
                     onClick={submitTypingTest}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition shadow-sm active:scale-95 cursor-pointer"
+                    className="px-3 py-1.5 sm:px-4 sm:py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition shadow-sm active:scale-95 cursor-pointer"
                   >
                     {langHindi ? 'समाप्त' : 'Finish'}
                   </button>
                 </div>
 
                 {/* Passage Box with Real-time Scrolling and Color-coded Characters */}
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 px-1">
-                    <span>{langHindi ? 'मूल पैराग्राफ (टाइप करने हेतु टेक्स्ट):' : 'Original Passage (Text to Type):'}</span>
-                    <span className="text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-mono">
+                    <span className="text-[11px] sm:text-xs">{langHindi ? 'मूल पैराग्राफ (टाइप करने हेतु टेक्स्ट):' : 'Original Passage (Text to Type):'}</span>
+                    <span className="text-[10px] sm:text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-mono">
                       {langHindi ? `${typedInput.length} / ${passageText.length} अक्षर` : `${typedInput.length} / ${passageText.length} chars`}
                     </span>
                   </div>
                   <div 
                     ref={typingScrollRef}
-                    className="bg-slate-50 p-4 sm:p-5 rounded-2xl text-slate-800 font-mono text-base sm:text-lg leading-relaxed border-2 border-slate-200 h-44 sm:h-52 overflow-y-auto overscroll-contain select-none shadow-inner"
+                    className="bg-slate-50 p-3 sm:p-5 rounded-2xl text-slate-800 font-mono text-sm sm:text-lg leading-relaxed border-2 border-slate-200 h-32 sm:h-52 overflow-y-auto overscroll-contain select-none shadow-inner"
                   >
                     {passageText.split('').map((char, index) => {
                       let charClass = "text-slate-700";
@@ -3524,18 +3475,23 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Input Area (Strictly 2-3 lines height as requested) */}
-                <div className="space-y-1.5">
+                {/* Input Area (Compact & Mobile Keyboard Friendly) */}
+                <div className="space-y-1">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 px-1">
-                    <span>{langHindi ? 'टाइपिंग इनपुट (यहीं टाइप करें):' : 'Typing Input (Type Here):'}</span>
-                    <span className="text-[11px] text-slate-400">
-                      {typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? (langHindi ? '⚠️ समय समाप्त (बंद)' : '⚠️ Time Over (Closed)') : (langHindi ? '2-3 पंक्तियों का कॉम्पैक्ट बॉक्स' : '2-3 lines compact box')}
+                    <span className="text-[11px] sm:text-xs">{langHindi ? 'टाइपिंग इनपुट (यहीं टाइप करें):' : 'Typing Input (Type Here):'}</span>
+                    <span className="text-[10px] sm:text-[11px] text-slate-400">
+                      {typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? (langHindi ? '⚠️ समय समाप्त (बंद)' : '⚠️ Time Over (Closed)') : (langHindi ? 'कीबोर्ड फ्रेंडली बॉक्स' : 'Keyboard friendly box')}
                     </span>
                   </div>
                   <textarea
-                    rows={3}
+                    rows={2}
                     disabled={typingTimeLeft <= 0 && typingDuration !== 'Infinite'}
                     value={typedInput}
+                    onFocus={(e) => {
+                      setTimeout(() => {
+                        e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                      }, 250);
+                    }}
                     onChange={(e) => {
                       if (!typingStarted) setTypingStarted(true);
                       setTypedInput(e.target.value);
@@ -3546,8 +3502,8 @@ export default function App() {
                     autoCapitalize="none"
                     autoCorrect="off"
                     spellCheck={false}
-                    placeholder={typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? (langHindi ? "समय समाप्त हो चुका है।" : "Time is over.") : (langHindi ? "कीबोर्ड से यहाँ टाइप करना शुरू करें (2-3 पंक्तियाँ)..." : "Start typing here with keyboard...")}
-                    className={"w-full h-20 sm:h-22 p-3 rounded-2xl border-2 font-mono text-sm sm:text-base leading-snug resize-none shadow-sm overscroll-contain transition-colors " + (typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' : 'border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none bg-white text-slate-900')}
+                    placeholder={typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? (langHindi ? "समय समाप्त हो चुका है।" : "Time is over.") : (langHindi ? "कीबोर्ड से यहाँ टाइप करना शुरू करें..." : "Start typing here with keyboard...")}
+                    className={"w-full h-18 sm:h-22 p-2.5 sm:p-3 rounded-2xl border-2 font-mono text-base sm:text-base leading-snug resize-none shadow-sm overscroll-contain transition-colors " + (typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' : 'border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none bg-white text-slate-900')}
                   />
                 </div>
               </motion.div>
