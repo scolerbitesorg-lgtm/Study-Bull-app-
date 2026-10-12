@@ -8,9 +8,19 @@ export const FALLBACK_SUPABASE_ANON_KEY = "sb_publishable_X8IsGDLwK9fUliHih60dlg
 export function getSupabaseCredentials(): { url: string; anonKey: string } {
   let envUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
   let envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
+
+  // If env contains unconfigured placeholders from templates, discard them
+  if (envUrl.includes('your-project-id') || !envUrl.startsWith('https://')) {
+    envUrl = '';
+  }
+  if (envKey.includes('your-anon-public-key') || envKey.length < 20) {
+    envKey = '';
+  }
   
   let localUrl = (typeof window !== 'undefined' ? localStorage.getItem('studybull_supabase_url') || '' : '').trim();
   let localKey = (typeof window !== 'undefined' ? localStorage.getItem('studybull_supabase_key') || '' : '').trim();
+  if (localUrl.includes('your-project-id') || !localUrl.startsWith('https://')) localUrl = '';
+  if (localKey.includes('your-anon-public-key') || localKey.length < 20) localKey = '';
 
   let url = envUrl || localUrl || FALLBACK_SUPABASE_URL;
   let anonKey = envKey || localKey || FALLBACK_SUPABASE_ANON_KEY;
@@ -31,6 +41,7 @@ export function saveSupabaseCredentials(url: string, anonKey: string) {
     if (anonKey) localStorage.setItem('studybull_supabase_key', anonKey.trim());
     else localStorage.removeItem('studybull_supabase_key');
   }
+  _clientInstance = null; // Reset singleton on credential change
 }
 
 // Check if credentials look valid (non-empty and not sample placeholders)
@@ -45,14 +56,19 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
+// Singleton client instance to prevent multiple client creations and connection churn
+let _clientInstance: SupabaseClient | null = null;
+
 // Create client helper
 export function getSupabaseClient(): SupabaseClient | null {
+  if (_clientInstance) return _clientInstance;
+
   const { url, anonKey } = getSupabaseCredentials();
   if (!url || !anonKey || !url.startsWith('https://')) {
     return null;
   }
   try {
-    return createClient(url, anonKey, {
+    _clientInstance = createClient(url, anonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -63,6 +79,7 @@ export function getSupabaseClient(): SupabaseClient | null {
         },
       },
     });
+    return _clientInstance;
   } catch (err) {
     console.warn('Failed to initialize Supabase client:', err);
     return null;
@@ -99,6 +116,15 @@ export interface StudyBullNode {
 
 // Full default Study Bull library matching schema (empty by default as requested; all temporary buttons added from admin)
 export const DEFAULT_STUDYBULL_NODES: StudyBullNode[] = [];
+
+// Helper: Determine if a node should be visible
+// Never drop buttons that have undefined enabled or status
+export function isNodeActive(n: any): boolean {
+  if (!n) return false;
+  if (n.enabled === false || n.enabled === 'false' || n.enabled === 0) return false;
+  if (n.status === 'draft' || n.status === 'disabled' || n.status === 'hidden') return false;
+  return true;
+}
 
 // Helper: Migration/sync function to keep Supabase in sync without forcing dummy nodes
 export async function syncExistingContentToSupabase(): Promise<{ nodes: any[]; success: boolean; error?: string }> {
@@ -164,7 +190,7 @@ export function normalizeNode(n: any): StudyBullNode {
     icon: String(n.icon || (isCalcNode ? '⚡' : isTypingNode ? '⌨️' : '📌')),
     subtitle: String(n.subtitle || n.sub || n.subtitleEn || ''),
     subtitleEn: n.subtitleEn || n.subtitle_en || undefined,
-    enabled: n.enabled !== false && n.enabled !== 'false' && n.enabled !== 0,
+    enabled: isNodeActive(n),
     children: isTool ? [] : (Array.isArray(n.children) ? n.children.map(normalizeNode) : []),
     passages: Array.isArray(n.passages) ? n.passages : (n.passages ? [n.passages] : undefined),
     questions: Array.isArray(n.questions) ? n.questions : [],
@@ -183,63 +209,150 @@ export function normalizeNode(n: any): StudyBullNode {
 }
 
 // 1. शुरुआती डेटा (Buttons, Folders, Quizzes, Settings) लोड करने के लिए:
+// Dual strategy: Direct native fetch (100% resilient on Vercel) + Supabase JS Client fallback
 export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any; raw?: any; error?: string }> {
-  const client = getSupabaseClient();
-  if (!client) {
+  const { url, anonKey } = getSupabaseCredentials();
+  if (!url || !anonKey) {
     return {
-      nodes: [],
-      settings: {},
+      nodes: getCachedNodes(),
+      settings: getCachedSettings(),
       error: 'Supabase credentials not configured',
     };
   }
 
+  // Strategy A: Ultra-fast native HTTPS fetch (bypasses all client SDK packaging/websocket issues on Vercel)
   try {
-    const { data, error } = await client
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+    const endpoint = `${url}/rest/v1/studybull_app_state?select=nodes,settings,updated_at&order=updated_at.desc&limit=1`;
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'apikey': anonKey,
+        'Authorization': `Bearer ${anonKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    if (response.ok) {
+      const rows = await response.json();
+      const latestRow = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+      if (latestRow) {
+        const rawNodes = Array.isArray(latestRow.nodes) ? latestRow.nodes : [];
+        const publishedNodes = rawNodes.filter(isNodeActive).map(normalizeNode);
+
+        try {
+          localStorage.setItem('studybull_user_cache', JSON.stringify(publishedNodes));
+          localStorage.setItem('studybull_cached_nodes', JSON.stringify(publishedNodes));
+          if (latestRow.settings) {
+            localStorage.setItem('studybull_cached_settings', JSON.stringify(latestRow.settings));
+          }
+        } catch {}
+
+        return {
+          nodes: publishedNodes,
+          settings: latestRow.settings || {},
+          raw: latestRow,
+        };
+      }
+    }
+  } catch (nativeErr) {
+    console.warn('Native fetch fallback to Supabase SDK:', nativeErr);
+  }
+
+  // Strategy B: Supabase JS Client
+  const client = getSupabaseClient();
+  if (!client) {
+    return {
+      nodes: getCachedNodes(),
+      settings: getCachedSettings(),
+      error: 'Supabase client unavailable',
+    };
+  }
+
+  try {
+    // Check latest row first (supports any custom ID or updated row)
+    const { data: rows, error: rowsErr } = await client
       .from('studybull_app_state')
       .select('nodes, settings, updated_at')
-      .eq('id', 'main')
-      .maybeSingle();
+      .order('updated_at', { ascending: false })
+      .limit(1);
 
-    if (error) {
-      console.warn('Supabase loadStudyBullApp query error:', error.message);
+    let row = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+
+    if (!row || rowsErr) {
+      // Fallback by ID 'main'
+      const { data: mainData, error: mainErr } = await client
+        .from('studybull_app_state')
+        .select('nodes, settings, updated_at')
+        .eq('id', 'main')
+        .maybeSingle();
+
+      if (mainErr) {
+        console.warn('Supabase loadStudyBullApp query error:', mainErr.message);
+        return {
+          nodes: getCachedNodes(),
+          settings: getCachedSettings(),
+          error: mainErr.message,
+        };
+      }
+      row = mainData;
+    }
+
+    if (row) {
+      const rawNodes = Array.isArray(row.nodes) ? row.nodes : [];
+      const publishedNodes = rawNodes.filter(isNodeActive).map(normalizeNode);
+
+      try {
+        localStorage.setItem('studybull_user_cache', JSON.stringify(publishedNodes));
+        localStorage.setItem('studybull_cached_nodes', JSON.stringify(publishedNodes));
+        if (row.settings) {
+          localStorage.setItem('studybull_cached_settings', JSON.stringify(row.settings));
+        }
+      } catch {}
+
       return {
-        nodes: [],
-        settings: {},
-        error: error.message,
+        nodes: publishedNodes,
+        settings: row.settings || {},
+        raw: row,
       };
     }
 
-    const rawNodes = Array.isArray(data?.nodes) ? data.nodes : [];
-
-    // Filter published nodes & normalize fields
-    const publishedNodes = rawNodes
-      .filter((n: any) => 
-        Boolean(n.enabled === true || n.enabled === 'true' || n.enabled === 1 || n.status === 'published' || n.isPublished === true)
-      )
-      .map(normalizeNode);
-
-    // Write to unified local user cache
-    try {
-      localStorage.setItem('studybull_user_cache', JSON.stringify(publishedNodes));
-      localStorage.setItem('studybull_cached_nodes', JSON.stringify(publishedNodes));
-      if (data?.settings) {
-        localStorage.setItem('studybull_cached_settings', JSON.stringify(data.settings));
-      }
-    } catch {}
-
     return {
-      nodes: publishedNodes,
-      settings: data?.settings || {},
-      raw: data,
+      nodes: getCachedNodes(),
+      settings: getCachedSettings(),
     };
   } catch (err: any) {
     console.error('Supabase loadStudyBullApp error:', err);
     return {
-      nodes: [],
-      settings: {},
+      nodes: getCachedNodes(),
+      settings: getCachedSettings(),
       error: err?.message || 'Network / connection error',
     };
   }
+}
+
+// Helpers for localStorage fallback
+function getCachedNodes(): any[] {
+  try {
+    const cached = localStorage.getItem('studybull_user_cache') || localStorage.getItem('studybull_cached_nodes');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {}
+  return [];
+}
+
+function getCachedSettings(): any {
+  try {
+    const cached = localStorage.getItem('studybull_cached_settings');
+    if (cached) return JSON.parse(cached);
+  } catch {}
+  return {};
 }
 
 // 2. Admin में बदलाव होते ही User App में तुरंत लाइव अपडेट करने के लिए:
@@ -256,15 +369,12 @@ export function subscribeToAdminUpdates(onUpdate: (data: { nodes: any[]; setting
           event: '*',
           schema: 'public',
           table: 'studybull_app_state',
-          filter: 'id=eq.main',
         },
         (payload: any) => {
           const row = payload.new as any;
           if (row) {
             const rawNodes = Array.isArray(row.nodes) ? row.nodes : [];
-            const published = rawNodes
-              .filter((n: any) => Boolean(n.enabled === true || n.enabled === 'true' || n.enabled === 1 || n.status === 'published' || n.isPublished === true))
-              .map(normalizeNode);
+            const published = rawNodes.filter(isNodeActive).map(normalizeNode);
 
             // Update localStorage cache simultaneously
             try {
@@ -285,7 +395,9 @@ export function subscribeToAdminUpdates(onUpdate: (data: { nodes: any[]; setting
       .subscribe();
 
     return () => {
-      client.removeChannel(channel);
+      try {
+        client.removeChannel(channel);
+      } catch {}
     };
   } catch (err) {
     console.warn('Failed to subscribe to realtime updates:', err);

@@ -1180,34 +1180,33 @@ export default function App() {
     }
   });
 
+  const applyLiveAdminData = (nodes: any[], settings: any) => {
+    if (Array.isArray(nodes)) {
+      setAdminNodes(nodes);
+      try {
+        localStorage.setItem('studybull_user_cache', JSON.stringify(nodes));
+        localStorage.setItem('studybull_cached_nodes', JSON.stringify(nodes));
+      } catch {}
+    }
+    if (settings && Object.keys(settings).length > 0) {
+      setAdminSettings(settings);
+      try {
+        localStorage.setItem('studybull_cached_settings', JSON.stringify(settings));
+      } catch {}
+    }
+    setIsDbLoaded(true);
+    try {
+      localStorage.setItem('studybull_db_loaded', 'true');
+    } catch {}
+  };
+
   useEffect(() => {
     let isMounted = true;
-
-    const applyLiveAdminData = (nodes: any[], settings: any) => {
-      if (!isMounted) return;
-      if (Array.isArray(nodes)) {
-        setAdminNodes(nodes);
-        try {
-          localStorage.setItem('studybull_user_cache', JSON.stringify(nodes));
-          localStorage.setItem('studybull_cached_nodes', JSON.stringify(nodes));
-        } catch {}
-      }
-      if (settings && Object.keys(settings).length > 0) {
-        setAdminSettings(settings);
-        try {
-          localStorage.setItem('studybull_cached_settings', JSON.stringify(settings));
-        } catch {}
-      }
-      setIsDbLoaded(true);
-      try {
-        localStorage.setItem('studybull_db_loaded', 'true');
-      } catch {}
-    };
 
     // 1. Initial background fetch & normalization from Supabase
     loadStudyBullApp().then((appData) => {
       if (!isMounted) return;
-      if (Array.isArray(appData.nodes)) {
+      if (Array.isArray(appData.nodes) && (appData.nodes.length > 0 || !appData.error)) {
         applyLiveAdminData(appData.nodes, appData.settings || {});
       } else {
         setIsDbLoaded(true);
@@ -1874,8 +1873,23 @@ export default function App() {
                   className="space-y-4"
                 >
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {/* Loading skeleton while fetching live buttons from database */}
+                    {!isDbLoaded && adminNodes.length === 0 && (
+                      <div className="col-span-2 sm:col-span-2 md:col-span-3 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs animate-pulse flex flex-col justify-between h-36">
+                            <div className="w-12 h-12 rounded-2xl bg-slate-100" />
+                            <div className="space-y-2 w-full">
+                              <div className="h-4 bg-slate-200 rounded-md w-3/4" />
+                              <div className="h-3 bg-slate-100 rounded-md w-1/2" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     {/* Empty State when no buttons are added yet from Admin Panel */}
-                    {adminNodes.length === 0 && (
+                    {isDbLoaded && adminNodes.length === 0 && (
                       <div className="col-span-2 sm:col-span-2 md:col-span-3 border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center text-slate-400 select-none bg-slate-50/60 my-6">
                         <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center text-2xl mb-3">
                           📲
@@ -1888,6 +1902,18 @@ export default function App() {
                             ? 'अपने Admin Panel से Calculation, Typing Test, Quiz या Notes जोड़ें। वे तुरंत यहाँ दिखाई देंगे।'
                             : 'Add Calculation, Typing Test, Quiz or Notes from your Admin Panel. They will appear here live.'}
                         </p>
+                        <button
+                          onClick={() => {
+                            setIsDbLoaded(false);
+                            loadStudyBullApp().then((d) => {
+                              if (Array.isArray(d.nodes)) applyLiveAdminData(d.nodes, d.settings || {});
+                            });
+                          }}
+                          className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          {langHindi ? 'रिफ्रेश करें' : 'Refresh Now'}
+                        </button>
                       </div>
                     )}
 
