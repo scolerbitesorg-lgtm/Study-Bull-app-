@@ -1001,6 +1001,93 @@ function generateUnlimitedMathQuestion(
   return finalQ!;
 }
 
+const HINDI_TO_ENGLISH_MAP: Record<string, string> = {
+  'नया Button Page': 'New Button Page',
+  'नया Button': 'New Button',
+  'नया फोल्डर': 'New Folder',
+  'मुख्य पृष्ठ': 'Home Page',
+  'मुख्य': 'Main',
+  'वापस': 'Back',
+  'कैलकुलेशन': 'Calculations',
+  'स्पीड मैथ': 'Speed Math',
+  'टाइपिंग': 'Typing',
+  'टाइपिंग लैब': 'Typing Lab',
+  'नोट्स': 'Notes',
+  'नोट्स (PDF)': 'Notes (PDF)',
+  'क्विज': 'Quiz',
+  'क्विज अभ्यास': 'Quiz Practice',
+  'मॉक टेस्ट': 'Mock Test',
+  'अभ्यास': 'Practice',
+  'भारतीय राजव्यवस्था': 'Indian Polity & Constitution',
+  'भारतीय इतिहास': 'Indian History',
+  'भूगोल एवं पर्यावरण': 'Geography & Environment',
+  'सामान्य विज्ञान': 'General Science',
+  'सामान्य ज्ञान': 'General Knowledge',
+  'गणित': 'Mathematics',
+  'रीजनिंग': 'Reasoning',
+  'अंग्रेजी': 'English',
+  'हिंदी': 'Hindi',
+  'सामग्री मौजूद': 'items available',
+  'फोल्डर खोलें': 'Open Folder',
+  'सामग्री': 'Content',
+  'विषय': 'Topic',
+  'अध्याय': 'Chapter',
+  'प्रश्नों की संख्या': 'Question Count',
+  'कठिनाई स्तर': 'Difficulty Level',
+  'विषय चुनें': 'Select Topic',
+  'असीमित': 'Unlimited',
+  'सरल': 'Easy',
+  'मध्यम': 'Medium',
+  'कठिन': 'Hard',
+  'प्रो': 'Pro',
+  'मिश्रित (सभी विषय)': 'Mixed (All Topics)',
+  'जोड़ (Addition)': 'Addition',
+  'घटाव (Subtraction)': 'Subtraction',
+  'गुणा (Multiplication)': 'Multiplication',
+  'भाग (Division)': 'Division',
+  'जोड़ व घटाव (Add & Subtract)': 'Add & Subtract',
+  'गुणा व भाग (Multiply & Divide)': 'Multiply & Divide',
+  'सरलीकरण (BODMAS)': 'Simplification (BODMAS)',
+  'प्रतिशत (Percentage)': 'Percentage',
+  'वर्ग व वर्गमूल (Squares & Roots)': 'Squares & Square Roots',
+  'घन व घनमूल (Cubes & Roots)': 'Cubes & Cube Roots',
+  'भिन्न व दशमलव (Fractions & Decimals)': 'Fractions & Decimals',
+  'औसत (Average)': 'Average',
+  'अनुपात व समानुपात (Ratio & Proportion)': 'Ratio & Proportion',
+  'साधारण ब्याज (Simple Interest)': 'Simple Interest',
+  'लाभ व हानि (Profit & Loss)': 'Profit & Loss',
+  'समय व कार्य (Time & Work)': 'Time & Work',
+  'समय, चाल व दूरी (Time & Distance)': 'Time & Distance',
+  'फीचर टूल': 'Feature Tool',
+  'स्टडी बुल इंटरएक्टिव फीचर': 'Study Bull Interactive Feature',
+  'स्पीड मैथ प्रैक्टिस एवं कैलकुलेशन बूस्टर': 'Speed Math Practice & Calculation Booster',
+  'प्रोफेशनल रिज्यूम एवं सीवी बिल्डर': 'Professional Resume & CV Builder',
+  'लाइव टाइपिंग स्पीड एवं एक्यूरेसी टेस्ट': 'Live Typing Speed & Accuracy Test'
+};
+
+function translateTextToEnglish(input: string): string {
+  if (!input) return '';
+  const str = String(input).trim();
+  if (HINDI_TO_ENGLISH_MAP[str]) {
+    return HINDI_TO_ENGLISH_MAP[str];
+  }
+
+  let translated = str;
+  Object.keys(HINDI_TO_ENGLISH_MAP).forEach((key) => {
+    if (translated.includes(key)) {
+      translated = translated.replaceAll(key, HINDI_TO_ENGLISH_MAP[key]);
+    }
+  });
+
+  translated = translated
+    .replace(/(\d+)\s*सामग्री मौजूद/g, '$1 items available')
+    .replace(/नया\s*Button/gi, 'New Button')
+    .replace(/नया\s*फोल्डर/gi, 'New Folder')
+    .replace(/फोल्डर खोलें/gi, 'Open Folder');
+
+  return translated;
+}
+
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [langHindi, setLangHindi] = useState<boolean>(() => {
@@ -1009,6 +1096,21 @@ export default function App() {
   const [soundMuted, setSoundMuted] = useState<boolean>(() => {
     return localStorage.getItem('study_bull_muted') === 'true';
   });
+
+  // Sync language setting across app and notify any active custom iframe pages
+  useEffect(() => {
+    localStorage.setItem('study_bull_lang', langHindi ? 'hi' : 'en');
+    const iframes = document.querySelectorAll('iframe');
+    iframes.forEach((iframe) => {
+      try {
+        iframe.contentWindow?.postMessage({
+          type: 'LANG_CHANGE',
+          langHindi: langHindi,
+          lang: langHindi ? 'hi' : 'en'
+        }, '*');
+      } catch {}
+    });
+  }, [langHindi]);
 
   // Notes Reader
   const [selectedChapter, setSelectedChapter] = useState<Chapter>(NOTES_CHAPTERS[0]);
@@ -1100,14 +1202,23 @@ export default function App() {
   // Helper functions to resolve feature title, icon, and subtitle cleanly from Admin nodes and code
   const resolveNodeTitle = (btn: any, hindiMode: boolean = true) => {
     if (!btn) return '';
-    const currentTitle = String(hindiMode ? (btn.title || btn.name) : (btn.titleEn || btn.title_en || btn.title || btn.name || '')).trim();
+    let currentTitle = '';
+    if (hindiMode) {
+      currentTitle = String(btn.title || btn.name || '').trim();
+    } else {
+      currentTitle = String(btn.titleEn || btn.title_en || '').trim();
+      if (!currentTitle) {
+        const rawHi = String(btn.title || btn.name || '').trim();
+        currentTitle = translateTextToEnglish(rawHi);
+      }
+    }
     const rawHtml = String(btn.htmlContent || btn.html || btn.code || btn.rawHtml || btn.content || '');
     if (rawHtml) {
       const titleMatch = rawHtml.match(/<title[^>]*>([^<]+)<\/title>/i);
       if (titleMatch && titleMatch[1]) {
         const extracted = titleMatch[1].trim();
         if (!currentTitle || currentTitle === 'नया Custom Web Page' || currentTitle.toLowerCase().includes('custom web page') || currentTitle.toLowerCase().includes('untitled')) {
-          return extracted;
+          return hindiMode ? extracted : translateTextToEnglish(extracted);
         }
       }
     }
@@ -1127,7 +1238,18 @@ export default function App() {
   };
 
   const resolveNodeSubtitle = (btn: any, hindiMode: boolean = true) => {
-    const currentSub = String(hindiMode ? (btn.sub || btn.subtitle || '') : (btn.subEn || btn.subtitle_en || btn.sub || btn.subtitle || '')).trim();
+    let currentSub = '';
+    if (hindiMode) {
+      currentSub = String(btn.sub || btn.subtitle || '').trim();
+    } else {
+      currentSub = String(btn.subEn || btn.subtitle_en || '').trim();
+      if (!currentSub) {
+        const rawHi = String(btn.sub || btn.subtitle || '').trim();
+        if (rawHi && !rawHi.includes('Separate Page') && !rawHi.includes('Custom Web Tool') && !rawHi.includes('Interactive Script')) {
+          currentSub = translateTextToEnglish(rawHi);
+        }
+      }
+    }
     const title = String(btn?.title || '').toLowerCase();
     const rawHtml = String(btn?.htmlContent || btn?.html || btn?.code || btn?.rawHtml || '').toLowerCase();
     if (currentSub && !currentSub.includes('Separate Page') && !currentSub.includes('Custom Web Tool') && !currentSub.includes('Interactive Script')) {
@@ -1753,9 +1875,32 @@ export default function App() {
             {isHtmlTool && rawHtml ? (
               <iframe
                 key={`fs-feature-${activeCustomNode.id}-${htmlReloadKey}`}
-                srcDoc={rawHtml.includes('<!DOCTYPE') || rawHtml.includes('<html') 
-                  ? rawHtml 
-                  : `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><script src="https://cdn.tailwindcss.com"></script><style>body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; } * { box-sizing: border-box; }</style></head><body>${rawHtml}</body></html>`}
+                srcDoc={(() => {
+                  const langScript = `<script>
+                    window.langHindi = ${langHindi};
+                    window.APP_LANG = "${langHindi ? 'hi' : 'en'}";
+                    window.addEventListener('message', function(e) {
+                      if (e.data && e.data.type === 'LANG_CHANGE') {
+                        window.langHindi = e.data.langHindi;
+                        window.APP_LANG = e.data.lang;
+                        document.documentElement.lang = e.data.lang;
+                        var nodes = document.querySelectorAll('[data-lang-hi], [data-lang-en]');
+                        nodes.forEach(function(node) {
+                          if (e.data.langHindi && node.getAttribute('data-lang-hi')) {
+                            node.textContent = node.getAttribute('data-lang-hi');
+                          } else if (!e.data.langHindi && node.getAttribute('data-lang-en')) {
+                            node.textContent = node.getAttribute('data-lang-en');
+                          }
+                        });
+                        window.dispatchEvent(new CustomEvent('applangchange', { detail: e.data }));
+                      }
+                    });
+                  </script>`;
+                  if (rawHtml.includes('<head>')) {
+                    return rawHtml.replace('<head>', '<head>' + langScript);
+                  }
+                  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><script src="https://cdn.tailwindcss.com"></script>${langScript}<style>body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; } * { box-sizing: border-box; }</style></head><body>${rawHtml}</body></html>`;
+                })()}
                 title={featureTitle}
                 sandbox="allow-scripts allow-modals allow-forms allow-same-origin allow-popups allow-downloads"
                 allow="clipboard-read; clipboard-write; fullscreen; autoplay"
