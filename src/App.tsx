@@ -148,6 +148,7 @@ interface Chapter {
   title: string;
   titleEn: string;
   subtitle: string;
+  subtitleEn?: string;
   content: string;
 }
 
@@ -967,7 +968,17 @@ function generateUnlimitedMathQuestion(
       question: qText,
       questionEn: qTextEn,
       options: shuffledOptions,
-      optionsEn: shuffledOptions,
+      optionsEn: shuffledOptions.map((str: string) => {
+        if (typeof str !== 'string') return str;
+        return str
+          .replace(/\bदिन\b/g, 'days')
+          .replace(/\bघंटे\b/g, 'hours')
+          .replace(/\bवर्ष\b/g, 'years')
+          .replace(/\bकिमी\/घंटा\b/g, 'km/h')
+          .replace(/\bकिमी\b/g, 'km')
+          .replace(/\bमीटर\b/g, 'm')
+          .replace(/\bअंक\b/g, 'points');
+      }),
       correct: correctIndex >= 0 ? correctIndex : 0,
       explanation,
       explanationEn,
@@ -1082,6 +1093,7 @@ export default function App() {
   // Review accordions state for Results
   const [reviewExpanded, setReviewExpanded] = useState(false);
   const [activeCustomNode, setActiveCustomNode] = useState<any>(null);
+  const [folderStack, setFolderStack] = useState<any[]>([]);
   const [htmlReloadKey, setHtmlReloadKey] = useState<number>(0);
   const [htmlIsFullscreen, setHtmlIsFullscreen] = useState<boolean>(false);
 
@@ -1099,7 +1111,7 @@ export default function App() {
         }
       }
     }
-    return currentTitle || 'फीचर टूल';
+    return currentTitle || (hindiMode ? 'फीचर टूल' : 'Feature Tool');
   };
 
   const resolveNodeIcon = (btn: any) => {
@@ -1145,6 +1157,166 @@ export default function App() {
     if (kind === 'folder' || kind === 'category' || kind === 'group' || kind === 'directory') return true;
     if (Array.isArray(item?.children) && item.children.length > 0) return true;
     return false;
+  };
+
+  // Reusable universal handler for clicking ANY Admin node (MCQs, Notes, Folders, Pages)
+  const handleNodeInteraction = (btn: any) => {
+    if (!btn) return;
+    if (isSectionNode(btn)) return;
+
+    if (btn.url) {
+      window.open(btn.url, '_blank');
+      return;
+    }
+
+    // IF THIS BUTTON HAS SUB-BUTTONS OR IS MARKED AS A FOLDER, OPEN AS A FOLDER VIEW SO ALL INSIDE BUTTONS ARE ACCESSIBLE
+    if (isFolderNode(btn)) {
+      if (currentView === 'custom_node' && activeCustomNode) {
+        setFolderStack(prev => [...prev, activeCustomNode]);
+      } else {
+        setFolderStack([]);
+      }
+      setActiveCustomNode(btn);
+      setHtmlReloadKey(0);
+      setHtmlIsFullscreen(false);
+      navigateTo('custom_node');
+      return;
+    }
+
+    const target = String(btn.view || btn.target_view || btn.type || btn.kind || btn.id || '').toLowerCase();
+    const kind = String(btn.kind || btn.type || '').toLowerCase();
+
+    // 1. ADMIN MCQs & QUIZZES (or custom questions attached to admin button)
+    const customQuestions = 
+      (Array.isArray(btn.questions) && btn.questions.length > 0 ? btn.questions : null) ||
+      (Array.isArray(btn.mcqs) && btn.mcqs.length > 0 ? btn.mcqs : null) ||
+      (Array.isArray(btn.items) && btn.items.length > 0 && btn.items[0]?.question ? btn.items : null) ||
+      (Array.isArray(btn.quiz) && btn.quiz.length > 0 ? btn.quiz : null) ||
+      (typeof btn.content === 'string' && btn.content.trim().startsWith('[') ? (() => {
+        try {
+          const parsed = JSON.parse(btn.content);
+          return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+        } catch { return null; }
+      })() : null);
+
+    if (customQuestions) {
+      const normalizedQs = customQuestions.map((q: any, i: number) => ({
+        id: q.id || i + 1,
+        question: q.question || q.qText || q.title || 'Question',
+        questionEn: q.questionEn || q.question_en || q.question || 'Question',
+        options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+        optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
+        correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+        explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
+        explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+      }));
+
+      const title = resolveNodeTitle(btn, langHindi);
+      setSelectedSubject({
+        id: btn.id,
+        title: title,
+        titleEn: btn.titleEn || btn.title_en || title,
+        subtitle: resolveNodeSubtitle(btn, langHindi),
+        subtitleEn: btn.subtitleEn || btn.subtitle_en || resolveNodeSubtitle(btn, false),
+        icon: resolveNodeIcon(btn),
+        questions: normalizedQs
+      });
+      setQuizQuestions(normalizedQs);
+      setQuizIndex(0);
+      setUserQuizAnswers(new Array(normalizedQs.length).fill(null));
+      setQuizScore(0);
+      setIsAnswerRevealed(false);
+
+      if (kind === 'mock' || target.includes('mock')) {
+        setMockIndex(0);
+        setUserMockAnswers(new Array(normalizedQs.length).fill(null));
+        setMockTimer(600);
+        setMockTimerActive(true);
+        navigateTo('mock_play');
+      } else {
+        navigateTo('quiz_play');
+      }
+      return;
+    }
+
+    // 2. ADMIN NOTES & PDF (custom text/chapters attached to node)
+    const notesText = btn.notesContent || btn.content || btn.text || btn.notes || btn.pdfUrl || btn.pdf || btn.body || btn.description;
+    const hasNotesContent = typeof notesText === 'string' && notesText.trim().length > 0 && !notesText.includes('<html') && !notesText.includes('<!DOCTYPE');
+    const hasChapters = Array.isArray(btn.chapters) && btn.chapters.length > 0;
+
+    if (kind === 'notes' || kind === 'pdf' || kind === 'note' || target.includes('note') || target.includes('pdf') || hasNotesContent || hasChapters) {
+      if (hasNotesContent || notesText) {
+        const title = resolveNodeTitle(btn, langHindi);
+        setSelectedChapter({
+          id: btn.id,
+          title: title,
+          titleEn: btn.titleEn || btn.title_en || title,
+          subtitle: resolveNodeSubtitle(btn, langHindi),
+          subtitleEn: resolveNodeSubtitle(btn, false),
+          content: notesText || (langHindi ? 'एडमिन पैनल से इस नोट्स की विषय सामग्री जोड़ी जा रही है...' : 'Notes content is being added from Admin Panel...')
+        });
+        navigateTo('notes_reader');
+        return;
+      }
+      if (hasChapters) {
+        setSelectedChapter(btn.chapters[0]);
+        navigateTo('notes_lib');
+        return;
+      }
+      navigateTo('notes_lib');
+      return;
+    }
+
+    // 3. SPEED MATH / CALCULATION
+    const isCalc = target.includes('calc') || 
+      kind === 'calc' || 
+      String(btn.title || '').toLowerCase().includes('calc') || 
+      String(btn.title || '').includes('कैलकुलेशन') || 
+      String(btn.title || '').toLowerCase().includes('speed math');
+
+    if (isCalc) {
+      navigateTo('calc_setup');
+      return;
+    }
+
+    // 4. TYPING LAB
+    const isTyping = target.includes('typing') || 
+      kind === 'typing' || 
+      String(btn.title || '').toLowerCase().includes('typing') || 
+      String(btn.title || '').includes('टाइपिंग');
+
+    if (isTyping) {
+      navigateTo('typing_setup');
+      return;
+    }
+
+    // 5. MOCK TEST SAMPLE FALLBACK
+    if (target.includes('mock')) {
+      setMockIndex(0);
+      setUserMockAnswers(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
+      setMockTimer(600);
+      setMockTimerActive(true);
+      navigateTo('mock_play');
+      return;
+    }
+
+    // 6. QUIZ SAMPLE FALLBACK
+    if (target.includes('quiz')) {
+      setSelectedSubject(QUIZ_SUBJECTS[0]);
+      setQuizQuestions(QUIZ_SUBJECTS[0].questions);
+      setQuizIndex(0);
+      setUserQuizAnswers(new Array(QUIZ_SUBJECTS[0].questions.length).fill(null));
+      setQuizScore(0);
+      setIsAnswerRevealed(false);
+      navigateTo('quiz_play');
+      return;
+    }
+
+    // 7. CUSTOM HTML CODE PAGE / OTHER
+    setActiveCustomNode(btn);
+    setHtmlReloadKey(0);
+    setHtmlIsFullscreen(false);
+    navigateTo('custom_node');
   };
 
   // Supabase State & Instant Cache-First (eliminates all old default flickers)
@@ -1352,23 +1524,38 @@ export default function App() {
   const handleBack = () => {
     switch (currentView) {
       case 'custom_node':
-        setActiveCustomNode(null);
-        setCurrentView('home');
+        if (folderStack.length > 0) {
+          const prevFolder = folderStack[folderStack.length - 1];
+          setFolderStack(s => s.slice(0, -1));
+          setActiveCustomNode(prevFolder);
+        } else {
+          setFolderStack([]);
+          setActiveCustomNode(null);
+          setCurrentView('home');
+        }
         break;
       case 'quiz_play':
       case 'quiz_result':
-        setCurrentView('quiz_categories');
+      case 'mock_play':
+      case 'mock_result':
+        setMockTimerActive(false);
+        if (activeCustomNode) {
+          setCurrentView('custom_node');
+        } else {
+          setActiveCustomNode(null);
+          setCurrentView('home');
+        }
         break;
       case 'quiz_categories':
-      case 'mock_result':
       case 'notes_lib':
       case 'calc_setup':
       case 'typing_setup':
-        setCurrentView('home');
-        break;
-      case 'mock_play':
-        setMockTimerActive(false);
-        setCurrentView('home');
+        if (activeCustomNode) {
+          setCurrentView('custom_node');
+        } else {
+          setActiveCustomNode(null);
+          setCurrentView('home');
+        }
         break;
       case 'notes_reader':
         setCurrentView('notes_lib');
@@ -1479,8 +1666,8 @@ export default function App() {
 
     return (
       <SafeErrorBoundary fallbackView={() => { setActiveCustomNode(null); setCurrentView('home'); }}>
-        <div className="fixed inset-0 z-50 flex flex-col w-screen h-screen bg-white select-none overflow-hidden">
-          {/* Top Bar - Clean minimal back header as shown in Image 2 */}
+        <div className="fixed inset-0 z-50 flex flex-col w-screen h-screen bg-slate-50 select-none overflow-hidden">
+          {/* Top Bar - Clean header matching main home page header */}
           <div 
             className="h-14 px-4 flex items-center justify-between text-white shadow-sm shrink-0 z-20"
             style={{
@@ -1489,10 +1676,7 @@ export default function App() {
           >
             <div className="flex items-center space-x-3 min-w-0">
               <button
-                onClick={() => {
-                  setActiveCustomNode(null);
-                  setCurrentView('home');
-                }}
+                onClick={handleBack}
                 className="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-sm transition active:scale-95 cursor-pointer shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -1505,22 +1689,67 @@ export default function App() {
                   <h1 className="text-sm sm:text-base font-bold text-white truncate">
                     {featureTitle}
                   </h1>
-                  {featureSubtitle && (
-                    <p className="text-[11px] text-white/80 truncate hidden sm:block">
-                      {featureSubtitle}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
 
             <div className="flex items-center space-x-2 shrink-0">
-              {/* Refresh button removed as requested by user */}
+              <button
+                onClick={() => setLangHindi(!langHindi)}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition border border-white/20 active:scale-95 cursor-pointer"
+              >
+                {langHindi ? 'EN' : 'हिंदी'}
+              </button>
+
+              <button
+                onClick={() => setSoundMuted(!soundMuted)}
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition border border-white/20 active:scale-95 cursor-pointer"
+                title={soundMuted ? 'ध्वनि चालू करें' : 'ध्वनि बंद करें'}
+              >
+                {soundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
-          {/* Pure 100% Full Viewport HTML Output without frames, margins or bottom bars */}
-          <div className="flex-1 w-full h-[calc(100vh-56px)] bg-white overflow-hidden relative">
+          {/* Interactive Breadcrumb / Open Tab Path Banner */}
+          <div className="bg-slate-900 text-white text-xs px-4 py-2 flex items-center space-x-2 overflow-x-auto whitespace-nowrap border-b border-slate-800 shrink-0 shadow-inner">
+            <button
+              onClick={() => {
+                setActiveCustomNode(null);
+                setFolderStack([]);
+                setCurrentView('home');
+              }}
+              className="hover:underline flex items-center gap-1 font-medium text-slate-300 hover:text-white transition cursor-pointer"
+            >
+              <span>🏠</span>
+              <span>{langHindi ? 'मुख्य पृष्ठ' : 'Home'}</span>
+            </button>
+
+            {folderStack.map((parent, idx) => (
+              <React.Fragment key={parent.id || idx}>
+                <span className="text-slate-500 font-bold">›</span>
+                <button
+                  onClick={() => {
+                    setFolderStack(s => s.slice(0, idx));
+                    setActiveCustomNode(parent);
+                  }}
+                  className="hover:underline font-medium text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1"
+                >
+                  <span>📁</span>
+                  <span>{resolveNodeTitle(parent, langHindi)}</span>
+                </button>
+              </React.Fragment>
+            ))}
+
+            <span className="text-slate-500 font-bold">›</span>
+            <span className="font-bold text-amber-300 flex items-center gap-1 bg-amber-400/20 px-2.5 py-0.5 rounded-md border border-amber-400/30 text-xs">
+              <span>{featureIcon}</span>
+              <span>{featureTitle}</span>
+            </span>
+          </div>
+
+          {/* Pure 100% Full Viewport Output without frames, margins or bottom bars */}
+          <div className="flex-1 w-full bg-white overflow-hidden relative">
             {isHtmlTool && rawHtml ? (
               <iframe
                 key={`fs-feature-${activeCustomNode.id}-${htmlReloadKey}`}
@@ -1583,34 +1812,7 @@ export default function App() {
                       const isChildFolder = isFolderNode(child);
 
                       const handleChildClick = () => {
-                        if (isChildSection) return;
-                        if (child.url) {
-                          window.open(child.url, '_blank');
-                          return;
-                        }
-                        if (childHasHtml || (child.kind === 'html' && child.id !== 'calc' && child.id !== 'typing')) {
-                          setActiveCustomNode(child);
-                          setHtmlReloadKey(0);
-                          return;
-                        }
-                        if (childTarget.includes('mock')) {
-                          setMockIndex(0);
-                          setUserMockAnswers(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
-                          setMockTimer(600);
-                          setMockTimerActive(true);
-                          navigateTo('mock_play');
-                        } else if (childTarget.includes('quiz')) {
-                          navigateTo('quiz_categories');
-                        } else if (childTarget.includes('note') || childTarget.includes('pdf')) {
-                          navigateTo('notes_lib');
-                        } else if (childTarget.includes('calc')) {
-                          navigateTo('calc_setup');
-                        } else if (childTarget.includes('typing')) {
-                          navigateTo('typing_setup');
-                        } else {
-                          setActiveCustomNode(child);
-                          setHtmlReloadKey(0);
-                        }
+                        handleNodeInteraction(child);
                       };
 
                       if (isChildSection) {
@@ -1641,39 +1843,7 @@ export default function App() {
                         );
                       }
 
-                      if (isChildFolder) {
-                        const childCount = Array.isArray(child.children) ? child.children.length : 0;
-                        return (
-                          <button
-                            key={child.id}
-                            onClick={handleChildClick}
-                            className="col-span-2 sm:col-span-2 md:col-span-3 group relative bg-white hover:bg-blue-50/30 rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer flex items-center justify-between text-left active:scale-[0.99]"
-                          >
-                            <div className="flex items-center space-x-4 min-w-0">
-                              <div className="w-14 h-14 rounded-2xl bg-amber-50 group-hover:bg-amber-100 border border-amber-200/70 flex items-center justify-center text-3xl shadow-inner shrink-0 transition-colors">
-                                {childIcon || '📁'}
-                              </div>
-                              <div className="min-w-0">
-                                <div className="flex items-center space-x-2">
-                                  <h3 className="font-bold text-slate-900 group-hover:text-blue-600 text-base sm:text-lg leading-snug truncate transition-colors">
-                                    {childTitle}
-                                  </h3>
-                                  <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-md">
-                                    Folder
-                                  </span>
-                                </div>
-                                <p className="text-xs text-slate-500 mt-1 font-medium line-clamp-1">
-                                  {childSubtitle || (childCount > 0 ? `${childCount} सामग्री मौजूद` : 'फोल्डर खोलें')}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2 text-slate-400 group-hover:text-blue-600 shrink-0 ml-3 transition-colors">
-                              <span className="text-xs font-bold hidden sm:inline text-slate-500">खोलें</span>
-                              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </div>
-                          </button>
-                        );
-                      }
+                      const childCount = Array.isArray(child.children) ? child.children.length : 0;
 
                       return (
                         <button
@@ -1682,11 +1852,17 @@ export default function App() {
                           className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100 hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                         >
                           <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
+                            {isChildFolder ? (
+                              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-md shadow-2xs">
+                                Folder
+                              </span>
+                            ) : (
+                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
+                            )}
                           </div>
 
-                          <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
-                            {childIcon}
+                          <div className={`w-12 h-12 rounded-2xl transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2 ${isChildFolder ? 'bg-amber-50 group-hover:bg-amber-100' : 'bg-blue-50 group-hover:bg-blue-100'}`}>
+                            {childIcon || (isChildFolder ? '📁' : '⚡')}
                           </div>
 
                           <div className="w-full">
@@ -1694,7 +1870,7 @@ export default function App() {
                               {childTitle}
                             </h3>
                             <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
-                              {childSubtitle}
+                              {childSubtitle || (isChildFolder ? (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder')) : '')}
                             </p>
                           </div>
                         </button>
@@ -1941,40 +2117,7 @@ export default function App() {
                       const isFolder = isFolderNode(btn);
 
                       const handleNodeClick = () => {
-                        if (isSection) return; // Sections are visual dividers/headers
-                        if (btn.url) {
-                          window.open(btn.url, '_blank');
-                          return;
-                        }
-                        if (isCalc) {
-                          navigateTo('calc_setup');
-                          return;
-                        }
-                        if (isTyping) {
-                          navigateTo('typing_setup');
-                          return;
-                        }
-                        if (hasCustomHtml || (btn.kind === 'html' && btn.id !== 'calc')) {
-                          setActiveCustomNode(btn);
-                          setHtmlIsFullscreen(false);
-                          navigateTo('custom_node');
-                          return;
-                        }
-                        if (target.includes('mock')) {
-                          setMockIndex(0);
-                          setUserMockAnswers(new Array(MOCK_TEST_QUESTIONS.length).fill(null));
-                          setMockTimer(600);
-                          setMockTimerActive(true);
-                          navigateTo('mock_play');
-                        } else if (target.includes('quiz')) {
-                          navigateTo('quiz_categories');
-                        } else if (target.includes('note') || target.includes('pdf')) {
-                          navigateTo('notes_lib');
-                        } else {
-                          setActiveCustomNode(btn);
-                          setHtmlIsFullscreen(false);
-                          navigateTo('custom_node');
-                        }
+                        handleNodeInteraction(btn);
                       };
 
                         // 1. SECTION (Image: Full-width horizontal title banner with tag badge)
@@ -2006,42 +2149,9 @@ export default function App() {
                           );
                         }
 
-                        // 2. FOLDER (Image: Horizontal full-width card with Folder icon, title, subtitle & chevron)
-                        if (isFolder) {
-                          const childCount = Array.isArray(btn.children) ? btn.children.length : 0;
-                          return (
-                            <button
-                              key={btn.id}
-                              onClick={handleNodeClick}
-                              className="col-span-2 sm:col-span-2 md:col-span-3 group relative bg-white hover:bg-blue-50/30 rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer flex items-center justify-between text-left active:scale-[0.99]"
-                            >
-                              <div className="flex items-center space-x-4 min-w-0">
-                                <div className="w-14 h-14 rounded-2xl bg-amber-50 group-hover:bg-amber-100 border border-amber-200/70 flex items-center justify-center text-3xl shadow-inner shrink-0 transition-colors">
-                                  {displayIcon || '📁'}
-                                </div>
-                                <div className="min-w-0">
-                                  <div className="flex items-center space-x-2">
-                                    <h3 className="font-bold text-slate-900 group-hover:text-blue-600 text-base sm:text-lg leading-snug truncate transition-colors">
-                                      {displayTitle}
-                                    </h3>
-                                    <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-md">
-                                      Folder
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-slate-500 mt-1 font-medium line-clamp-1">
-                                    {displaySubtitle || (childCount > 0 ? `${childCount} सामग्री मौजूद` : 'फोल्डर खोलें')}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-2 text-slate-400 group-hover:text-blue-600 shrink-0 ml-3 transition-colors">
-                                <span className="text-xs font-bold hidden sm:inline text-slate-500">खोलें</span>
-                                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                              </div>
-                            </button>
-                          );
-                        }
+                        // 2. UNIFORM BLOCK GRID CARD (Used for both Folders and regular buttons)
+                        const childCount = Array.isArray(btn.children) ? btn.children.length : 0;
 
-                        // 3. BUTTON (Cube Grid Card: Square rounded card with icon in light blue box, title, and subtitle)
                         return (
                           <button
                             key={btn.id}
@@ -2049,11 +2159,17 @@ export default function App() {
                             className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100 hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                           >
                             <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
+                              {isFolder ? (
+                                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-md shadow-2xs">
+                                  Folder
+                                </span>
+                              ) : (
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
+                              )}
                             </div>
 
-                            <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
-                              {displayIcon}
+                            <div className={`w-12 h-12 rounded-2xl transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2 ${isFolder ? 'bg-amber-50 group-hover:bg-amber-100' : 'bg-blue-50 group-hover:bg-blue-100'}`}>
+                              {displayIcon || (isFolder ? '📁' : '⚡')}
                             </div>
 
                             <div className="w-full">
@@ -2061,7 +2177,7 @@ export default function App() {
                                 {displayTitle}
                               </h3>
                               <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
-                                {displaySubtitle}
+                                {displaySubtitle || (isFolder ? (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder')) : '')}
                               </p>
                             </div>
                           </button>
@@ -2134,9 +2250,9 @@ export default function App() {
                   return (
                     <>
                       <div className="flex items-center justify-between pb-4 border-b border-slate-100 text-xs font-bold text-slate-500">
-                        <span>प्रश्न {quizIndex + 1} / {quizQuestions.length}</span>
+                        <span>{langHindi ? `प्रश्न ${quizIndex + 1} / ${quizQuestions.length}` : `Question ${quizIndex + 1} / ${quizQuestions.length}`}</span>
                         <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold">
-                          स्कोर: {quizScore}
+                          {langHindi ? `स्कोर: ${quizScore}` : `Score: ${quizScore}`}
                         </span>
                       </div>
 
@@ -2197,9 +2313,9 @@ export default function App() {
                       {isAnswerRevealed && (
                         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-950">
                           <p className="font-bold mb-1 flex items-center gap-1.5">
-                            <Sparkles className="w-4 h-4 text-blue-600" /> व्याख्या (Explanation):
+                            <Sparkles className="w-4 h-4 text-blue-600" /> {langHindi ? 'व्याख्या (Explanation):' : 'Explanation:'}
                           </p>
-                          <p>{langHindi ? currentQ.explanation : currentQ.explanationEn}</p>
+                          <p>{langHindi ? (currentQ.explanation || currentQ.explanationEn) : (currentQ.explanationEn || currentQ.explanation)}</p>
                         </div>
                       )}
 
@@ -2222,7 +2338,7 @@ export default function App() {
                             }}
                             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md transition flex items-center gap-2 active:scale-95 cursor-pointer"
                           >
-                            <span>{quizIndex + 1 < quizQuestions.length ? 'अगला प्रश्न' : 'रिजल्ट देखें'}</span>
+                            <span>{quizIndex + 1 < quizQuestions.length ? (langHindi ? 'अगला प्रश्न' : 'Next Question') : (langHindi ? 'रिजल्ट देखें' : 'View Results')}</span>
                             <ChevronRight className="w-4 h-4" />
                           </button>
                         </div>
@@ -2248,25 +2364,25 @@ export default function App() {
                 </div>
 
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-1">क्विज परिणाम (Scorecard)</h2>
-                  <p className="text-xs text-slate-500">{langHindi ? selectedSubject.title : selectedSubject.titleEn}</p>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-1">{langHindi ? 'क्विज परिणाम (Scorecard)' : 'Quiz Results (Scorecard)'}</h2>
+                  <p className="text-xs text-slate-500">{langHindi ? selectedSubject.title : (selectedSubject.titleEn || selectedSubject.title)}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">कुल सही (Correct)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'कुल सही (Correct)' : 'Total Correct'}</p>
                     <p className="text-2xl font-bold text-emerald-600 mt-1">{quizScore}</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">कुल गलत (Incorrect)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'कुल गलत (Incorrect)' : 'Total Incorrect'}</p>
                     <p className="text-2xl font-bold text-rose-600 mt-1">{quizQuestions.length - quizScore}</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">सटीकता (Accuracy)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'सटीकता (Accuracy)' : 'Accuracy'}</p>
                     <p className="text-xl font-bold text-purple-600 mt-1">{Math.round((quizScore / (quizQuestions.length || 1)) * 100)}%</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">कुल प्रश्न (Total)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'कुल प्रश्न (Total)' : 'Total Questions'}</p>
                     <p className="text-xl font-bold text-blue-600 mt-1">{quizQuestions.length}</p>
                   </div>
                 </div>
@@ -2277,7 +2393,7 @@ export default function App() {
                     onClick={() => setReviewExpanded(!reviewExpanded)}
                     className="w-full flex items-center justify-between text-xs font-bold text-blue-700 bg-blue-50 px-4 py-2.5 rounded-xl transition cursor-pointer"
                   >
-                    <span>{reviewExpanded ? 'विस्तृत समीक्षा छुपाएं' : 'सभी प्रश्नों की विस्तृत समीक्षा देखें'}</span>
+                    <span>{reviewExpanded ? (langHindi ? 'विस्तृत समीक्षा छुपाएं' : 'Hide Detailed Review') : (langHindi ? 'सभी प्रश्नों की विस्तृत समीक्षा देखें' : 'View Detailed Answer Review')}</span>
                     {reviewExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
 
@@ -2289,20 +2405,20 @@ export default function App() {
                         return (
                           <div key={idx} className={"p-4 rounded-2xl border text-xs " + (isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200')}>
                             <p className="font-bold text-slate-900 mb-1">
-                              Q{idx + 1}. {langHindi ? q.question : q.questionEn}
+                              Q{idx + 1}. {langHindi ? q.question : (q.questionEn || q.question)}
                             </p>
                             <p className="text-slate-700 mb-1">
-                              आपका उत्तर: <span className={isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}>
-                                {userAns !== null && userAns !== undefined ? q.options[userAns] : 'अनुत्तरित'}
+                              {langHindi ? 'आपका उत्तर:' : 'Your Answer:'} <span className={isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}>
+                                {userAns !== null && userAns !== undefined ? (langHindi ? q.options[userAns] : (q.optionsEn?.[userAns] || q.options[userAns])) : (langHindi ? 'अनुत्तरित' : 'Unanswered')}
                               </span>
                             </p>
                             {!isCorrect && (
                               <p className="text-emerald-800 font-bold mb-1">
-                                सही उत्तर: {q.options[q.correct]}
+                                {langHindi ? 'सही उत्तर:' : 'Correct Answer:'} {langHindi ? q.options[q.correct] : (q.optionsEn?.[q.correct] || q.options[q.correct])}
                               </p>
                             )}
                             <p className="text-slate-600 mt-1 italic">
-                              💡 {langHindi ? q.explanation : q.explanationEn}
+                              💡 {langHindi ? q.explanation : (q.explanationEn || q.explanation)}
                             </p>
                           </div>
                         );
@@ -2322,13 +2438,13 @@ export default function App() {
                     }}
                     className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer"
                   >
-                    <RotateCcw className="w-4 h-4" /> पुनः अभ्यास
+                    <RotateCcw className="w-4 h-4" /> {langHindi ? 'पुनः अभ्यास' : 'Practice Again'}
                   </button>
                   <button
                     onClick={() => navigateTo('quiz_categories')}
                     className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-95 cursor-pointer"
                   >
-                    विषय बदलें
+                    {langHindi ? 'विषय बदलें' : 'Change Subject'}
                   </button>
                 </div>
               </motion.div>
@@ -2354,7 +2470,7 @@ export default function App() {
                           <span>{String(Math.floor(mockTimer / 60)).padStart(2, '0')}:{String(mockTimer % 60).padStart(2, '0')}</span>
                         </div>
                         <div className="text-xs font-bold text-slate-300">
-                          प्रश्न {mockIndex + 1} / {mockQuestions.length}
+                          {langHindi ? `प्रश्न ${mockIndex + 1} / ${mockQuestions.length}` : `Question ${mockIndex + 1} / ${mockQuestions.length}`}
                         </div>
                         <button
                           onClick={() => {
@@ -2364,7 +2480,7 @@ export default function App() {
                           }}
                           className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs shadow-sm transition active:scale-95 cursor-pointer"
                         >
-                          सबमिट करें (Submit)
+                          {langHindi ? 'सबमिट करें (Submit)' : 'Submit Test'}
                         </button>
                       </div>
 
@@ -2413,7 +2529,7 @@ export default function App() {
                           disabled={mockIndex === 0}
                           className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm disabled:opacity-50 active:scale-95 cursor-pointer"
                         >
-                          पिछला (Previous)
+                          {langHindi ? 'पिछला (Previous)' : 'Previous'}
                         </button>
                         <button
                           onClick={() => {
@@ -2431,7 +2547,7 @@ export default function App() {
                           }}
                           className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-sm active:scale-95 cursor-pointer"
                         >
-                          {mockIndex + 1 < mockQuestions.length ? 'अगला (Next)' : 'सबमिट टेस्ट'}
+                          {mockIndex + 1 < mockQuestions.length ? (langHindi ? 'अगला (Next)' : 'Next') : (langHindi ? 'सबमिट टेस्ट' : 'Submit Test')}
                         </button>
                       </div>
                     </>
@@ -2455,8 +2571,8 @@ export default function App() {
                 </div>
 
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-1">मॉक टेस्ट स्कोरकार्ड (Analysis)</h2>
-                  <p className="text-xs text-slate-500">Real Exam Simulation Report</p>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-1">{langHindi ? 'मॉक टेस्ट स्कोरकार्ड (Analysis)' : 'Mock Test Scorecard (Analysis)'}</h2>
+                  <p className="text-xs text-slate-500">{langHindi ? 'रिएल एग्जाम सिमुलेशन रिपोर्ट' : 'Real Exam Simulation Report'}</p>
                 </div>
 
                 {(() => {
@@ -2474,15 +2590,15 @@ export default function App() {
                     <>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
-                          <p className="text-xs text-emerald-700 font-bold">सही (Correct)</p>
+                          <p className="text-xs text-emerald-700 font-bold">{langHindi ? 'सही (Correct)' : 'Correct'}</p>
                           <p className="text-2xl font-bold text-emerald-800 mt-1">{correct}</p>
                         </div>
                         <div className="bg-rose-50 p-4 rounded-2xl border border-rose-200">
-                          <p className="text-xs text-rose-700 font-bold">गलत (Wrong)</p>
+                          <p className="text-xs text-rose-700 font-bold">{langHindi ? 'गलत (Wrong)' : 'Wrong'}</p>
                           <p className="text-2xl font-bold text-rose-800 mt-1">{wrong}</p>
                         </div>
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                          <p className="text-xs text-slate-600 font-bold">छोड़े गए (Skipped)</p>
+                          <p className="text-xs text-slate-600 font-bold">{langHindi ? 'छोड़े गए (Skipped)' : 'Skipped'}</p>
                           <p className="text-2xl font-bold text-slate-800 mt-1">{unattempted}</p>
                         </div>
                       </div>
@@ -2493,7 +2609,7 @@ export default function App() {
                           onClick={() => setReviewExpanded(!reviewExpanded)}
                           className="w-full flex items-center justify-between text-xs font-bold text-blue-700 bg-blue-50 px-4 py-2.5 rounded-xl transition cursor-pointer"
                         >
-                          <span>{reviewExpanded ? 'प्रश्नों की समीक्षा छुपाएं' : 'प्रश्नों के सही उत्तर व व्याख्या देखें'}</span>
+                          <span>{reviewExpanded ? (langHindi ? 'प्रश्नों की समीक्षा छुपाएं' : 'Hide Answer Review') : (langHindi ? 'प्रश्नों के सही उत्तर व व्याख्या देखें' : 'View Correct Answers & Explanations')}</span>
                           {reviewExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
 
@@ -2505,18 +2621,18 @@ export default function App() {
                               return (
                                 <div key={idx} className={"p-4 rounded-2xl border text-xs " + (isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200')}>
                                   <p className="font-bold text-slate-900 mb-1">
-                                    Q{idx + 1}. {langHindi ? q.question : q.questionEn}
+                                    Q{idx + 1}. {langHindi ? q.question : (q.questionEn || q.question)}
                                   </p>
                                   <p className="text-slate-700 mb-1">
-                                    आपका उत्तर: <span className={isCorrect ? 'text-emerald-700 font-bold' : userAns === null ? 'text-slate-500' : 'text-rose-700 font-bold'}>
-                                      {userAns !== null && userAns !== undefined ? q.options[userAns] : 'छोड़ा गया'}
+                                    {langHindi ? 'आपका उत्तर:' : 'Your Answer:'} <span className={isCorrect ? 'text-emerald-700 font-bold' : userAns === null ? 'text-slate-500' : 'text-rose-700 font-bold'}>
+                                      {userAns !== null && userAns !== undefined ? (langHindi ? q.options[userAns] : (q.optionsEn?.[userAns] || q.options[userAns])) : (langHindi ? 'छोड़ा गया' : 'Skipped')}
                                     </span>
                                   </p>
                                   <p className="text-emerald-800 font-bold mb-1">
-                                    सही उत्तर: {q.options[q.correct]}
+                                    {langHindi ? 'सही उत्तर:' : 'Correct Answer:'} {langHindi ? q.options[q.correct] : (q.optionsEn?.[q.correct] || q.options[q.correct])}
                                   </p>
                                   <p className="text-slate-600 mt-1 italic">
-                                    💡 {langHindi ? q.explanation : q.explanationEn}
+                                    💡 {langHindi ? q.explanation : (q.explanationEn || q.explanation)}
                                   </p>
                                 </div>
                               );
@@ -2539,13 +2655,13 @@ export default function App() {
                     }}
                     className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer"
                   >
-                    <RotateCcw className="w-4 h-4" /> पुनः टेस्ट दें
+                    <RotateCcw className="w-4 h-4" /> {langHindi ? 'पुनः टेस्ट दें' : 'Retake Test'}
                   </button>
                   <button
                     onClick={() => navigateTo('home')}
                     className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-95 cursor-pointer"
                   >
-                    होम स्क्रीन पर लौटें
+                    {langHindi ? 'होम स्क्रीन पर लौटें' : 'Return to Home'}
                   </button>
                 </div>
               </motion.div>
@@ -2562,8 +2678,8 @@ export default function App() {
                 className="space-y-6"
               >
                 <div className="text-center">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">विषयवार PDF नोट्स लाइब्रेरी</h2>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">विषय चुनें और इन-ऐप PDF नोट्स पढ़ें</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{langHindi ? 'विषयवार PDF नोट्स लाइब्रेरी' : 'Subject-Wise PDF Notes Library'}</h2>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1">{langHindi ? 'विषय चुनें और इन-ऐप PDF नोट्स पढ़ें' : 'Select subject to read in-app PDF notes'}</p>
                 </div>
 
                 <div className="space-y-3 max-w-2xl mx-auto">
@@ -2581,8 +2697,8 @@ export default function App() {
                           📄
                         </div>
                         <div>
-                          <h3 className="font-bold text-slate-900 text-sm sm:text-base">{langHindi ? chap.title : chap.titleEn}</h3>
-                          <p className="text-xs text-slate-500 mt-0.5">{chap.subtitle}</p>
+                          <h3 className="font-bold text-slate-900 text-sm sm:text-base">{langHindi ? chap.title : (chap.titleEn || chap.title)}</h3>
+                          <p className="text-xs text-slate-500 mt-0.5">{langHindi ? chap.subtitle : (chap.subtitleEn || chap.subtitle)}</p>
                         </div>
                       </div>
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -2611,7 +2727,7 @@ export default function App() {
                           onClick={handleBack}
                           className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-xs shadow-sm hover:bg-blue-700 transition active:scale-95 cursor-pointer"
                         >
-                          ← वापस
+                          ← {langHindi ? 'वापस' : 'Back'}
                         </button>
                         <span className="text-xs font-medium opacity-70">Study Bull Official Notes</span>
                         
@@ -2669,7 +2785,7 @@ export default function App() {
               >
                 {/* Question Count */}
                 <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">प्रश्नों की संख्या (Question Count)</h3>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{langHindi ? 'प्रश्नों की संख्या (Question Count)' : 'Question Count'}</h3>
                   <div className="grid grid-cols-5 gap-2">
                     {[10, 25, 50, 100, 'Infinite'].map((cnt) => (
                       <button
@@ -2677,7 +2793,7 @@ export default function App() {
                         onClick={() => setCalcCount(cnt as number | 'Infinite')}
                         className={"py-3 rounded-xl font-bold text-xs sm:text-sm border transition active:scale-95 cursor-pointer " + (calcCount === cnt ? 'bg-blue-600 border-blue-500 text-white shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200')}
                       >
-                        {cnt === 'Infinite' ? 'असीमित' : `${cnt} Q`}
+                        {cnt === 'Infinite' ? (langHindi ? 'असीमित' : 'Unlimited') : `${cnt} Q`}
                       </button>
                     ))}
                   </div>
@@ -2686,7 +2802,7 @@ export default function App() {
                 {/* Difficulty */}
                 <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                    <Flame className="w-4 h-4 text-amber-500" /> कठिनाई स्तर (Difficulty)
+                    <Flame className="w-4 h-4 text-amber-500" /> {langHindi ? 'कठिनाई स्तर (Difficulty)' : 'Difficulty Level'}
                   </h3>
                   <div className="grid grid-cols-4 gap-2">
                     {(['सरल', 'मध्यम', 'कठिन', 'प्रो'] as const).map((diff) => (
@@ -2695,7 +2811,7 @@ export default function App() {
                         onClick={() => setCalcDifficulty(diff)}
                         className={"py-3 rounded-xl font-bold text-xs sm:text-sm border transition active:scale-95 cursor-pointer " + (calcDifficulty === diff ? 'bg-blue-600 border-blue-500 text-white shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200')}
                       >
-                        {diff}
+                        {langHindi ? diff : (diff === 'सरल' ? 'Easy' : diff === 'मध्यम' ? 'Medium' : diff === 'कठिन' ? 'Hard' : 'Pro')}
                       </button>
                     ))}
                   </div>
@@ -2705,10 +2821,10 @@ export default function App() {
                 <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                      <Calculator className="w-4 h-4 text-blue-600" /> विषय चुनें (Math Topics)
+                      <Calculator className="w-4 h-4 text-blue-600" /> {langHindi ? 'विषय चुनें (Math Topics)' : 'Select Math Topic'}
                     </h3>
                     <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                      {ALL_MATH_TOPICS.length} विषय उपलब्ध
+                      {langHindi ? `${ALL_MATH_TOPICS.length} विषय उपलब्ध` : `${ALL_MATH_TOPICS.length} topics available`}
                     </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1">
@@ -2730,7 +2846,7 @@ export default function App() {
                   onClick={generateCalculationSet}
                   className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-bold text-base shadow-md flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
                 >
-                  <span>🚀 अभ्यास शुरू करें ({calcCount === 'Infinite' ? 'असीमित प्रश्न' : `${calcCount} प्रश्न`})</span>
+                  <span>🚀 {langHindi ? `अभ्यास शुरू करें (${calcCount === 'Infinite' ? 'असीमित प्रश्न' : `${calcCount} प्रश्न`})` : `Start Practice (${calcCount === 'Infinite' ? 'Unlimited' : `${calcCount} Questions`})`}</span>
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </motion.div>
@@ -2751,7 +2867,7 @@ export default function App() {
                   return (
                     <>
                       <div className="bg-white border border-slate-200 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-slate-700 shadow-sm flex-wrap gap-2">
-                        <span className="truncate max-w-[180px] sm:max-w-[220px]">टॉपिक: {currentCalcQ.category || calcTopic}</span>
+                        <span className="truncate max-w-[180px] sm:max-w-[220px]">{langHindi ? `टॉपिक: ${currentCalcQ.category || calcTopic}` : `Topic: ${currentCalcQ.category || calcTopic}`}</span>
                         <div className="flex items-center gap-3 sm:gap-4">
                           <span className="text-amber-600 flex items-center gap-1">
                             <Zap className="w-3.5 h-3.5" /> {calcScore}
@@ -2761,7 +2877,7 @@ export default function App() {
                             <span>{String(Math.floor(calcTimer / 60)).padStart(2, '0')}:{String(calcTimer % 60).padStart(2, '0')}</span>
                           </span>
                           <span className="bg-slate-100 px-2.5 py-1 rounded-lg">
-                            Q {calcIndex + 1} {calcCount === 'Infinite' ? '(∞ असीमित)' : `/ ${calcQuestions.length}`}
+                            Q {calcIndex + 1} {calcCount === 'Infinite' ? (langHindi ? '(∞ असीमित)' : '(∞ Unlimited)') : `/ ${calcQuestions.length}`}
                           </span>
                           {calcCount === 'Infinite' && (
                             <button
@@ -2779,7 +2895,7 @@ export default function App() {
                               }}
                               className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold transition text-[11px] cursor-pointer"
                             >
-                              समाप्त करें
+                              {langHindi ? 'समाप्त करें' : 'Finish'}
                             </button>
                           )}
                         </div>
@@ -2787,7 +2903,7 @@ export default function App() {
 
                       <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 text-center shadow-sm relative overflow-hidden">
                         <span className="absolute top-3 left-4 text-[10px] uppercase font-bold tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                          स्पीड कैलकुलेशन • {calcDifficulty}
+                          {langHindi ? `स्पीड कैलकुलेशन • ${calcDifficulty}` : `Speed Math • ${calcDifficulty}`}
                         </span>
                         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 my-6 leading-relaxed">
                           {langHindi ? currentCalcQ.question : currentCalcQ.questionEn}
@@ -2843,10 +2959,10 @@ export default function App() {
                       {calcAnswered && (
                         <div className={"rounded-2xl p-4 border text-sm " + (calcSelected === currentCalcQ.correct ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900')}>
                           <p className="font-bold mb-1">
-                            {calcSelected === currentCalcQ.correct ? '✅ सही उत्तर!' : `❌ गलत उत्तर! सही उत्तर था: ${currentCalcQ.options[currentCalcQ.correct]}`}
+                            {calcSelected === currentCalcQ.correct ? (langHindi ? '✅ सही उत्तर!' : '✅ Correct Answer!') : (langHindi ? `❌ गलत उत्तर! सही उत्तर था: ${currentCalcQ.options[currentCalcQ.correct]}` : `❌ Incorrect! Correct answer was: ${currentCalcQ.options[currentCalcQ.correct]}`)}
                           </p>
                           <p className="text-xs text-slate-700 mt-1 font-medium whitespace-pre-line">
-                            📖 {langHindi ? currentCalcQ.explanation : currentCalcQ.explanationEn}
+                            📖 {langHindi ? currentCalcQ.explanation : (currentCalcQ.explanationEn || currentCalcQ.explanation)}
                           </p>
                           {currentCalcQ.shortcut && (
                             <p className="text-xs text-blue-700 mt-1.5 font-semibold">
@@ -2865,7 +2981,6 @@ export default function App() {
                                 setCalcSelected(null);
                                 setCalcAnswered(false);
                               } else if (calcCount === 'Infinite') {
-                                // Dynamically generate a brand new unique question on the fly
                                 const nextQ = generateUnlimitedMathQuestion(
                                   calcTopic,
                                   calcQuestions.length + 1,
@@ -2877,13 +2992,10 @@ export default function App() {
                                 setCalcSelected(null);
                                 setCalcAnswered(false);
 
-                                // Save updated signatures to localStorage
                                 try {
                                   const arr = Array.from(seenMathSignaturesRef.current).slice(-2000);
                                   localStorage.setItem('study_seen_math_questions_v2', JSON.stringify(arr));
-                                } catch {
-                                  // Ignore
-                                }
+                                } catch {}
                               } else {
                                 setCalcTimerActive(false);
                                 playGentleSound('celebrate', soundMuted);
@@ -2899,7 +3011,7 @@ export default function App() {
                             }}
                             className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
                           >
-                            <span>{calcCount === 'Infinite' || calcIndex + 1 < calcQuestions.length ? 'अगला प्रश्न' : 'रिजल्ट देखें'}</span>
+                            <span>{calcCount === 'Infinite' || calcIndex + 1 < calcQuestions.length ? (langHindi ? 'अगला प्रश्न' : 'Next Question') : (langHindi ? 'रिजल्ट देखें' : 'View Results')}</span>
                             <ChevronRight className="w-5 h-5" />
                           </button>
 
@@ -2919,7 +3031,7 @@ export default function App() {
                               }}
                               className="px-5 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-98 cursor-pointer text-sm"
                             >
-                              समाप्त करें
+                              {langHindi ? 'समाप्त करें' : 'Finish'}
                             </button>
                           )}
                         </div>
@@ -2945,25 +3057,25 @@ export default function App() {
                 </div>
 
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-1">कैलकुलेशन रिपोर्ट कार्ड (Analysis)</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-1">{langHindi ? 'कैलकुलेशन रिपोर्ट कार्ड (Analysis)' : 'Calculation Report Card (Analysis)'}</h2>
                   <p className="text-xs text-slate-500">{calcTopic} • {calcDifficulty}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">कुल सही (Correct)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'कुल सही (Correct)' : 'Total Correct'}</p>
                     <p className="text-2xl font-bold text-emerald-600 mt-1">{calcCorrectCount}</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">कुल गलत (Incorrect)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'कुल गलत (Incorrect)' : 'Total Incorrect'}</p>
                     <p className="text-2xl font-bold text-rose-600 mt-1">{calcWrongCount}</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">कुल समय (Time Taken)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'कुल समय (Time Taken)' : 'Time Taken'}</p>
                     <p className="text-xl font-bold text-blue-600 mt-1">{calcTimer}s</p>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold">सटीकता (Accuracy)</p>
+                    <p className="text-xs text-slate-500 font-bold">{langHindi ? 'सटीकता (Accuracy)' : 'Accuracy'}</p>
                     <p className="text-xl font-bold text-purple-600 mt-1">{Math.round((calcCorrectCount / (calcQuestions.length || 1)) * 100)}%</p>
                   </div>
                 </div>
@@ -2974,7 +3086,7 @@ export default function App() {
                     onClick={() => setReviewExpanded(!reviewExpanded)}
                     className="w-full flex items-center justify-between text-xs font-bold text-blue-700 bg-blue-50 px-4 py-2.5 rounded-xl transition cursor-pointer"
                   >
-                    <span>{reviewExpanded ? 'सवालों की व्याख्या छुपाएं' : 'सभी सवालों के हल और शॉर्टकट ट्रिक्स देखें'}</span>
+                    <span>{reviewExpanded ? (langHindi ? 'सवालों की व्याख्या छुपाएं' : 'Hide Explanations') : (langHindi ? 'सभी सवालों के हल और शॉर्टकट ट्रिक्स देखें' : 'View All Solutions & Shortcut Tricks')}</span>
                     {reviewExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
 
@@ -2986,16 +3098,16 @@ export default function App() {
                         return (
                           <div key={idx} className={"p-4 rounded-2xl border text-xs " + (isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200')}>
                             <div className="flex items-center justify-between mb-1">
-                              <span className="font-bold text-slate-900">Q{idx + 1}. {q.question}</span>
+                              <span className="font-bold text-slate-900">Q{idx + 1}. {langHindi ? q.question : (q.questionEn || q.question)}</span>
                               <span className={"font-bold px-2 py-0.5 rounded " + (isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800')}>
-                                {isCorrect ? 'सही' : 'गलत'}
+                                {isCorrect ? (langHindi ? 'सही' : 'Correct') : (langHindi ? 'गलत' : 'Wrong')}
                               </span>
                             </div>
                             <p className="text-emerald-800 font-bold mb-1">
-                              सही उत्तर: {q.options[q.correct]}
+                              {langHindi ? 'सही उत्तर:' : 'Correct Answer:'} {langHindi ? q.options[q.correct] : (q.optionsEn?.[q.correct] || q.options[q.correct])}
                             </p>
                             <p className="text-slate-700 whitespace-pre-line mt-1">
-                              {q.explanation}
+                              {langHindi ? q.explanation : (q.explanationEn || q.explanation)}
                             </p>
                             {q.shortcut && (
                               <p className="text-blue-700 font-semibold mt-1">
@@ -3014,13 +3126,13 @@ export default function App() {
                     onClick={generateCalculationSet}
                     className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer"
                   >
-                    <RotateCcw className="w-4 h-4" /> नया सेट हल करें
+                    <RotateCcw className="w-4 h-4" /> {langHindi ? 'नया सेट हल करें' : 'Solve New Set'}
                   </button>
                   <button
                     onClick={() => navigateTo('calc_setup')}
                     className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-95 cursor-pointer"
                   >
-                    सेटअप बदलें
+                    {langHindi ? 'सेटअप बदलें' : 'Change Setup'}
                   </button>
                 </div>
               </motion.div>
@@ -3037,12 +3149,12 @@ export default function App() {
                 className="space-y-6 max-w-2xl mx-auto"
               >
                 <div className="text-center">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">⌨️ टाइपिंग स्पीड एवं एक्यूरेसी लैब</h2>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">SSC CGL, CHSL, Delhi Police HC स्पीड एवं एक्यूरेसी टेस्ट</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{langHindi ? '⌨️ टाइपिंग स्पीड एवं एक्यूरेसी लैब' : '⌨️ Typing Speed & Accuracy Lab'}</h2>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1">{langHindi ? 'SSC CGL, CHSL, Delhi Police HC स्पीड एवं एक्यूरेसी टेस्ट' : 'SSC CGL, CHSL, Delhi Police HC Typing Test'}</p>
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">समय अवधि चुनें (Duration):</h3>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{langHindi ? 'समय अवधि चुनें (Duration):' : 'Select Time Duration:'}</h3>
                   <div className="grid grid-cols-5 gap-2">
                     {[1, 2, 5, 10, 'Infinite'].map((dur) => (
                       <button
@@ -3050,7 +3162,7 @@ export default function App() {
                         onClick={() => setTypingDuration(dur as number | 'Infinite')}
                         className={"py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition active:scale-95 cursor-pointer " + (typingDuration === dur ? 'bg-blue-600 border-blue-500 text-white shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200')}
                       >
-                        {dur === 'Infinite' ? '∞ Free' : `${dur} मि`}
+                        {dur === 'Infinite' ? (langHindi ? '∞ नि:शुल्क' : '∞ Free') : `${dur} ${langHindi ? 'मि' : 'm'}`}
                       </button>
                     ))}
                   </div>
@@ -3062,7 +3174,6 @@ export default function App() {
                   </h3>
 
                   {(() => {
-                    // Check if Admin panel configured tests inside a Typing folder, button, or children
                     const typingNode = adminNodes.find((n: any) => 
                       String(n.id || n.view || n.type || '').toLowerCase().includes('typing') ||
                       String(n.title || '').toLowerCase().includes('typing') ||
@@ -3128,7 +3239,7 @@ export default function App() {
                               </h4>
                               <p className="text-xs text-slate-500 mt-0.5 truncate">{sub}</p>
                               <p className="text-[10px] text-slate-400 mt-0.5 font-mono">
-                                {text.trim().split(/\s+/).filter(Boolean).length} शब्द • {text.length} अक्षर
+                                {langHindi ? `${text.trim().split(/\s+/).filter(Boolean).length} शब्द • ${text.length} अक्षर` : `${text.trim().split(/\s+/).filter(Boolean).length} words • ${text.length} chars`}
                               </p>
                             </div>
                           </div>
@@ -3191,16 +3302,16 @@ export default function App() {
                     onClick={submitTypingTest}
                     className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs transition shadow-sm active:scale-95 cursor-pointer"
                   >
-                    समाप्त
+                    {langHindi ? 'समाप्त' : 'Finish'}
                   </button>
                 </div>
 
                 {/* Passage Box with Real-time Scrolling and Color-coded Characters */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 px-1">
-                    <span>मूल पैराग्राफ (टाइप करने हेतु टेक्स्ट):</span>
+                    <span>{langHindi ? 'मूल पैराग्राफ (टाइप करने हेतु टेक्स्ट):' : 'Original Passage (Text to Type):'}</span>
                     <span className="text-[11px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-mono">
-                      {typedInput.length} / {passageText.length} अक्षर
+                      {langHindi ? `${typedInput.length} / ${passageText.length} अक्षर` : `${typedInput.length} / ${passageText.length} chars`}
                     </span>
                   </div>
                   <div 
@@ -3230,9 +3341,9 @@ export default function App() {
                 {/* Input Area (Strictly 2-3 lines height as requested) */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-500 px-1">
-                    <span>टाइपिंग इनपुट (यहीं टाइप करें):</span>
+                    <span>{langHindi ? 'टाइपिंग इनपुट (यहीं टाइप करें):' : 'Typing Input (Type Here):'}</span>
                     <span className="text-[11px] text-slate-400">
-                      {typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? '⚠️ समय समाप्त (बंद)' : '2-3 पंक्तियों का कॉम्पैक्ट बॉक्स'}
+                      {typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? (langHindi ? '⚠️ समय समाप्त (बंद)' : '⚠️ Time Over (Closed)') : (langHindi ? '2-3 पंक्तियों का कॉम्पैक्ट बॉक्स' : '2-3 lines compact box')}
                     </span>
                   </div>
                   <textarea
@@ -3249,7 +3360,7 @@ export default function App() {
                     autoCapitalize="none"
                     autoCorrect="off"
                     spellCheck={false}
-                    placeholder={typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? "समय समाप्त हो चुका है।" : "कीबोर्ड से यहाँ टाइप करना शुरू करें (2-3 पंक्तियाँ)..."}
+                    placeholder={typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? (langHindi ? "समय समाप्त हो चुका है।" : "Time is over.") : (langHindi ? "कीबोर्ड से यहाँ टाइप करना शुरू करें (2-3 पंक्तियाँ)..." : "Start typing here with keyboard...")}
                     className={"w-full h-20 sm:h-22 p-3 rounded-2xl border-2 font-mono text-sm sm:text-base leading-snug resize-none shadow-sm overscroll-contain transition-colors " + (typingTimeLeft <= 0 && typingDuration !== 'Infinite' ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed' : 'border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none bg-white text-slate-900')}
                   />
                 </div>
@@ -3271,7 +3382,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-1">टाइपिंग टेस्ट स्कोरकार्ड</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-1">{langHindi ? 'टाइपिंग टेस्ट स्कोरकार्ड' : 'Typing Test Scorecard'}</h2>
                   <p className="text-xs text-slate-600 font-semibold">{activeTypingTitle}</p>
                 </div>
 
@@ -3288,19 +3399,19 @@ export default function App() {
                   return (
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <p className="text-xs text-slate-500 font-bold">स्पीड (Speed)</p>
+                        <p className="text-xs text-slate-500 font-bold">{langHindi ? 'स्पीड (Speed)' : 'Speed'}</p>
                         <p className="text-2xl font-bold text-blue-600 mt-1">{wpm} WPM</p>
                       </div>
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <p className="text-xs text-slate-500 font-bold">सटीकता (Accuracy)</p>
+                        <p className="text-xs text-slate-500 font-bold">{langHindi ? 'सटीकता (Accuracy)' : 'Accuracy'}</p>
                         <p className="text-2xl font-bold text-emerald-600 mt-1">{accuracy}%</p>
                       </div>
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <p className="text-xs text-slate-500 font-bold">टाइप किए गए शब्द</p>
+                        <p className="text-xs text-slate-500 font-bold">{langHindi ? 'टाइप किए गए शब्द' : 'Typed Words'}</p>
                         <p className="text-xl font-bold text-slate-800 mt-1">{words}</p>
                       </div>
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <p className="text-xs text-slate-500 font-bold">कुल वर्ण (Chars)</p>
+                        <p className="text-xs text-slate-500 font-bold">{langHindi ? 'कुल वर्ण (Chars)' : 'Total Chars'}</p>
                         <p className="text-xl font-bold text-purple-600 mt-1">{typedInput.length}</p>
                       </div>
                     </div>
@@ -3317,13 +3428,13 @@ export default function App() {
                     }}
                     className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer"
                   >
-                    <RotateCcw className="w-4 h-4" /> पुनः टेस्ट दें
+                    <RotateCcw className="w-4 h-4" /> {langHindi ? 'पुनः टेस्ट दें' : 'Retake Test'}
                   </button>
                   <button
                     onClick={() => navigateTo('typing_setup')}
                     className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-95 cursor-pointer"
                   >
-                    सेटअप बदलें
+                    {langHindi ? 'सेटअप बदलें' : 'Change Setup'}
                   </button>
                 </div>
               </motion.div>
