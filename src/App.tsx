@@ -1269,12 +1269,19 @@ export default function App() {
 
   // Node Type Helpers according to Admin schema and Image layout
   const isSectionNode = (item: any) => {
+    if (!item) return false;
+    // If item has children, questions, mcqs, html or url, it is a container with sub-buttons/content, not a static section banner
+    if (Array.isArray(item.children) && item.children.length > 0) return false;
+    if (Array.isArray(item.questions) && item.questions.length > 0) return false;
+    if (Array.isArray(item.mcqs) && item.mcqs.length > 0) return false;
+    if (item.htmlContent || item.html || item.code || item.url || item.notesContent) return false;
+
     const kind = String(item?.kind || item?.type || '').toLowerCase();
     return kind === 'section' || kind === 'divider' || kind === 'heading' || kind === 'header';
   };
 
   const isFolderNode = (item: any) => {
-    if (isSectionNode(item)) return false;
+    if (!item) return false;
     const kind = String(item?.kind || item?.type || '').toLowerCase();
     if (kind === 'folder' || kind === 'category' || kind === 'group' || kind === 'directory') return true;
     if (Array.isArray(item?.children) && item.children.length > 0) return true;
@@ -1284,7 +1291,6 @@ export default function App() {
   // Reusable universal handler for clicking ANY Admin node (MCQs, Notes, Folders, Pages)
   const handleNodeInteraction = (btn: any) => {
     if (!btn) return;
-    if (isSectionNode(btn)) return;
 
     if (btn.url) {
       window.open(btn.url, '_blank');
@@ -1292,7 +1298,7 @@ export default function App() {
     }
 
     // IF THIS BUTTON HAS SUB-BUTTONS OR IS MARKED AS A FOLDER, OPEN AS A FOLDER VIEW SO ALL INSIDE BUTTONS ARE ACCESSIBLE
-    if (isFolderNode(btn)) {
+    if (isFolderNode(btn) || (Array.isArray(btn.children) && btn.children.length > 0)) {
       if (currentView === 'custom_node' && activeCustomNode) {
         setFolderStack(prev => [...prev, activeCustomNode]);
       } else {
@@ -1962,9 +1968,10 @@ export default function App() {
 
                       if (isChildSection) {
                         return (
-                          <div
+                          <button
                             key={child.id}
-                            className="col-span-2 sm:col-span-2 md:col-span-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-white border border-blue-200/80 rounded-2xl p-4 flex items-center justify-between shadow-sm my-1"
+                            onClick={handleChildClick}
+                            className="col-span-2 sm:col-span-2 md:col-span-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-white border border-blue-200/80 hover:border-blue-300 rounded-2xl p-4 flex items-center justify-between shadow-sm my-1 text-left w-full cursor-pointer transition active:scale-98"
                           >
                             <div className="flex items-center space-x-3 min-w-0">
                               <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl shrink-0 shadow-sm">
@@ -1981,10 +1988,13 @@ export default function App() {
                                 )}
                               </div>
                             </div>
-                            <span className="shrink-0 px-2.5 py-1 bg-blue-100 text-blue-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">
-                              Section
-                            </span>
-                          </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="px-2.5 py-1 bg-blue-100 text-blue-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">
+                                Section
+                              </span>
+                              <ChevronRight className="w-4 h-4 text-blue-500" />
+                            </div>
+                          </button>
                         );
                       }
 
@@ -2268,9 +2278,10 @@ export default function App() {
                         // 1. SECTION (Image: Full-width horizontal title banner with tag badge)
                         if (isSection) {
                           return (
-                            <div
+                            <button
                               key={btn.id}
-                              className="col-span-2 sm:col-span-2 md:col-span-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-white border border-blue-200/80 rounded-2xl p-4 flex items-center justify-between shadow-sm my-1"
+                              onClick={handleNodeClick}
+                              className="col-span-2 sm:col-span-2 md:col-span-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-white border border-blue-200/80 hover:border-blue-300 rounded-2xl p-4 flex items-center justify-between shadow-sm my-1 text-left w-full cursor-pointer transition active:scale-98"
                             >
                               <div className="flex items-center space-x-3 min-w-0">
                                 <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl shrink-0 shadow-sm">
@@ -2287,10 +2298,13 @@ export default function App() {
                                   )}
                                 </div>
                               </div>
-                              <span className="shrink-0 px-2.5 py-1 bg-blue-100 text-blue-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">
-                                Section
-                              </span>
-                            </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="px-2.5 py-1 bg-blue-100 text-blue-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">
+                                  Section
+                                </span>
+                                <ChevronRight className="w-4 h-4 text-blue-500" />
+                              </div>
+                            </button>
                           );
                         }
 
@@ -2396,9 +2410,19 @@ export default function App() {
                     <>
                       <div className="flex items-center justify-between pb-4 border-b border-slate-100 text-xs font-bold text-slate-500">
                         <span>{langHindi ? `प्रश्न ${quizIndex + 1} / ${quizQuestions.length}` : `Question ${quizIndex + 1} / ${quizQuestions.length}`}</span>
-                        <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold">
-                          {langHindi ? `स्कोर: ${quizScore}` : `Score: ${quizScore}`}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setLangHindi(!langHindi)}
+                            className="px-2.5 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold transition border border-blue-200 active:scale-95 cursor-pointer text-xs flex items-center gap-1"
+                            title="Language Toggle / भाषा बदलें"
+                          >
+                            <span>🌐</span>
+                            <span>{langHindi ? 'EN' : 'हिंदी'}</span>
+                          </button>
+                          <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold">
+                            {langHindi ? `स्कोर: ${quizScore}` : `Score: ${quizScore}`}
+                          </span>
+                        </div>
                       </div>
 
                       <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-relaxed">
@@ -2609,13 +2633,22 @@ export default function App() {
                   const currentMockQ = mockQuestions[mockIndex] || mockQuestions[0];
                   return (
                     <>
-                      <div className="bg-slate-900 text-white rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                      <div className="bg-slate-900 text-white rounded-2xl p-4 flex items-center justify-between shadow-sm flex-wrap gap-2">
                         <div className="flex items-center gap-2 font-mono text-emerald-400 font-bold text-lg">
                           <Clock className="w-5 h-5" />
                           <span>{String(Math.floor(mockTimer / 60)).padStart(2, '0')}:{String(mockTimer % 60).padStart(2, '0')}</span>
                         </div>
-                        <div className="text-xs font-bold text-slate-300">
-                          {langHindi ? `प्रश्न ${mockIndex + 1} / ${mockQuestions.length}` : `Question ${mockIndex + 1} / ${mockQuestions.length}`}
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => setLangHindi(!langHindi)}
+                            className="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition border border-white/20 active:scale-95 cursor-pointer text-xs flex items-center gap-1"
+                          >
+                            <span>🌐</span>
+                            <span>{langHindi ? 'EN' : 'हिंदी'}</span>
+                          </button>
+                          <div className="text-xs font-bold text-slate-300">
+                            {langHindi ? `प्रश्न ${mockIndex + 1} / ${mockQuestions.length}` : `Question ${mockIndex + 1} / ${mockQuestions.length}`}
+                          </div>
                         </div>
                         <button
                           onClick={() => {
@@ -3013,7 +3046,15 @@ export default function App() {
                     <>
                       <div className="bg-white border border-slate-200 rounded-2xl p-3 flex items-center justify-between text-xs font-bold text-slate-700 shadow-sm flex-wrap gap-2">
                         <span className="truncate max-w-[180px] sm:max-w-[220px]">{langHindi ? `टॉपिक: ${currentCalcQ.category || calcTopic}` : `Topic: ${currentCalcQ.category || calcTopic}`}</span>
-                        <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="flex items-center gap-2.5 sm:gap-3">
+                          <button
+                            onClick={() => setLangHindi(!langHindi)}
+                            className="px-2 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold transition border border-blue-200 active:scale-95 cursor-pointer text-xs flex items-center gap-1"
+                            title="Language Toggle / भाषा बदलें"
+                          >
+                            <span>🌐</span>
+                            <span>{langHindi ? 'EN' : 'हिंदी'}</span>
+                          </button>
                           <span className="text-amber-600 flex items-center gap-1">
                             <Zap className="w-3.5 h-3.5" /> {calcScore}
                           </span>
