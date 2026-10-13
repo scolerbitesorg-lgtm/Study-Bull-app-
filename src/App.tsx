@@ -70,43 +70,57 @@ class SafeErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
 
 // Gentle, Soft Sound System
 // Only plays on Question Answers and Result screens. NEVER on regular button taps!
-const playGentleSound = (type: 'correct' | 'wrong' | 'celebrate', muted: boolean) => {
+const playGentleSound = (type: 'tap' | 'correct' | 'wrong' | 'celebrate', muted: boolean) => {
   if (muted) return;
   try {
     const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    // Soft, delicate volume (0.012 to 0.018 gain)
-    if (type === 'correct') {
+    // Soft, delicate volume (0.015 to 0.02 gain)
+    if (type === 'tap') {
       osc.type = 'sine';
+      osc.frequency.setValueAtTime(420, ctx.currentTime);
+      gain.gain.setValueAtTime(0.012, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.06);
+    } else if (type === 'correct') {
+      // Distinct Happy Ascending Chime (C5 -> E5 -> G5)
+      osc.type = 'triangle';
       osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.04); // E5
-      gain.gain.setValueAtTime(0.015, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.16);
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
+      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
+      gain.gain.setValueAtTime(0.02, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
       osc.start();
-      osc.stop(ctx.currentTime + 0.16);
+      osc.stop(ctx.currentTime + 0.3);
     } else if (type === 'wrong') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(260, ctx.currentTime);
-      osc.frequency.setValueAtTime(220, ctx.currentTime + 0.04);
-      gain.gain.setValueAtTime(0.014, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.16);
+      // Distinct Soft Descending Thud (320Hz -> 180Hz)
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(320, ctx.currentTime);
+      osc.frequency.setValueAtTime(180, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.015, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
       osc.start();
-      osc.stop(ctx.currentTime + 0.16);
+      osc.stop(ctx.currentTime + 0.25);
     } else if (type === 'celebrate') {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(440, ctx.currentTime); // A4
-      osc.frequency.setValueAtTime(554.37, ctx.currentTime + 0.05); // C#5
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.10); // E5
-      gain.gain.setValueAtTime(0.018, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.28);
+      osc.frequency.setValueAtTime(554.37, ctx.currentTime + 0.06); // C#5
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12); // E5
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.18); // A5
+      gain.gain.setValueAtTime(0.02, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
       osc.start();
-      osc.stop(ctx.currentTime + 0.28);
+      osc.stop(ctx.currentTime + 0.35);
     }
   } catch {
     // Graceful fallback for audio policy
@@ -3422,6 +3436,7 @@ export default function App() {
                               key={idx}
                               onClick={() => {
                                 if (!isAnswerRevealed) {
+                                  playGentleSound('tap', soundMuted);
                                   const updated = [...userQuizAnswers];
                                   updated[quizIndex] = idx;
                                   setUserQuizAnswers(updated);
@@ -3680,6 +3695,7 @@ export default function App() {
                             <button
                               key={idx}
                               onClick={() => {
+                                playGentleSound('tap', soundMuted);
                                 const updated = [...userMockAnswers];
                                 updated[mockIndex] = idx;
                                 setUserMockAnswers(updated);
@@ -4308,6 +4324,7 @@ export default function App() {
                               key={idx}
                               onClick={() => {
                                 if (!calcAnswered) {
+                                  playGentleSound('tap', soundMuted);
                                   setCalcSelected(idx);
                                   setCalcAnswered(true);
                                   const isCorrect = idx === currentCalcQ.correct;

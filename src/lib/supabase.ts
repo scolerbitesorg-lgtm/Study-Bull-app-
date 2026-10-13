@@ -520,3 +520,126 @@ export async function recordUserAttempt(type: 'quiz' | 'mock' | 'calc' | 'typing
     return null;
   }
 }
+
+// 4. App Snippets / Button Previews Realtime Sync (Admin Code Editor to User App Preview)
+export async function upsertAppSnippet(buttonId: string, htmlContent: string): Promise<{ success: boolean; error?: string }> {
+  const client = getSupabaseClient();
+  if (!client) {
+    // Fallback to localStorage if Supabase client not initialized
+    try {
+      localStorage.setItem(`snippet_${buttonId}`, htmlContent);
+      localStorage.setItem(`snippet_updated_${buttonId}`, new Date().toISOString());
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: e?.message || 'LocalStorage save error' };
+    }
+  }
+
+  try {
+    const { error } = await client
+      .from('app_snippets')
+      .upsert(
+        {
+          button_id: buttonId,
+          html_content: htmlContent,
+          updated_at: new Date().toISOString()
+        },
+        { onConflict: 'button_id' }
+      );
+
+    if (error) {
+      console.warn('Supabase upsertAppSnippet error:', error.message);
+      // Fallback to local storage
+      localStorage.setItem(`snippet_${buttonId}`, htmlContent);
+      return { success: false, error: error.message };
+    }
+
+    try {
+      localStorage.setItem(`snippet_${buttonId}`, htmlContent);
+    } catch {}
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('upsertAppSnippet exception:', err);
+    return { success: false, error: err?.message || 'Network error' };
+  }
+}
+
+export async function fetchAppSnippet(buttonId: string): Promise<string | null> {
+  // Check local cache first for instant load
+  try {
+    const local = localStorage.getItem(`snippet_${buttonId}`);
+    if (local !== null) {
+      // return local immediately, but also fetch fresh from server
+    }
+  } catch {}
+
+  const client = getSupabaseClient();
+  if (!client) {
+    try {
+      return localStorage.getItem(`snippet_${buttonId}`) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  try {
+    const { data, error } = await client
+      .from('app_snippets')
+      .select('html_content')
+      .eq('button_id', buttonId)
+      .maybeSingle();
+
+    if (error || !data) {
+      return localStorage.getItem(`snippet_${buttonId}`) || null;
+    }
+
+    try {
+      localStorage.setItem(`snippet_${buttonId}`, data.html_content);
+    } catch {}
+
+    return data.html_content;
+  } catch (err) {
+    console.warn('fetchAppSnippet error:', err);
+    return localStorage.getItem(`snippet_${buttonId}`) || null;
+  }
+}
+
+export function subscribeToSnippetUpdates(buttonId: string, onUpdate: (htmlContent: string) => void) {
+  const client = getSupabaseClient();
+  if (!client) return () => {};
+
+  try {
+    const channelName = `snippet-realtime-${buttonId}-${Math.random().toString(36).substring(2, 7)}`;
+    const channel = client
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'app_snippets',
+          filter: `button_id=eq.${buttonId}`,
+        },
+        (payload: any) => {
+          const newRow = payload.new as any;
+          if (newRow && typeof newRow.html_content === 'string') {
+            try {
+              localStorage.setItem(`snippet_${buttonId}`, newRow.html_content);
+            } catch {}
+            onUpdate(newRow.html_content);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      try {
+        client.removeChannel(channel);
+      } catch {}
+    };
+  } catch (err) {
+    console.warn('Failed to subscribe to snippet updates:', err);
+    return () => {};
+  }
+}
