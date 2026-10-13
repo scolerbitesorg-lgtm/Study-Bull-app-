@@ -173,13 +173,17 @@ export function normalizeNode(n: any): StudyBullNode {
 
   const resolvedHtml = n.htmlContent || n.html || n.code || n.rawHtml || 
     (typeof n.content === 'string' && (
-      n.content.includes('<html') || 
+      n.content.includes('<') || 
       n.content.includes('<!DOCTYPE') || 
       n.content.includes('<div') || 
       n.content.includes('<script') ||
       n.content.includes('<style') ||
-      n.content.includes('function ') ||
-      n.content.includes('document.get') ||
+      n.content.includes('function') ||
+      n.content.includes('fetch(') ||
+      n.content.includes('axios') ||
+      n.content.includes('document.') ||
+      n.content.includes('window.') ||
+      n.content.includes('localStorage') ||
       n.content.includes('addEventListener')
     ) ? n.content : undefined);
 

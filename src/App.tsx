@@ -2202,7 +2202,7 @@ export default function App() {
     const target = String(btn.view || btn.target_view || btn.type || btn.kind || btn.id || '').toLowerCase();
     const kind = String(btn.kind || btn.type || '').toLowerCase();
 
-    // 0. CUSTOM HTML / INTERACTIVE WEB APPS (MoodMoji, widgets, tools)
+    // 0. CUSTOM HTML / INTERACTIVE WEB APPS (MoodMoji, widgets, tools, API fetch tools)
     const isHtmlNode = Boolean(
       kind === 'html' ||
       target.includes('html') ||
@@ -2212,13 +2212,17 @@ export default function App() {
       btn.code ||
       btn.rawHtml ||
       (typeof btn.content === 'string' && (
-        btn.content.includes('<html') ||
+        btn.content.includes('<') ||
         btn.content.includes('<!DOCTYPE') ||
         btn.content.includes('<script') ||
         btn.content.includes('<style') ||
         btn.content.includes('<div') ||
-        btn.content.includes('function ') ||
-        btn.content.includes('document.get') ||
+        btn.content.includes('function') ||
+        btn.content.includes('fetch(') ||
+        btn.content.includes('axios') ||
+        btn.content.includes('document.') ||
+        btn.content.includes('window.') ||
+        btn.content.includes('localStorage') ||
         btn.content.includes('addEventListener')
       ))
     );
@@ -2718,16 +2722,28 @@ export default function App() {
       activeCustomNode.html ||
       activeCustomNode.code ||
       activeCustomNode.rawHtml ||
-      (typeof activeCustomNode.content === 'string' && (activeCustomNode.content.includes('<html') || activeCustomNode.content.includes('<!DOCTYPE') || activeCustomNode.content.includes('<script')))
+      (typeof activeCustomNode.content === 'string' && (
+        activeCustomNode.content.includes('<') ||
+        activeCustomNode.content.includes('function') ||
+        activeCustomNode.content.includes('fetch(') ||
+        activeCustomNode.content.includes('document.') ||
+        activeCustomNode.content.includes('window.') ||
+        activeCustomNode.content.includes('localStorage')
+      ))
     );
 
-    const rawHtml = String(
+    const extractedCode = String(
       activeCustomNode.htmlContent ||
       activeCustomNode.html ||
       activeCustomNode.code ||
       activeCustomNode.rawHtml ||
-      (typeof activeCustomNode.content === 'string' && (activeCustomNode.content.includes('<') || activeCustomNode.content.includes('<!DOCTYPE')) ? activeCustomNode.content : '')
+      (typeof activeCustomNode.content === 'string' ? activeCustomNode.content : '')
     ).trim();
+
+    // If pure JS without HTML tags, automatically wrap in script tag
+    const rawHtml = (extractedCode && !extractedCode.includes('<') && (extractedCode.includes('function') || extractedCode.includes('fetch') || extractedCode.includes('console.')))
+      ? `<script>\n${extractedCode}\n</script>`
+      : extractedCode;
 
     const featureTitle = resolveNodeTitle(activeCustomNode, langHindi);
     const featureIcon = resolveNodeIcon(activeCustomNode);

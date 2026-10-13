@@ -48,6 +48,39 @@ export default function SandboxedHtmlView({
     const polyfillScript = `
 <script>
 (function() {
+  // 1. API Fetch & XMLHttpRequest Enhancement (Automatic HTTPS upgrade & CORS resilience)
+  try {
+    var origFetch = window.fetch;
+    if (typeof origFetch === "function") {
+      window.fetch = function(input, init) {
+        try {
+          if (typeof input === "string" && input.startsWith("http://")) {
+            input = "https://" + input.slice(7);
+          } else if (input && typeof input === "object" && input.url && input.url.startsWith("http://")) {
+            input = new Request("https://" + input.url.slice(7), input);
+          }
+        } catch(err) {}
+        return origFetch.call(this, input, init);
+      };
+    }
+  } catch(e) {}
+
+  try {
+    var OrigXHR = window.XMLHttpRequest;
+    if (OrigXHR && OrigXHR.prototype && OrigXHR.prototype.open) {
+      var origOpen = OrigXHR.prototype.open;
+      OrigXHR.prototype.open = function(method, url) {
+        try {
+          if (typeof url === "string" && url.startsWith("http://")) {
+            url = "https://" + url.slice(7);
+          }
+        } catch(err) {}
+        return origOpen.apply(this, arguments);
+      };
+    }
+  } catch(e) {}
+
+  // 2. Resilient Storage (localStorage & sessionStorage fallback for data catching/caching)
   function createMemoryStore() {
     var store = {};
     return {
@@ -59,6 +92,7 @@ export default function SandboxedHtmlView({
       get length() { return Object.keys(store).length; }
     };
   }
+
   try {
     var testKey = "__sb_test_" + Math.random();
     window.localStorage.setItem(testKey, "1");
@@ -67,10 +101,12 @@ export default function SandboxedHtmlView({
     try {
       var memLocal = createMemoryStore();
       var memSession = createMemoryStore();
-      Object.defineProperty(window, 'localStorage', { value: memLocal, configurable: true, writable: true });
-      Object.defineProperty(window, 'sessionStorage', { value: memSession, configurable: true, writable: true });
+      Object.defineProperty(window, "localStorage", { value: memLocal, configurable: true, writable: true });
+      Object.defineProperty(window, "sessionStorage", { value: memSession, configurable: true, writable: true });
     } catch(err2) {}
   }
+
+  // 3. User interaction fallbacks (alert, confirm, prompt)
   if (typeof window.alert !== "function") {
     window.alert = function(msg) { console.log("[Alert]:", msg); };
   }
@@ -80,8 +116,13 @@ export default function SandboxedHtmlView({
   if (typeof window.prompt !== "function") {
     window.prompt = function() { return ""; };
   }
-  window.addEventListener('error', function(e) {
-    console.warn('[StudyBull Sandbox Notice]:', e.message);
+
+  // 4. Global error and unhandled rejection guards (prevents script crashes from stopping rendering)
+  window.addEventListener("error", function(e) {
+    console.warn("[StudyBull Sandbox Notice]:", e.message || e);
+  });
+  window.addEventListener("unhandledrejection", function(e) {
+    console.warn("[StudyBull Sandbox Unhandled Rejection]:", e.reason);
   });
 })();
 </script>
@@ -111,6 +152,8 @@ export default function SandboxedHtmlView({
     } catch(e) {}
   }
 
+  // Instant execution without delay
+  reportHeight();
   if (document.readyState === "complete" || document.readyState === "interactive") {
     reportHeight();
   } else {
@@ -142,26 +185,36 @@ export default function SandboxedHtmlView({
 </style>
 `;
 
+    // Complete HTML Document
     if (/<html[\s>]/i.test(trimmed) || /<!doctype/i.test(trimmed)) {
       let doc = trimmed;
+
       if (!/<meta[^>]+viewport/i.test(doc)) {
         if (/<head[\s>]/i.test(doc)) {
           doc = doc.replace(/<head[\s>]/i, (match) => `${match}\n  ${metaViewport}`);
-        } else {
+        } else if (/<html[\s>]/i.test(doc)) {
           doc = doc.replace(/<html[\s>]/i, (match) => `${match}\n<head>${metaViewport}</head>`);
         }
       }
+
       if (/<head[\s>]/i.test(doc)) {
         doc = doc.replace(/<head[\s>]/i, (match) => `${match}\n${polyfillScript}\n${baseStyle}`);
+      } else if (/<body[\s>]/i.test(doc)) {
+        doc = doc.replace(/<body[\s>]/i, (match) => `${polyfillScript}\n${baseStyle}\n${match}`);
+      } else if (/<html[\s>]/i.test(doc)) {
+        doc = doc.replace(/<html[\s>]/i, (match) => `${match}\n<head>${polyfillScript}${baseStyle}</head>`);
       } else {
-        doc = polyfillScript + baseStyle + doc;
+        // Fallback: append after doctype
+        doc = doc.replace(/(<!doctype[^>]*>)/i, `$1\n<head>${polyfillScript}${baseStyle}</head>`);
       }
+
       if (/<\/body>/i.test(doc)) {
         return doc.replace(/<\/body>/i, `${resizeScript}\n</body>`);
       }
       return doc + resizeScript;
     }
 
+    // HTML Snippet
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -214,7 +267,8 @@ export default function SandboxedHtmlView({
     );
   }
 
-  const computedHeight = contentHeight || minHeight;
+  const isFullScreen = minHeight === "100%" || style?.height === "100%";
+  const computedHeight = isFullScreen ? "100%" : (contentHeight || minHeight);
 
   return (
     <div
@@ -222,10 +276,14 @@ export default function SandboxedHtmlView({
       style={{
         width: "100%",
         maxWidth: "100%",
+        height: isFullScreen ? "100%" : undefined,
         boxSizing: "border-box",
         overflow: "hidden",
         borderRadius: 12,
         background: "#ffffff",
+        display: isFullScreen ? "flex" : "block",
+        flexDirection: isFullScreen ? "column" : undefined,
+        flex: isFullScreen ? 1 : undefined,
         ...style,
       }}
     >
@@ -233,9 +291,9 @@ export default function SandboxedHtmlView({
         ref={iframeRef}
         title={title || "Custom Web View"}
         srcDoc={safeSrcDoc}
-        sandbox="allow-scripts allow-forms allow-modals allow-popups allow-downloads"
-        allow="fullscreen; clipboard-read; clipboard-write; autoplay; encrypted-media; picture-in-picture"
-        loading="lazy"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-downloads"
+        allow="fullscreen; clipboard-read; clipboard-write; autoplay; encrypted-media; picture-in-picture; geolocation; camera; microphone"
+        loading="eager"
         style={{
           width: "100%",
           maxWidth: "100%",
@@ -249,6 +307,7 @@ export default function SandboxedHtmlView({
           overflowY: "auto",
           overflowX: "hidden",
           boxSizing: "border-box",
+          flex: isFullScreen ? 1 : undefined,
         }}
       />
     </div>
