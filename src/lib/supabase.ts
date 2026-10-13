@@ -170,16 +170,39 @@ export function normalizeNode(n: any): StudyBullNode {
 
   const isTool = isCalcNode || isTypingNode;
   const rawKind = String(n.kind || '').toLowerCase();
-  let resolvedKind: any = 'button';
 
+  const resolvedHtml = n.htmlContent || n.html || n.code || n.rawHtml || 
+    (typeof n.content === 'string' && (
+      n.content.includes('<html') || 
+      n.content.includes('<!DOCTYPE') || 
+      n.content.includes('<div') || 
+      n.content.includes('<script') ||
+      n.content.includes('<style') ||
+      n.content.includes('function ') ||
+      n.content.includes('document.get') ||
+      n.content.includes('addEventListener')
+    ) ? n.content : undefined);
+
+  const isHtmlNode = Boolean(
+    rawKind === 'html' || 
+    String(n.view || '').toLowerCase() === 'custom_node' ||
+    String(n.target_view || '').toLowerCase() === 'custom_node' ||
+    resolvedHtml
+  );
+
+  let resolvedKind: any = 'button';
   if (isCalcNode) resolvedKind = 'calc';
   else if (isTypingNode) resolvedKind = 'typing';
+  else if (isHtmlNode) resolvedKind = 'html';
   else if (['button', 'folder', 'section', 'mcq', 'mock', 'notes', 'html', 'tool'].includes(rawKind)) {
     resolvedKind = rawKind;
   }
 
-  const resolvedHtml = n.htmlContent || n.html || n.code || n.rawHtml || 
-    (typeof n.content === 'string' && (n.content.includes('<html') || n.content.includes('<!DOCTYPE') || n.content.includes('<div') || n.content.includes('<script')) ? n.content : undefined);
+  // Filter out accidental JavaScript/HTML code snippets improperly saved into questions
+  const cleanQuestions = (Array.isArray(n.questions) ? n.questions : []).filter((q: any) => {
+    const t = String(q?.question || q?.qText || q?.title || '');
+    return t && !t.includes('document.') && !t.includes('var ') && !t.includes('STORE_KEY') && !t.includes('moodmoji') && !t.includes('BATCH=') && !t.includes('elementById') && !t.includes('onclick=');
+  });
 
   return {
     ...n,
@@ -187,13 +210,13 @@ export function normalizeNode(n: any): StudyBullNode {
     title: String(n.title || n.name || 'Untitled'),
     titleEn: n.titleEn || n.title_en || undefined,
     kind: resolvedKind,
-    icon: String(n.icon || (isCalcNode ? '⚡' : isTypingNode ? '⌨️' : '📌')),
+    icon: String(n.icon || (isCalcNode ? '⚡' : isTypingNode ? '⌨️' : isHtmlNode ? '🌐' : '📌')),
     subtitle: String(n.subtitle || n.sub || n.subtitleEn || ''),
     subtitleEn: n.subtitleEn || n.subtitle_en || undefined,
     enabled: isNodeActive(n),
     children: isTool ? [] : (Array.isArray(n.children) ? n.children.map(normalizeNode) : []),
     passages: Array.isArray(n.passages) ? n.passages : (n.passages ? [n.passages] : undefined),
-    questions: Array.isArray(n.questions) ? n.questions : [],
+    questions: isHtmlNode ? [] : cleanQuestions,
     isLeaf: isTool ? true : (n.isLeaf !== undefined ? Boolean(n.isLeaf) : undefined),
     allowChildren: isTool ? false : (n.allowChildren !== undefined ? Boolean(n.allowChildren) : undefined),
     canAddChildren: isTool ? false : (n.canAddChildren !== undefined ? Boolean(n.canAddChildren) : undefined),
@@ -202,8 +225,8 @@ export function normalizeNode(n: any): StudyBullNode {
     html: resolvedHtml,
     code: resolvedHtml,
     ...(n.content ? { content: n.content } : {}),
-    view: n.view || (isCalcNode ? 'calc_setup' : isTypingNode ? 'typing_setup' : undefined),
-    target_view: n.target_view || n.view || (isCalcNode ? 'calc_setup' : isTypingNode ? 'typing_setup' : undefined),
+    view: n.view || (isCalcNode ? 'calc_setup' : isTypingNode ? 'typing_setup' : isHtmlNode ? 'custom_node' : undefined),
+    target_view: n.target_view || n.view || (isCalcNode ? 'calc_setup' : isTypingNode ? 'typing_setup' : isHtmlNode ? 'custom_node' : undefined),
     ...(n.url ? { url: n.url } : {})
   };
 }

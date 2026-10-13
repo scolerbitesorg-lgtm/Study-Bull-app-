@@ -14,6 +14,7 @@ import {
   recordUserAttempt,
   syncExistingContentToSupabase
 } from './lib/supabase.ts';
+import { SandboxedHtmlView } from './components/SandboxedHtmlView';
 
 // Error Boundary to prevent any blank or white screen crashes
 interface ErrorBoundaryProps {
@@ -69,7 +70,6 @@ class SafeErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
 }
 
 // Gentle, Soft Sound System
-// Only plays on Question Answers and Result screens. NEVER on regular button taps!
 const playGentleSound = (type: 'tap' | 'correct' | 'wrong' | 'celebrate', muted: boolean) => {
   if (muted) return;
   try {
@@ -84,43 +84,43 @@ const playGentleSound = (type: 'tap' | 'correct' | 'wrong' | 'celebrate', muted:
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    // Soft, delicate volume (0.015 to 0.02 gain)
+    // Soft, delicate volume with clear audibility
     if (type === 'tap') {
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(420, ctx.currentTime);
-      gain.gain.setValueAtTime(0.012, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.06);
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      gain.gain.setValueAtTime(0.02, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
       osc.start();
-      osc.stop(ctx.currentTime + 0.06);
+      osc.stop(ctx.currentTime + 0.05);
     } else if (type === 'correct') {
-      // Distinct Happy Ascending Chime (C5 -> E5 -> G5)
+      // Distinct Happy Ascending Chime with smooth ramps
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
-      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
-      gain.gain.setValueAtTime(0.02, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+      osc.frequency.linearRampToValueAtTime(659.25, ctx.currentTime + 0.08); // E5
+      osc.frequency.linearRampToValueAtTime(783.99, ctx.currentTime + 0.16); // G5
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
       osc.start();
-      osc.stop(ctx.currentTime + 0.3);
+      osc.stop(ctx.currentTime + 0.35);
     } else if (type === 'wrong') {
-      // Distinct Soft Descending Thud (320Hz -> 180Hz)
+      // Distinct Soft Descending Thud with smooth ramp
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(320, ctx.currentTime);
-      osc.frequency.setValueAtTime(180, ctx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.015, ctx.currentTime);
+      osc.frequency.setValueAtTime(280, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.035, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
       osc.start();
       osc.stop(ctx.currentTime + 0.25);
     } else if (type === 'celebrate') {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(440, ctx.currentTime); // A4
-      osc.frequency.setValueAtTime(554.37, ctx.currentTime + 0.06); // C#5
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12); // E5
-      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.18); // A5
-      gain.gain.setValueAtTime(0.02, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+      osc.frequency.linearRampToValueAtTime(554.37, ctx.currentTime + 0.08); // C#5
+      osc.frequency.linearRampToValueAtTime(659.25, ctx.currentTime + 0.16); // E5
+      osc.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.24); // A5
+      gain.gain.setValueAtTime(0.03, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
       osc.start();
-      osc.stop(ctx.currentTime + 0.35);
+      osc.stop(ctx.currentTime + 0.4);
     }
   } catch {
     // Graceful fallback for audio policy
@@ -224,26 +224,33 @@ function getQuizSubjectsFromAdmin(nodes: any[]): any[] {
         (Array.isArray(item.quiz) && item.quiz.length > 0 ? item.quiz : null);
       
       if (questions && questions.length > 0) {
-        const normalizedQs: QuizQuestion[] = questions.map((q: any, i: number) => ({
-          id: q.id || i + 1,
-          question: q.question || q.qText || q.title || 'Question',
-          questionEn: q.questionEn || q.question_en || q.question || 'Question',
-          options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
-          optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
-          correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
-          explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
-          explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
-        }));
-
-        subjects.push({
-          id: item.id,
-          title: item.title || item.name || 'Quiz',
-          titleEn: item.titleEn || item.title_en || item.title || item.name || 'Quiz',
-          subtitle: item.subtitle || item.sub || 'Practice MCQs',
-          subtitleEn: item.subtitleEn || item.subtitle_en || 'Practice MCQs',
-          icon: item.icon || '📝',
-          questions: normalizedQs
+        const validQs = questions.filter((q: any) => {
+          const t = String(q.question || q.qText || q.title || '');
+          return t && !t.includes('document.') && !t.includes('var ') && !t.includes('STORE_KEY') && !t.includes('moodmoji') && !t.includes('BATCH=') && !t.includes('elementById');
         });
+
+        if (validQs.length > 0) {
+          const normalizedQs: QuizQuestion[] = validQs.map((q: any, i: number) => ({
+            id: q.id || i + 1,
+            question: q.question || q.qText || q.title || 'Question',
+            questionEn: q.questionEn || q.question_en || q.question || 'Question',
+            options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+            optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
+            correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+            explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
+            explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+          }));
+
+          subjects.push({
+            id: item.id,
+            title: item.title || item.name || 'Quiz',
+            titleEn: item.titleEn || item.title_en || item.title || item.name || 'Quiz',
+            subtitle: item.subtitle || item.sub || 'Practice MCQs',
+            subtitleEn: item.subtitleEn || item.subtitle_en || 'Practice MCQs',
+            icon: item.icon || '📝',
+            questions: normalizedQs
+          });
+        }
       }
 
       if (Array.isArray(item.children) && item.children.length > 0) {
@@ -268,17 +275,24 @@ function getMockQuestionsFromAdmin(nodes: any[]): QuizQuestion[] {
         (Array.isArray(item.mcqs) && item.mcqs.length > 0 ? item.mcqs : null);
       
       if ((kind === 'mock' || target.includes('mock')) && questions) {
-        const normalizedQs: QuizQuestion[] = questions.map((q: any, i: number) => ({
-          id: q.id || i + 1,
-          question: q.question || q.qText || q.title || 'Question',
-          questionEn: q.questionEn || q.question_en || q.question || 'Question',
-          options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
-          optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
-          correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
-          explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
-          explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
-        }));
-        mockQs = mockQs.concat(normalizedQs);
+        const validQs = questions.filter((q: any) => {
+          const t = String(q.question || q.qText || q.title || '');
+          return t && !t.includes('document.') && !t.includes('var ') && !t.includes('STORE_KEY') && !t.includes('moodmoji') && !t.includes('BATCH=') && !t.includes('elementById');
+        });
+
+        if (validQs.length > 0) {
+          const normalizedQs: QuizQuestion[] = validQs.map((q: any, i: number) => ({
+            id: q.id || i + 1,
+            question: q.question || q.qText || q.title || 'Question',
+            questionEn: q.questionEn || q.question_en || q.question || 'Question',
+            options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
+            optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
+            correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+            explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
+            explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+          }));
+          mockQs = mockQs.concat(normalizedQs);
+        }
       }
 
       if (Array.isArray(item.children) && item.children.length > 0) {
@@ -2188,8 +2202,37 @@ export default function App() {
     const target = String(btn.view || btn.target_view || btn.type || btn.kind || btn.id || '').toLowerCase();
     const kind = String(btn.kind || btn.type || '').toLowerCase();
 
+    // 0. CUSTOM HTML / INTERACTIVE WEB APPS (MoodMoji, widgets, tools)
+    const isHtmlNode = Boolean(
+      kind === 'html' ||
+      target.includes('html') ||
+      target.includes('custom_node') ||
+      btn.htmlContent ||
+      btn.html ||
+      btn.code ||
+      btn.rawHtml ||
+      (typeof btn.content === 'string' && (
+        btn.content.includes('<html') ||
+        btn.content.includes('<!DOCTYPE') ||
+        btn.content.includes('<script') ||
+        btn.content.includes('<style') ||
+        btn.content.includes('<div') ||
+        btn.content.includes('function ') ||
+        btn.content.includes('document.get') ||
+        btn.content.includes('addEventListener')
+      ))
+    );
+
+    if (isHtmlNode) {
+      setActiveCustomNode(btn);
+      setHtmlReloadKey(0);
+      setHtmlIsFullscreen(false);
+      navigateTo('custom_node');
+      return;
+    }
+
     // 1. ADMIN MCQs & QUIZZES (or custom questions attached to admin button)
-    const customQuestions = 
+    const rawQuestions = 
       (Array.isArray(btn.questions) && btn.questions.length > 0 ? btn.questions : null) ||
       (Array.isArray(btn.mcqs) && btn.mcqs.length > 0 ? btn.mcqs : null) ||
       (Array.isArray(btn.items) && btn.items.length > 0 && btn.items[0]?.question ? btn.items : null) ||
@@ -2201,8 +2244,13 @@ export default function App() {
         } catch { return null; }
       })() : null);
 
-    if (customQuestions) {
-      const normalizedQs = customQuestions.map((q: any, i: number) => ({
+    const validQuestions = rawQuestions?.filter((q: any) => {
+      const t = String(q.question || q.qText || q.title || '');
+      return t && !t.includes('document.') && !t.includes('var ') && !t.includes('STORE_KEY') && !t.includes('moodmoji') && !t.includes('BATCH=') && !t.includes('elementById') && !t.includes('onclick=');
+    });
+
+    if (validQuestions && validQuestions.length > 0) {
+      const normalizedQs = validQuestions.map((q: any, i: number) => ({
         id: q.id || i + 1,
         question: q.question || q.qText || q.title || 'Question',
         questionEn: q.questionEn || q.question_en || q.question || 'Question',
@@ -2765,64 +2813,14 @@ export default function App() {
 
           {/* Pure 100% Full Viewport Output without frames, margins or bottom bars */}
           <div className="flex-1 w-full bg-white overflow-hidden relative">
-            {isHtmlTool && rawHtml ? (
-              <iframe
+            {isHtmlTool ? (
+              <SandboxedHtmlView
                 key={`fs-feature-${activeCustomNode.id}-${htmlReloadKey}`}
-                srcDoc={(() => {
-                  const langScript = `<script>
-                    window.langHindi = ${langHindi};
-                    window.APP_LANG = "${langHindi ? 'hi' : 'en'}";
-                    window.addEventListener('message', function(e) {
-                      if (e.data && e.data.type === 'LANG_CHANGE') {
-                        window.langHindi = e.data.langHindi;
-                        window.APP_LANG = e.data.lang;
-                        document.documentElement.lang = e.data.lang;
-                        var nodes = document.querySelectorAll('[data-lang-hi], [data-lang-en]');
-                        nodes.forEach(function(node) {
-                          if (e.data.langHindi && node.getAttribute('data-lang-hi')) {
-                            node.textContent = node.getAttribute('data-lang-hi');
-                          } else if (!e.data.langHindi && node.getAttribute('data-lang-en')) {
-                            node.textContent = node.getAttribute('data-lang-en');
-                          }
-                        });
-                        window.dispatchEvent(new CustomEvent('applangchange', { detail: e.data }));
-                      }
-                    });
-                  </script>`;
-                  if (rawHtml.includes('<head>')) {
-                    return rawHtml.replace('<head>', '<head>' + langScript);
-                  }
-                  return `<!DOCTYPE html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><script src="https://cdn.tailwindcss.com"></script>${langScript}<style>body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; } * { box-sizing: border-box; }</style></head><body>${rawHtml}</body></html>`;
-                })()}
+                htmlContent={rawHtml}
                 title={featureTitle}
-                sandbox="allow-scripts allow-modals allow-forms allow-same-origin allow-popups allow-downloads"
-                allow="clipboard-read; clipboard-write; fullscreen; autoplay"
-                className="w-full h-full border-0 block"
-                style={{ width: '100%', height: '100%', border: 'none' }}
+                minHeight="100%"
+                style={{ width: '100%', height: '100%' }}
               />
-            ) : isHtmlTool ? (
-              <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                <div className="w-16 h-16 rounded-3xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl mb-4 shadow-sm">
-                  {featureIcon}
-                </div>
-                <h3 className="text-lg font-bold text-slate-800">
-                  {featureTitle}
-                </h3>
-                <p className="text-sm text-slate-500 max-w-md mt-2">
-                  {langHindi 
-                    ? 'एडमिन पैनल से इस फीचर के लिए कोड लोड किया जा रहा है...' 
-                    : 'Loading code from Admin Panel...'}
-                </p>
-                <button
-                  onClick={() => {
-                    setActiveCustomNode(null);
-                    setCurrentView('home');
-                  }}
-                  className="mt-6 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm cursor-pointer"
-                >
-                  {langHindi ? 'होम पर वापस जाएं' : 'Back to Home'}
-                </button>
-              </div>
             ) : (
               /* If folder or container, show child buttons cleanly in full screen with back button */
               <div className="max-w-4xl mx-auto p-6 overflow-y-auto h-full">
@@ -4052,25 +4050,52 @@ export default function App() {
                           )}
                         </div>
 
-                        {/* Document Content Paragraphs */}
-                        <div className={`space-y-4 leading-relaxed ${fontSizeClass}`}>
-                          {chap.content.split('\n').map((paragraph, idx) => {
-                            const trimmed = paragraph.trim();
-                            if (!trimmed) return <div key={idx} className="h-3" />;
-                            if (trimmed.startsWith('#') || trimmed.endsWith(':') || trimmed.startsWith('•') || trimmed.startsWith('-')) {
-                              return (
-                                <h3 key={idx} className={`font-black text-lg sm:text-xl mt-6 mb-2 border-b pb-1.5 ${readerDarkMode ? 'text-white border-slate-800' : 'text-black border-slate-300'}`}>
-                                  {trimmed.replace(/^[#\-•]\s*/, '')}
-                                </h3>
-                              );
-                            }
+                        {/* Document Content */}
+                        {(() => {
+                          const isHtmlContent = Boolean(
+                            chap.content && (
+                              chap.content.includes('<html') ||
+                              chap.content.includes('<!DOCTYPE') ||
+                              chap.content.includes('<script') ||
+                              chap.content.includes('<style') ||
+                              chap.content.includes('<div') ||
+                              chap.content.includes('<body')
+                            )
+                          );
+
+                          if (isHtmlContent) {
                             return (
-                              <p key={idx} className={`leading-relaxed font-semibold ${readerDarkMode ? 'text-slate-100' : 'text-black'}`}>
-                                {trimmed}
-                              </p>
+                              <div className="w-full my-4 rounded-xl overflow-hidden shadow-xs border border-slate-200 dark:border-slate-800 bg-white">
+                                <SandboxedHtmlView
+                                  htmlContent={chap.content}
+                                  title={langHindi ? chap.title : (chap.titleEn || chap.title)}
+                                  minHeight={480}
+                                />
+                              </div>
                             );
-                          })}
-                        </div>
+                          }
+
+                          return (
+                            <div className={`space-y-4 leading-relaxed ${fontSizeClass}`}>
+                              {chap.content.split('\n').map((paragraph, idx) => {
+                                const trimmed = paragraph.trim();
+                                if (!trimmed) return <div key={idx} className="h-3" />;
+                                if (trimmed.startsWith('#') || trimmed.endsWith(':') || trimmed.startsWith('•') || trimmed.startsWith('-')) {
+                                  return (
+                                    <h3 key={idx} className={`font-black text-lg sm:text-xl mt-6 mb-2 border-b pb-1.5 ${readerDarkMode ? 'text-white border-slate-800' : 'text-black border-slate-300'}`}>
+                                      {trimmed.replace(/^[#\-•]\s*/, '')}
+                                    </h3>
+                                  );
+                                }
+                                return (
+                                  <p key={idx} className={`leading-relaxed font-semibold ${readerDarkMode ? 'text-slate-100' : 'text-black'}`}>
+                                    {trimmed}
+                                  </p>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
 
                         {/* Page Footer */}
                         <div className="mt-16 pt-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
