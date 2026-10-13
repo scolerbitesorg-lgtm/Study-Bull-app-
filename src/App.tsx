@@ -1982,6 +1982,7 @@ export default function App() {
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [readerDarkMode, setReaderDarkMode] = useState(false);
   const [copiedNotification, setCopiedNotification] = useState(false);
+  const [readerFontSize, setReaderFontSize] = useState<'sm' | 'base' | 'lg' | 'xl'>('base');
 
   // Quiz State
   const [selectedSubject, setSelectedSubject] = useState<any>(null);
@@ -3901,62 +3902,116 @@ export default function App() {
               </motion.div>
             )}
 
-            {/* 8. NOTES FULL SCREEN READER */}
+            {/* 8. NOTES FULL SCREEN READER (PDF VIEWER STYLE) */}
             {currentView === 'notes_reader' && (
               <motion.div
                 key="notes-reader"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.16 }}
-                className={"rounded-3xl shadow-lg border p-6 sm:p-8 max-w-3xl mx-auto transition-colors " + (readerDarkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900')}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="max-w-4xl mx-auto space-y-4 pb-12"
               >
                 {(() => {
-                  const chap = selectedChapter || getNotesChaptersFromAdmin(adminNodes)[0];
+                  const allChapters = getNotesChaptersFromAdmin(adminNodes);
+                  const chap = selectedChapter || allChapters[0];
                   if (!chap) {
                     return (
-                      <div className="text-center py-12">
-                        <p className="text-sm font-bold text-slate-600 mb-4">
+                      <div className="text-center py-16 bg-white rounded-xl border border-slate-300 shadow-sm p-8">
+                        <p className="text-sm font-medium text-slate-600 mb-4">
                           {langHindi ? 'कोई नोट्स सामग्री उपलब्ध नहीं है' : 'No notes content available'}
                         </p>
                         <button
                           onClick={() => navigateTo('home')}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-sm cursor-pointer"
+                          className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-medium shadow-sm cursor-pointer hover:bg-slate-800"
                         >
                           {langHindi ? 'मुख्य पृष्ठ पर लौटें' : 'Return to Home'}
                         </button>
                       </div>
                     );
                   }
+
+                  const currentIndex = allChapters.findIndex(c => c.id === chap.id);
+                  const prevChapter = currentIndex > 0 ? allChapters[currentIndex - 1] : null;
+                  const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
+
+                  const fontSizeClass = readerFontSize === 'sm' ? 'text-sm' : readerFontSize === 'lg' ? 'text-lg' : readerFontSize === 'xl' ? 'text-xl' : 'text-base';
+                  const wordCount = chap.content.split(/\s+/).length;
+                  const readTime = Math.ceil(wordCount / 130);
+
                   return (
                     <>
-                      <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 mb-6 flex-wrap gap-3">
-                        <button
-                          onClick={handleBack}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-xs shadow-sm hover:bg-blue-700 transition active:scale-95 cursor-pointer"
-                        >
-                          ← {langHindi ? 'वापस' : 'Back'}
-                        </button>
-                        <span className="text-xs font-medium opacity-70">Study Bull Official Notes</span>
-                        
-                        <div className="flex items-center gap-2">
+                      {/* PDF Viewer Top Bar */}
+                      <div className="bg-slate-800 text-slate-200 px-4 py-3 rounded-t-xl flex items-center justify-between flex-wrap gap-3 shadow-md">
+                        <div className="flex items-center space-x-3">
+                          <button
+                            onClick={handleBack}
+                            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-medium transition cursor-pointer flex items-center gap-1.5"
+                          >
+                            <span>←</span>
+                            <span>{langHindi ? 'वापस' : 'Back'}</span>
+                          </button>
+                          <div className="flex items-center space-x-2 border-l border-slate-700 pl-3">
+                            <span className="text-red-400 font-bold text-sm">PDF</span>
+                            <span className="text-xs font-medium text-slate-300 truncate max-w-[200px] sm:max-w-xs">
+                              {langHindi ? chap.title : (chap.titleEn || chap.title)}.pdf
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          {/* Page Indicator */}
+                          <span className="text-xs text-slate-400 bg-slate-900 px-2.5 py-1 rounded">
+                            {currentIndex + 1} / {allChapters.length}
+                          </span>
+
+                          {/* Font Size Adjuster */}
+                          <div className="flex items-center bg-slate-900 rounded p-0.5 border border-slate-700">
+                            <button
+                              onClick={() => setReaderFontSize('sm')}
+                              className={`px-2 py-0.5 rounded text-xs font-bold transition ${readerFontSize === 'sm' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
+                              title="Small Font"
+                            >
+                              A-
+                            </button>
+                            <button
+                              onClick={() => setReaderFontSize('base')}
+                              className={`px-2 py-0.5 rounded text-xs font-bold transition ${readerFontSize === 'base' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
+                              title="Normal Font"
+                            >
+                              A
+                            </button>
+                            <button
+                              onClick={() => setReaderFontSize('lg')}
+                              className={`px-2 py-0.5 rounded text-xs font-bold transition ${readerFontSize === 'lg' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
+                              title="Large Font"
+                            >
+                              A+
+                            </button>
+                          </div>
+
+                          {/* Dark / Light Mode */}
                           <button
                             onClick={() => setReaderDarkMode(!readerDarkMode)}
-                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition active:scale-95 cursor-pointer"
+                            className="p-1.5 rounded bg-slate-900 hover:bg-slate-700 transition cursor-pointer text-slate-300"
+                            title="Toggle Theme"
                           >
-                            {readerDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+                            {readerDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-300" />}
                           </button>
+
+                          {/* Copy Content */}
                           <button
                             onClick={() => {
                               navigator.clipboard.writeText(chap.content);
                               setCopiedNotification(true);
                               setTimeout(() => setCopiedNotification(false), 2000);
                             }}
-                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition relative active:scale-95 cursor-pointer"
+                            className="p-1.5 rounded bg-slate-900 hover:bg-slate-700 transition relative cursor-pointer text-slate-300"
+                            title="Copy Notes"
                           >
                             <Copy className="w-4 h-4" />
                             {copiedNotification && (
-                              <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-0.5 rounded shadow">
+                              <span className="absolute -bottom-7 left-1/2 transform -translate-x-1/2 bg-slate-950 text-white text-[10px] px-2 py-0.5 rounded shadow">
                                 Copied!
                               </span>
                             )}
@@ -3964,16 +4019,79 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl p-6 mb-6 shadow-sm flex items-center justify-between">
-                        <div>
-                          <span className="text-[10px] uppercase font-bold tracking-wider bg-white/20 px-2.5 py-1 rounded-full">CHAPTER</span>
-                          <h2 className="text-lg sm:text-xl font-bold mt-2">{langHindi ? chap.title : chap.titleEn}</h2>
+                      {/* PDF Document Page View */}
+                      <div className={`p-8 sm:p-16 rounded-b-xl border border-t-0 shadow-2xl transition-colors min-h-[600px] font-sans ${readerDarkMode ? 'bg-[#12141c] border-slate-800 text-white' : 'bg-white border-slate-300 text-black'}`}>
+                        {/* Document Header */}
+                        <div className={`border-b pb-6 mb-8 text-center sm:text-left ${readerDarkMode ? 'border-slate-800' : 'border-slate-300'}`}>
+                          <div className="text-xs uppercase tracking-widest text-blue-600 dark:text-blue-400 font-bold mb-1">
+                            {langHindi ? 'अध्याय नोट्स • अध्ययन सामग्री' : 'Chapter Notes • Study Material'}
+                          </div>
+                          <h1 className={`text-2xl sm:text-3xl font-black tracking-tight ${readerDarkMode ? 'text-white' : 'text-black'}`}>
+                            {langHindi ? chap.title : (chap.titleEn || chap.title)}
+                          </h1>
+                          {chap.subtitle && (
+                            <p className={`text-sm font-semibold mt-1 ${readerDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>
+                              {chap.subtitle}
+                            </p>
+                          )}
                         </div>
-                        <Sparkles className="w-8 h-8 text-amber-300 flex-shrink-0" />
+
+                        {/* Document Content Paragraphs */}
+                        <div className={`space-y-4 leading-relaxed ${fontSizeClass}`}>
+                          {chap.content.split('\n').map((paragraph, idx) => {
+                            const trimmed = paragraph.trim();
+                            if (!trimmed) return <div key={idx} className="h-3" />;
+                            if (trimmed.startsWith('#') || trimmed.endsWith(':') || trimmed.startsWith('•') || trimmed.startsWith('-')) {
+                              return (
+                                <h3 key={idx} className={`font-black text-lg sm:text-xl mt-6 mb-2 border-b pb-1.5 ${readerDarkMode ? 'text-white border-slate-800' : 'text-black border-slate-300'}`}>
+                                  {trimmed.replace(/^[#\-•]\s*/, '')}
+                                </h3>
+                              );
+                            }
+                            return (
+                              <p key={idx} className={`leading-relaxed font-semibold ${readerDarkMode ? 'text-slate-100' : 'text-black'}`}>
+                                {trimmed}
+                              </p>
+                            );
+                          })}
+                        </div>
+
+                        {/* Page Footer */}
+                        <div className="mt-16 pt-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                          <span>Page {currentIndex + 1} of {allChapters.length}</span>
+                          <span>StudyNotes Pro</span>
+                        </div>
                       </div>
 
-                      <div className="prose max-w-none leading-relaxed whitespace-pre-line font-medium mb-8 text-base">
-                        {chap.content}
+                      {/* Bottom Navigation Bar */}
+                      <div className="flex items-center justify-between pt-2 px-1 flex-wrap gap-3">
+                        {prevChapter ? (
+                          <button
+                            onClick={() => setSelectedChapter(prevChapter)}
+                            className="px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition flex items-center gap-2 cursor-pointer shadow-xs"
+                          >
+                            <span>←</span>
+                            <span className="truncate max-w-[150px]">{prevChapter.title}</span>
+                          </button>
+                        ) : <div />}
+
+                        {nextChapter ? (
+                          <button
+                            onClick={() => setSelectedChapter(nextChapter)}
+                            className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center gap-2 cursor-pointer shadow-xs ml-auto"
+                          >
+                            <span className="truncate max-w-[150px]">{nextChapter.title}</span>
+                            <span>→</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => navigateTo('notes_lib')}
+                            className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center gap-2 cursor-pointer shadow-xs ml-auto"
+                          >
+                            <span>{langHindi ? 'सभी नोट्स देखें' : 'View All Notes'}</span>
+                            <span>✓</span>
+                          </button>
+                        )}
                       </div>
                     </>
                   );
