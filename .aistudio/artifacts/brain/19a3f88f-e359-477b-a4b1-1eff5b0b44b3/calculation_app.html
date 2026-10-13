@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SSC Speed Math Calculation Practice</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between p-3 sm:p-6">
+
+  <div class="max-w-2xl mx-auto w-full">
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">⚡</span>
+        <div>
+          <h1 class="font-extrabold text-slate-900 text-lg sm:text-xl">Speed Math Master</h1>
+          <p class="text-[11px] text-slate-500 font-medium">SSC CGL, CHSL, MTS & Railway Practice</p>
+        </div>
+      </div>
+      <button id="langToggleBtn" class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold rounded-xl hover:bg-blue-100 transition active:scale-95">
+        🌐 हिंदी / ENG
+      </button>
+    </header>
+
+    <!-- SCREEN 1: SETUP -->
+    <section id="screenSetup" class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm space-y-5">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900" id="txtSetupTitle">कैलकुलेशन प्रैक्टिस सेटअप</h2>
+        <p class="text-xs text-slate-500 mt-0.5" id="txtSetupSubtitle">अपना पसंदीदा विषय और स्तर चुनें</p>
+      </div>
+
+      <!-- Topic Selection -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5" id="lblTopic">विषय (Chapter):</label>
+        <select id="selectTopic" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-sm focus:outline-none focus:border-blue-500">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <!-- Difficulty Selection -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5" id="lblDifficulty">कठिनाई स्तर (Difficulty):</label>
+        <div class="grid grid-cols-4 gap-2" id="difficultyGroup">
+          <button type="button" data-diff="सरल" class="diff-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50">सरल</button>
+          <button type="button" data-diff="मध्यम" class="diff-btn py-2 text-xs font-bold rounded-xl border border-blue-600 bg-blue-50 text-blue-700">मध्यम</button>
+          <button type="button" data-diff="कठिन" class="diff-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50">कठिन</button>
+          <button type="button" data-diff="प्रो" class="diff-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50">प्रो</button>
+        </div>
+      </div>
+
+      <!-- Question Count Selection -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1.5" id="lblCount">प्रश्नों की संख्या (Questions):</label>
+        <div class="grid grid-cols-4 gap-2" id="countGroup">
+          <button type="button" data-count="10" class="count-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50">10 Q</button>
+          <button type="button" data-count="20" class="count-btn py-2 text-xs font-bold rounded-xl border border-blue-600 bg-blue-50 text-blue-700">20 Q</button>
+          <button type="button" data-count="50" class="count-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50">50 Q</button>
+          <button type="button" data-count="Infinite" class="count-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50">अनंत ∞</button>
+        </div>
+      </div>
+
+      <!-- Start Button -->
+      <button id="btnStartPractice" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-base shadow-md transition active:scale-98">
+        🚀 प्रैक्टिस शुरू करें (Start)
+      </button>
+    </section>
+
+    <!-- SCREEN 2: PRACTICE / QUIZ -->
+    <section id="screenPractice" class="hidden space-y-4">
+      <!-- Status Top Bar -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-lg" id="badgeQProgress">Q 1/20</span>
+          <span class="text-xs font-bold text-slate-600 truncate max-w-[150px] sm:max-w-xs" id="badgeTopic">मिश्रित</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1 text-slate-600 font-bold text-xs bg-slate-100 px-2.5 py-1 rounded-lg">
+            ⏱️ <span id="timerText">0s</span>
+          </div>
+          <button id="btnSoundToggle" class="text-sm p-1.5 hover:bg-slate-100 rounded-lg">🔊</button>
+        </div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm text-center">
+        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400" id="txtQType">CALCULATION QUESTION</span>
+        <h2 id="qText" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2 mb-6 tracking-tight"></h2>
+
+        <!-- Options Grid -->
+        <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Explanation & Shortcut Box -->
+        <div id="explanationBox" class="hidden mt-6 text-left p-4 sm:p-5 bg-amber-50/70 border border-amber-200 rounded-2xl space-y-2">
+          <div class="flex items-center gap-1.5 text-amber-900 font-bold text-xs">
+            ⚡ <span id="txtShortcutTitle">शॉर्टकट / वैदिक ट्रिक (Shortcut):</span>
+          </div>
+          <p id="txtShortcut" class="text-xs text-amber-950 font-semibold"></p>
+          <div class="border-t border-amber-200/80 pt-2 mt-2">
+            <span class="text-[11px] font-bold text-slate-500" id="txtStepTitle">विस्तृत समाधान (Solution):</span>
+            <p id="txtExplanation" class="text-xs text-slate-700 whitespace-pre-line mt-1"></p>
+          </div>
+        </div>
+
+        <!-- Next / Action Button -->
+        <div id="actionContainer" class="hidden mt-6 flex gap-3">
+          <button id="btnNext" class="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-md transition active:scale-98">
+            अगला प्रश्न (Next Question) ➔
+          </button>
+          <button id="btnFinishInfinite" class="hidden px-5 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-98 text-sm">
+            समाप्त करें (Finish)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: RESULT -->
+    <section id="screenResult" class="hidden bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 text-center shadow-lg space-y-6">
+      <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner">
+        🏆
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900" id="txtResultTitle">कैलकुलेशन रिपोर्ट कार्ड</h2>
+        <p class="text-xs text-slate-500 mt-1" id="txtResultSubtitle"></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <p class="text-xs text-slate-500 font-bold">कुल सही (Correct)</p>
+          <p class="text-2xl font-bold text-emerald-600 mt-1" id="resCorrect">0</p>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <p class="text-xs text-slate-500 font-bold">कुल गलत (Incorrect)</p>
+          <p class="text-2xl font-bold text-rose-600 mt-1" id="resWrong">0</p>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <p class="text-xs text-slate-500 font-bold">समय (Time Taken)</p>
+          <p class="text-xl font-bold text-blue-600 mt-1" id="resTime">0s</p>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <p class="text-xs text-slate-500 font-bold">सटीकता (Accuracy)</p>
+          <p class="text-xl font-bold text-purple-600 mt-1" id="resAccuracy">0%</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button id="btnRestart" class="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition shadow-sm active:scale-95">
+          🔄 नया सेट हल करें
+        </button>
+        <button id="btnBackToSetup" class="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-95">
+          ⚙️ सेटअप बदलें
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <footer class="text-center text-xs text-slate-400 mt-8">
+    100% Offline Mathematically Proven SSC Question Engine • Zero AI Required
+  </footer>
+
+  <script>
+    // -------------------------------------------------------------
+    // MATH ENGINE & SOUND FX (Web Audio API)
+    // -------------------------------------------------------------
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let isMuted = false;
+
+    function playSound(type) {
+      if (isMuted) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.08);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.setValueAtTime(180, now + 0.1);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        }
+      } catch (e) {}
+    }
+
+    const ALL_MATH_TOPICS = [
+      'मिश्रित (सभी विषय)',
+      'जोड़ (Addition)',
+      'घटाव (Subtraction)',
+      'गुणा (Multiplication)',
+      'भाग (Division)',
+      'जोड़ व घटाव (Add & Subtract)',
+      'गुणा व भाग (Multiply & Divide)',
+      'सरलीकरण (BODMAS)',
+      'प्रतिशत (Percentage)',
+      'वर्ग व वर्गमूल (Squares & Roots)',
+      'घन व घनमूल (Cubes & Roots)',
+      'भिन्न व दशमलव (Fractions & Decimals)',
+      'औसत (Average)',
+      'अनुपात व समानुपात (Ratio & Proportion)',
+      'साधारण ब्याज (Simple Interest)',
+      'लाभ व हानि (Profit & Loss)',
+      'समय व कार्य (Time & Work)',
+      'समय, चाल व दूरी (Time & Distance)'
+    ];
+
+    const seenSignatures = new Set();
+
+    function generateUnlimitedMathQuestion(topic, indexSeed, difficulty = 'मध्यम') {
+      const baseTopics = ALL_MATH_TOPICS.filter(t => !t.includes('मिश्रित'));
+      let attempts = 0;
+      let finalQ = null;
+
+      while (attempts < 60) {
+        attempts++;
+        let chosenTopic = topic;
+        if (topic.includes('मिश्रित')) {
+          chosenTopic = baseTopics[Math.floor(Math.random() * baseTopics.length)];
+        }
+
+        let qText = '', qTextEn = '', ansStr = '', explanation = '', explanationEn = '', shortcut = '', distractors = [];
+
+        if (chosenTopic.includes('प्रतिशत') || chosenTopic.toLowerCase().includes('percent')) {
+          const typeVar = Math.floor(Math.random() * 13);
+          if (typeVar === 0) {
+            // 1. Basic Value & Conversion
+            const p = [10, 15, 20, 25, 30, 40, 50, 60, 75][Math.floor(Math.random() * 9)];
+            const base = (Math.floor(Math.random() * 20) + 5) * 50;
+            const ans = (p * base) / 100;
+            qText = `मान ज्ञात कीजिए: ₹${base} का ${p}% कितना होगा?`;
+            qTextEn = `Find ${p}% of ₹${base}.`;
+            ansStr = `₹${ans}`;
+            explanation = `मूल्य = (${base} × ${p}) ÷ 100 = ₹${ans}।`;
+            explanationEn = `Value = (${base} * ${p}) / 100 = ₹${ans}.`;
+            shortcut = `10% = ₹${base / 10} -> ${p}% = ₹${ans}`;
+            distractors = [`₹${ans + 20}`, `₹${Math.max(10, ans - 20)}`, `₹${ans + 40}`, `₹${Math.max(10, ans - 40)}`];
+          } else if (typeVar === 1) {
+            // 2. A is X% More / Less than B
+            const p = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+            const ans = Math.round((p / (100 + p)) * 100 * 100) / 100;
+            const ansDisplay = Number.isInteger(ans) ? `${ans}%` : `${ans.toFixed(2)}%`;
+            qText = `यदि A का वेतन B से ${p}% अधिक है, तो B का वेतन A से कितना % कम होगा?`;
+            qTextEn = `If A's salary is ${p}% more than B's, by what % is B less than A?`;
+            ansStr = ansDisplay;
+            explanation = `[P ÷ (100 + P)] × 100% = ${ansDisplay}।`;
+            explanationEn = `[P / (100 + P)] * 100% = ${ansDisplay}.`;
+            shortcut = `सूत्र: [${p} ÷ ${100 + p}] × 100% = ${ansDisplay}`;
+            distractors = [`${p}%`, `${Math.round(ans + 5)}%`, `${Math.max(1, Math.round(ans - 5))}%`, `${p + 5}%`];
+          } else if (typeVar === 2) {
+            // 3. Consumption & Expenditure Balance
+            const p = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+            const ans = Math.round((p / (100 + p)) * 100 * 100) / 100;
+            const ansDisplay = Number.isInteger(ans) ? `${ans}%` : `${ans.toFixed(2)}%`;
+            qText = `चीनी के मूल्य में ${p}% की वृद्धि हो जाती है। खपत में कितने % की कमी की जाए ताकि खर्च समान रहे?`;
+            qTextEn = `Price rises by ${p}%. By what % should consumption be reduced so expenditure remains constant?`;
+            ansStr = ansDisplay;
+            explanation = `[P ÷ (100 + P)] × 100% = ${ansDisplay}।`;
+            explanationEn = `[P / (100 + P)] * 100% = ${ansDisplay}.`;
+            shortcut = `सूत्र: [${p} ÷ ${100 + p}] × 100% = ${ansDisplay}`;
+            distractors = [`${p}%`, `${Math.round(ans + 3)}%`, `${Math.max(1, Math.round(ans - 3))}%`, `${p + 5}%`];
+          } else if (typeVar === 3) {
+            // 4. Price Change with Extra Quantity
+            const p = 20, money = 100, extraKg = 2;
+            const reducedPrice = (money * (p / 100)) / extraKg; // ₹10
+            qText = `सेब के मूल्य में ${p}% की कमी होने से एक व्यक्ति ₹${money} में ${extraKg} किग्रा अधिक सेब खरीद पाता है। घटा हुआ मूल्य प्रति किग्रा क्या है?`;
+            qTextEn = `A ${p}% drop in prices allows buying ${extraKg} kg more for ₹${money}. Find reduced price per kg.`;
+            ansStr = `₹${reducedPrice}/किग्रा`;
+            explanation = `बचत = ₹${(money * p) / 100} ÷ ${extraKg} = ₹${reducedPrice}/किग्रा।`;
+            explanationEn = `Savings = ₹${(money * p) / 100} / ${extraKg} = ₹${reducedPrice}/kg.`;
+            shortcut = `(₹100 × 20%) ÷ 2 = ₹${reducedPrice}/किग्रा`;
+            distractors = [`₹${reducedPrice + 2.5}/किग्रा`, `₹${Math.max(1, reducedPrice - 2)}/किग्रा`, `₹${reducedPrice + 5}/किग्रा`, `₹${reducedPrice * 2}/किग्रा`];
+          } else if (typeVar === 4) {
+            // 5. Successive Percentage Change
+            const a = 20, b = -10;
+            const netChange = a + b + (a * b) / 100; // +8%
+            qText = `एक संख्या में पहले ${a}% की वृद्धि तथा फिर ${Math.abs(b)}% की कमी की जाती है। शुद्ध प्रतिशत परिवर्तन क्या होगा?`;
+            qTextEn = `A number is increased by ${a}% and then decreased by ${Math.abs(b)}%. Net change?`;
+            ansStr = `+${netChange}%`;
+            explanation = `A + B + (AB ÷ 100) = 20 - 10 - 2 = +8% (8% वृद्धि)।`;
+            explanationEn = `A + B + (AB / 100) = +8%.`;
+            shortcut = `${a} - ${Math.abs(b)} - 2 = +8%`;
+            distractors = [`+10%`, `-8%`, `+12%`, `0%`];
+          } else if (typeVar === 5) {
+            // 6. Geometry Dimensions
+            const l = 10, b = 20;
+            const areaChange = l + b + (l * b) / 100; // +32%
+            qText = `आयताकार मैदान की लंबाई में ${l}% तथा चौड़ाई में ${b}% की वृद्धि करने पर क्षेत्रफल में कितने % परिवर्तन होगा?`;
+            qTextEn = `Length increases by ${l}% and breadth by ${b}%. Percent change in area?`;
+            ansStr = `+${areaChange}%`;
+            explanation = `L + B + (L × B) ÷ 100 = 10 + 20 + 2 = +32%।`;
+            explanationEn = `Area change % = +32%.`;
+            shortcut = `10 + 20 + 2 = +32%`;
+            distractors = [`+30%`, `+28%`, `+35%`, `+25%`];
+          } else if (typeVar === 6) {
+            // 7. Exam Marks
+            const p1 = 30, m1 = 15, p2 = 40, m2 = 35;
+            const maxMarks = Math.round(((m1 + m2) / (p2 - p1)) * 100); // 500
+            qText = `एक परीक्षा में A को ${p1}% अंक मिले और वह ${m1} अंकों से फेल हो गया। B को ${p2}% अंक मिले जो पास अंकों से ${m2} अधिक थे। अधिकतम अंक क्या हैं?`;
+            qTextEn = `A gets ${p1}% and fails by ${m1}. B gets ${p2}% and gets ${m2} more than pass marks. Max marks?`;
+            ansStr = `${maxMarks}`;
+            explanation = `[(${m1} + ${m2}) ÷ (${p2} - ${p1})] × 100 = (50 ÷ 10) × 100 = ${maxMarks} अंक।`;
+            explanationEn = `Max marks = (50 / 10) * 100 = ${maxMarks}.`;
+            shortcut = `(50 ÷ 10) × 100 = ${maxMarks}`;
+            distractors = [`${maxMarks + 100}`, `${Math.max(100, maxMarks - 100)}`, `${maxMarks + 50}`, `${Math.max(100, maxMarks - 50)}`];
+          } else if (typeVar === 7) {
+            // 8. Election & Vote Share
+            const w = 60, margin = 1200;
+            const total = Math.round((margin / (2 * w - 100)) * 100); // 6000
+            qText = `दो उम्मीदवारों के चुनाव में विजेता को ${w}% मत मिले और वह ${margin} मतों से जीत गया। कुल मतों की संख्या क्या थी?`;
+            qTextEn = `Winner got ${w}% votes and won by ${margin} votes. Find total votes.`;
+            ansStr = `${total}`;
+            explanation = `अंतर % = ${w}% - ${100 - w}% = 20% -> 20% = ${margin} -> 100% = ${total} वोट।`;
+            explanationEn = `20% = ${margin} -> 100% = ${total}.`;
+            shortcut = `(${margin} ÷ 20) × 100 = ${total}`;
+            distractors = [`${total + 1000}`, `${Math.max(500, total - 1000)}`, `${total + 2000}`, `${Math.max(500, total - 2000)}`];
+          } else if (typeVar === 8) {
+            // 9. Income & Expenditure
+            const rentP = 20, foodP = 50, savings = 2400;
+            const totalInc = Math.round(savings / (((100 - rentP) * (100 - foodP)) / 10000)); // 6000
+            qText = `एक व्यक्ति अपनी आय का ${rentP}% किराए पर और शेष का ${foodP}% भोजन पर खर्च करता है। यदि बचत ₹${savings} है, तो कुल आय क्या है?`;
+            qTextEn = `Spends ${rentP}% on rent and ${foodP}% of remainder on food. Saves ₹${savings}. Total income?`;
+            ansStr = `₹${totalInc}`;
+            explanation = `अंतिम बचत % = 80% का 50% = 40% -> 40% = ₹${savings} -> कुल आय = ₹${totalInc}।`;
+            explanationEn = `Savings % = 40% = ₹${savings} -> Total = ₹${totalInc}.`;
+            shortcut = `₹${savings} ÷ 0.40 = ₹${totalInc}`;
+            distractors = [`₹${totalInc + 1000}`, `₹${Math.max(1000, totalInc - 1000)}`, `₹${totalInc + 2000}`, `₹${Math.max(1000, totalInc - 2000)}`];
+          } else if (typeVar === 9) {
+            // 10. Population
+            const p0 = 10000, r = 10, yrs = 2;
+            const pNew = Math.round(p0 * Math.pow(1 + r / 100, yrs)); // 12100
+            qText = `कस्बे की वर्तमान जनसंख्या ${p0} है। यदि प्रतिवर्ष ${r}% वृद्धि हो, तो ${yrs} वर्ष बाद जनसंख्या क्या होगी?`;
+            qTextEn = `Town population is ${p0} and grows at ${r}%/year. Population after ${yrs} years?`;
+            ansStr = `${pNew}`;
+            explanation = `${p0} × (1.1)² = ${p0} × 1.21 = ${pNew}।`;
+            explanationEn = `${p0} * 1.21 = ${pNew}.`;
+            shortcut = `${p0} × 1.21 = ${pNew}`;
+            distractors = [`${pNew + 500}`, `${Math.max(1000, pNew - 500)}`, `${p0 + p0 * 0.2}`, `${pNew + 1000}`];
+          } else if (typeVar === 10) {
+            // 11. Venn Diagram
+            const fH = 40, fE = 30, fBoth = 15;
+            const passBoth = 100 - (fH + fE - fBoth); // 45%
+            qText = `एक परीक्षा में ${fH}% हिंदी में, ${fE}% अंग्रेजी में और ${fBoth}% दोनों में अनुत्तीर्ण हुए। दोनों में उत्तीर्ण % क्या है?`;
+            qTextEn = `Failed in H: ${fH}%, E: ${fE}%, Both: ${fBoth}%. Pass percentage in both?`;
+            ansStr = `${passBoth}%`;
+            explanation = `कुल फेल = ${fH} + ${fE} - ${fBoth} = 55% -> पास = 100 - 55 = 45%।`;
+            explanationEn = `Total fail = 55%. Pass both = 45%.`;
+            shortcut = `100 - (40 + 30 - 15) = 45%`;
+            distractors = [`${passBoth + 10}%`, `${Math.max(1, passBoth - 10)}%`, `${passBoth + 5}%`, `${Math.max(1, passBoth - 5)}%`];
+          } else if (typeVar === 11) {
+            // 12. Fresh vs Dry Fruit
+            const freshKg = 100;
+            const dryKg = 25; // 20kg pulp
+            qText = `ताजे फल में 80% पानी है और सूखे फल में 20% पानी है। ${freshKg} किग्रा ताजे फलों से कितना सूखा फल मिलेगा?`;
+            qTextEn = `Fresh fruit has 80% water and dry fruit 20% water. How much dry fruit from ${freshKg} kg fresh fruit?`;
+            ansStr = `${dryKg} किग्रा`;
+            explanation = `गुदा = 20 किग्रा स्थिर -> सूखे फल में 80% गुदा = 20 किग्रा -> कुल सूखा फल = ${dryKg} किग्रा।`;
+            explanationEn = `Pulp = 20 kg -> 80% = 20 kg -> Dry fruit = 25 kg.`;
+            shortcut = `(100 × 20%) ÷ 80% = 25 किग्रा`;
+            distractors = [`${dryKg + 5} किग्रा`, `${Math.max(1, dryKg - 5)} किग्रा`, `${dryKg + 10} किग्रा`, `${Math.max(1, dryKg - 10)} किग्रा`];
+          } else {
+            // 13. Calculation Error
+            const errP = 64;
+            qText = `एक छात्र ने किसी संख्या को 5/3 से गुणा करने के बजाय गलती से 3/5 से गुणा कर दिया। त्रुटि % क्या है?`;
+            qTextEn = `Multiplied a number by 3/5 instead of 5/3. Find percentage error.`;
+            ansStr = `${errP}%`;
+            explanation = `संख्या = 15 -> सही = 25, गलत = 9 -> अंतर = 16 -> त्रुटि % = (16 ÷ 25) × 100 = 64%।`;
+            explanationEn = `Correct = 25, Wrong = 9. Error % = (16 / 25) * 100 = 64%.`;
+            shortcut = `[(25 - 9) ÷ 25] × 100 = 64%`;
+            distractors = [`50%`, `45%`, `36%`, `60%`];
+          }
+        }
+        else {
+          const a = (Math.floor(Math.random() * 10) + 2) * 6;
+          const b = [2, 3, 6][Math.floor(Math.random() * 3)];
+          const c = Math.floor(Math.random() * 5) + 3;
+          const d = Math.floor(Math.random() * 15) + 5;
+          const ans = (a / b) * c + d;
+          qText = `मान ज्ञात कीजिए: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
+          qTextEn = `Evaluate: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
+          ansStr = `${ans}`;
+          explanation = `1. भाग: ${a} ÷ ${b} = ${a / b}\n2. गुणा: ${a / b} × ${c} = ${(a / b) * c}\n3. जोड़ = ${ans}।`;
+          explanationEn = `Division -> Multiply -> Add = ${ans}.`;
+          shortcut = `BODMAS नियम = ${ans}`;
+          distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+        }
+
+        const optionSet = new Set([ansStr]);
+        for (const dist of distractors) {
+          if (dist && dist !== ansStr) optionSet.add(dist);
+          if (optionSet.size >= 4) break;
+        }
+
+        let fallbackStep = 1;
+        while (optionSet.size < 4) {
+          const fb = ansStr.startsWith('₹') ? `₹${parseInt(ansStr.replace('₹','')) + fallbackStep * 15}` : `${parseInt(ansStr) + fallbackStep * 5}`;
+          if (!optionSet.has(fb)) optionSet.add(fb);
+          fallbackStep++;
+        }
+
+        const shuffledOptions = Array.from(optionSet).sort(() => Math.random() - 0.5);
+        const correctIndex = shuffledOptions.indexOf(ansStr);
+
+        const signature = `${chosenTopic}:::${qText}`;
+        if (!seenSignatures.has(signature) || attempts >= 55) {
+          seenSignatures.add(signature);
+          finalQ = {
+            id: indexSeed,
+            question: qText,
+            questionEn: qTextEn,
+            options: shuffledOptions,
+            correct: correctIndex,
+            explanation,
+            explanationEn,
+            shortcut,
+            category: chosenTopic
+          };
+          break;
+        }
+      }
+      return finalQ;
+    }
+
+    // UI Controller
+    let langHindi = true;
+    let selectedTopic = ALL_MATH_TOPICS[0];
+    let selectedDifficulty = 'मध्यम';
+    let selectedCount = '20';
+
+    let questions = [];
+    let currentIndex = 0;
+    let timer = 0;
+    let timerInterval = null;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let answered = false;
+
+    const selectTopic = document.getElementById('selectTopic');
+    ALL_MATH_TOPICS.forEach(topic => {
+      const opt = document.createElement('option');
+      opt.value = topic;
+      opt.textContent = topic;
+      selectTopic.appendChild(opt);
+    });
+
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.diff-btn').forEach(b => {
+          b.className = 'diff-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50';
+        });
+        btn.className = 'diff-btn py-2 text-xs font-bold rounded-xl border border-blue-600 bg-blue-50 text-blue-700';
+        selectedDifficulty = btn.dataset.diff;
+      });
+    });
+
+    document.querySelectorAll('.count-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.count-btn').forEach(b => {
+          b.className = 'count-btn py-2 text-xs font-bold rounded-xl border border-slate-200 hover:bg-slate-50';
+        });
+        btn.className = 'count-btn py-2 text-xs font-bold rounded-xl border border-blue-600 bg-blue-50 text-blue-700';
+        selectedCount = btn.dataset.count;
+      });
+    });
+
+    document.getElementById('langToggleBtn').addEventListener('click', () => {
+      langHindi = !langHindi;
+      renderCurrentQuestion();
+    });
+
+    const btnSoundToggle = document.getElementById('btnSoundToggle');
+    btnSoundToggle.addEventListener('click', () => {
+      isMuted = !isMuted;
+      btnSoundToggle.textContent = isMuted ? '🔇' : '🔊';
+    });
+
+    document.getElementById('btnStartPractice').addEventListener('click', () => {
+      selectedTopic = selectTopic.value;
+      const totalQ = selectedCount === 'Infinite' ? 20 : parseInt(selectedCount);
+      questions = [];
+      for (let i = 0; i < totalQ; i++) {
+        questions.push(generateUnlimitedMathQuestion(selectedTopic, i + 1, selectedDifficulty));
+      }
+
+      currentIndex = 0;
+      correctCount = 0;
+      wrongCount = 0;
+      timer = 0;
+      answered = false;
+
+      document.getElementById('screenSetup').classList.add('hidden');
+      document.getElementById('screenResult').classList.add('hidden');
+      document.getElementById('screenPractice').classList.remove('hidden');
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timer++;
+        document.getElementById('timerText').textContent = timer + 's';
+      }, 1000);
+
+      renderCurrentQuestion();
+    });
+
+    function renderCurrentQuestion() {
+      if (!questions[currentIndex]) return;
+      const q = questions[currentIndex];
+
+      document.getElementById('badgeQProgress').textContent = `Q ${currentIndex + 1}${selectedCount === 'Infinite' ? ' (∞)' : '/' + questions.length}`;
+      document.getElementById('badgeTopic').textContent = q.category;
+      document.getElementById('qText').textContent = langHindi ? q.question : (q.questionEn || q.question);
+
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+      answered = false;
+
+      document.getElementById('explanationBox').classList.add('hidden');
+      document.getElementById('actionContainer').classList.add('hidden');
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full p-4 rounded-2xl border border-slate-200 hover:border-blue-400 bg-white font-bold text-slate-800 text-sm flex items-center justify-between transition cursor-pointer active:scale-98 shadow-2xs';
+        btn.innerHTML = `<span>${String.fromCharCode(65 + idx)}. ${opt}</span>`;
+        btn.addEventListener('click', () => handleOptionClick(idx, btn));
+        container.appendChild(btn);
+      });
+
+      if (selectedCount === 'Infinite') {
+        document.getElementById('btnFinishInfinite').classList.remove('hidden');
+      } else {
+        document.getElementById('btnFinishInfinite').classList.add('hidden');
+      }
+    }
+
+    function handleOptionClick(index, btnElem) {
+      if (answered) return;
+      answered = true;
+
+      const q = questions[currentIndex];
+      const allButtons = document.getElementById('optionsContainer').children;
+
+      if (index === q.correct) {
+        correctCount++;
+        playSound('correct');
+        btnElem.className = 'w-full p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-extrabold text-sm flex items-center justify-between shadow-xs';
+        btnElem.innerHTML += `<span>✓</span>`;
+      } else {
+        wrongCount++;
+        playSound('wrong');
+        btnElem.className = 'w-full p-4 rounded-2xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-extrabold text-sm flex items-center justify-between shadow-xs';
+        btnElem.innerHTML += `<span>✗</span>`;
+        
+        allButtons[q.correct].className = 'w-full p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-extrabold text-sm flex items-center justify-between shadow-xs';
+        allButtons[q.correct].innerHTML += `<span>✓</span>`;
+      }
+
+      document.getElementById('txtShortcut').textContent = q.shortcut || 'उपलब्ध नहीं';
+      document.getElementById('txtExplanation').textContent = langHindi ? q.explanation : (q.explanationEn || q.explanation);
+      document.getElementById('explanationBox').classList.remove('hidden');
+
+      const btnNext = document.getElementById('btnNext');
+      btnNext.textContent = (selectedCount === 'Infinite' || currentIndex + 1 < questions.length)
+        ? (langHindi ? 'अगला प्रश्न ➔' : 'Next Question ➔')
+        : (langHindi ? 'रिजल्ट देखें 🏆' : 'View Results 🏆');
+
+      document.getElementById('actionContainer').classList.remove('hidden');
+    }
+
+    document.getElementById('btnNext').addEventListener('click', () => {
+      if (currentIndex + 1 < questions.length) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else if (selectedCount === 'Infinite') {
+        const nextQ = generateUnlimitedMathQuestion(selectedTopic, questions.length + 1, selectedDifficulty);
+        questions.push(nextQ);
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    document.getElementById('btnFinishInfinite').addEventListener('click', () => {
+      showResults();
+    });
+
+    function showResults() {
+      clearInterval(timerInterval);
+      document.getElementById('screenPractice').classList.add('hidden');
+      document.getElementById('screenResult').classList.remove('hidden');
+
+      document.getElementById('txtResultSubtitle').textContent = `${selectedTopic} • ${selectedDifficulty}`;
+      document.getElementById('resCorrect').textContent = correctCount;
+      document.getElementById('resWrong').textContent = wrongCount;
+      document.getElementById('resTime').textContent = timer + 's';
+      
+      const totalAttempted = correctCount + wrongCount;
+      const acc = totalAttempted > 0 ? Math.round((correctCount / totalAttempted) * 100) : 0;
+      document.getElementById('resAccuracy').textContent = acc + '%';
+    }
+
+    document.getElementById('btnRestart').addEventListener('click', () => {
+      document.getElementById('btnStartPractice').click();
+    });
+
+    document.getElementById('btnBackToSetup').addEventListener('click', () => {
+      document.getElementById('screenResult').classList.add('hidden');
+      document.getElementById('screenSetup').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

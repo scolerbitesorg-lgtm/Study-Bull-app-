@@ -815,103 +815,72 @@ function generateUnlimitedMathQuestion(
         distractors = [`${ans + 10}`, `${ans - 10}`, `${ans + 20}`, `${Math.max(1, ans - 20)}`];
       }
     }
-    // 7. सरलीकरण (BODMAS)
+    // 7. सरलीकरण (BODMAS / Simplification)
     else if (chosenTopic.includes('सरलीकरण')) {
-      const typeVar = Math.floor(Math.random() * 5);
+      const typeVar = Math.floor(Math.random() * 7);
       if (typeVar === 0) {
-        // Direct BODMAS: (A + B) x C / D - E
-        const d = [2, 3, 4, 5, 6][Math.floor(Math.random() * 5)];
-        const k = Math.floor(Math.random() * 10) + 4;
-        const sumAB = d * k;
-        const a = Math.floor(sumAB / 2);
-        const b = sumAB - a;
-        const c = Math.floor(Math.random() * 8) + 3;
-        const e = Math.floor(Math.random() * 15) + 2;
-        const ans = k * c - e;
-        qText = `BODMAS नियम से सरल करें: (${a} + ${b}) × ${c} ÷ ${d} - ${e} = ?`;
-        qTextEn = `Simplify using BODMAS: (${a} + ${b}) × ${c} ÷ ${d} - ${e} = ?`;
-        ansStr = `${ans}`;
-        explanation = `BODMAS चरण:\n1. कोष्ठक (Bracket): (${a} + ${b}) = ${sumAB}\n2. भाग (Division): ${sumAB} ÷ ${d} = ${k}\n3. गुणा (Multiplication): ${k} × ${c} = ${k * c}\n4. घटाव (Subtraction): ${k * c} - ${e} = ${ans}।`;
-        explanationEn = `BODMAS steps: Bracket (${sumAB}) -> Division (${k}) -> Multiply (${k * c}) -> Subtract (${ans}).`;
-        shortcut = `BODMAS क्रमानुसार: ${ans}`;
-        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+        // SMP_01: BODMAS / VBODMAS Rule
+        ansStr = `15`;
+        qText = `सरल कीजिए: 18 - [6 - {4 - (8 - 6 + 3)}]`;
+        qTextEn = `Solve: 18 - [6 - {4 - (8 - 6 + 3)}]`;
+        explanation = `सबसे पहले छोटे कोष्ठक को हल करें: (8 - 6 + 3) = 5। फिर मजहला कोष्ठक: {4 - 5} = -1। बड़ा कोष्ठक: [6 - (-1)] = 7। अतः 18 - 7 = 15।`;
+        explanationEn = `Step by step inner to outer brackets: inner = 5, middle = -1, outer = 7. Result = 18 - 7 = 15.`;
+        shortcut = `कोष्ठक नियम (BODMAS): 18 - 7 = 15`;
+        distractors = [`12`, `18`, `10`, `14`];
       } else if (typeVar === 1) {
-        // Nested Brackets: [A + {B x (C - D)} / E]
-        const c = Math.floor(Math.random() * 20) + 15;
-        const d = Math.floor(Math.random() * 10) + 2;
-        const diff = c - d;
-        const b = Math.floor(Math.random() * 5) + 2;
-        const prod = b * diff;
-        const e = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
-        const divPart = Math.floor(prod / e) * e; // make divisible
-        const a = Math.floor(Math.random() * 30) + 10;
-        const ans = a + divPart / e;
-        qText = `कोष्ठक BODMAS नियम: ${a} + [{${b} × (${c} - ${d})} ÷ ${e}] = ?`;
-        qTextEn = `Nested Bracket BODMAS: ${a} + [{${b} × (${c} - ${d})} ÷ ${e}] = ?`;
-        ansStr = `${ans}`;
-        explanation = `चरण 1 (छोटा कोष्ठक): ${c} - ${d} = ${diff}\nचरण 2 (मझला कोष्ठक): ${b} × ${diff} = ${prod}\nचरण 3 (बड़ा कोष्ठक): ${divPart} ÷ ${e} = ${divPart / e}\nचरण 4 (जोड़): ${a} + ${divPart / e} = ${ans}।`;
-        explanationEn = `Inner bracket -> middle -> outer -> addition = ${ans}.`;
-        shortcut = `अंदर से बाहर की ओर कोष्ठक खोलें = ${ans}`;
-        distractors = [`${ans + 4}`, `${Math.max(1, ans - 4)}`, `${ans + 8}`, `${Math.max(1, ans - 8)}`];
+        // SMP_02: Algebraic Identity Based
+        ansStr = `1`;
+        qText = `मान ज्ञात कीजिए: (0.73 × 0.73 × 0.73 + 0.27 × 0.27 × 0.27) ÷ (0.73 × 0.73 - 0.73 × 0.27 + 0.27 × 0.27)`;
+        qTextEn = `Evaluate: (0.73 * 0.73 * 0.73 + 0.27 * 0.27 * 0.27) / (0.73 * 0.73 - 0.73 * 0.27 + 0.27 * 0.27)`;
+        explanation = `सर्वसमिका: (a³ + b³) ÷ (a² - ab + b²) = (a + b) = 0.73 + 0.27 = 1.00।`;
+        explanationEn = `Identity formula: (a³ + b³) / (a² - ab + b²) = a + b = 0.73 + 0.27 = 1.`;
+        shortcut = `a + b = 0.73 + 0.27 = 1`;
+        distractors = [`0.5`, `1.5`, `2`, `0`];
       } else if (typeVar === 2) {
-        // Algebraic identity BODMAS: If a + b + c = 0, find a³ + b³ + c³ - 3abc
-        const isIdentity = Math.random() > 0.5;
-        if (isIdentity) {
-          const a = Math.floor(Math.random() * 25) + 10;
-          const b = Math.floor(Math.random() * 15) + 5;
-          const c = -(a + b);
-          qText = `यदि a = ${a}, b = ${b}, c = ${c} (जहाँ a + b + c = 0), तो व्यंजक (a³ + b³ + c³ - 3abc) का मान क्या होगा?`;
-          qTextEn = `If a = ${a}, b = ${b}, c = ${c} (where a + b + c = 0), what is the value of (a³ + b³ + c³ - 3abc)?`;
-          ansStr = `0`;
-          explanation = `बीजगणितीय सर्वसमिका का नियम:\nयदि a + b + c = 0 होता है, तो a³ + b³ + c³ - 3abc = 0 सदैव होता है।`;
-          explanationEn = `Identity rule: If a + b + c = 0, then a³ + b³ + c³ - 3abc = 0 always.`;
-          shortcut = `वैदिक सर्वसमिका नियम: जब a + b + c = 0 हो, उत्तर = 0`;
-          distractors = [`1`, `${a + b}`, `${a * b}`, `-1`];
-        } else {
-          // (x² - y²) / (x + y)
-          const x = Math.floor(Math.random() * 80) + 20;
-          const y = Math.floor(Math.random() * (x - 5)) + 3;
-          const num = x * x - y * y;
-          const den = x + y;
-          const ans = x - y;
-          qText = `बीजगणितीय सरलीकरण: (${num}) ÷ (${den}) = ?`;
-          qTextEn = `Algebraic simplification: (${num}) ÷ (${den}) = ?`;
-          ansStr = `${ans}`;
-          explanation = `${num} = (${x})² - (${y})² = (${x} - ${y})(${x} + ${y})।\nअतः (${x} - ${y})(${x} + ${y}) ÷ (${x} + ${y}) = ${x} - ${y} = ${ans}।`;
-          explanationEn = `(x² - y²) / (x + y) = x - y = ${x} - ${y} = ${ans}.`;
-          shortcut = `सूत्र: x - y = ${x} - ${y} = ${ans}`;
-          distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
-        }
+        // SMP_03: Continued Fractions (Ladder Fractions)
+        ansStr = `8/5`;
+        qText = `सरल कीजिए: 1 + 1 / (1 + 1 / (1 + 1 / 2))`;
+        qTextEn = `Simplify: 1 + 1 / (1 + 1 / (1 + 1 / 2))`;
+        explanation = `नीचे से हल करें: 1 + 1/2 = 3/2 -> 1 + 2/3 = 5/3 -> 1 + 3/5 = 8/5।`;
+        explanationEn = `Solving bottom-up: 3/2 -> 5/3 -> 8/5.`;
+        shortcut = `नीचे से ऊपर हल करने पर = 8/5`;
+        distractors = [`5/8`, `3/5`, `13/8`, `7/5`];
       } else if (typeVar === 3) {
-        // Square root BODMAS: √(A + B) x C - D
-        const sqBase = Math.floor(Math.random() * 15) + 5; // e.g. 12
-        const sq = sqBase * sqBase;
-        const part1 = Math.floor(sq * 0.6);
-        const part2 = sq - part1;
-        const c = Math.floor(Math.random() * 6) + 3;
-        const d = Math.floor(Math.random() * 20) + 5;
-        const ans = sqBase * c - d;
-        qText = `वर्गमूल BODMAS: √( ${part1} + ${part2} ) × ${c} - ${d} = ?`;
-        qTextEn = `Square root BODMAS: √( ${part1} + ${part2} ) × ${c} - ${d} = ?`;
-        ansStr = `${ans}`;
-        explanation = `1. वर्गमूल: √(${part1} + ${part2}) = √${sq} = ${sqBase}\n2. गुणा: ${sqBase} × ${c} = ${sqBase * c}\n3. घटाव: ${sqBase * c} - ${d} = ${ans}।`;
-        explanationEn = `1. Root = ${sqBase}. 2. Multiply = ${sqBase * c}. 3. Subtract = ${ans}.`;
-        shortcut = `वर्गमूल निकाल कर गुणा करें = ${ans}`;
-        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+        // SMP_04: Surds & Indices Rationalization
+        ansStr = `sqrt(3) - sqrt(2)`;
+        qText = `हर का परिमेयकरण (Rationalization) करें: 1 / (√3 + √2)`;
+        qTextEn = `Simplify by rationalization: 1 / (sqrt(3) + sqrt(2))`;
+        explanation = `अंश व हर को (√3 - √2) से गुणा करने पर: (√3 - √2) ÷ (3 - 2) = √3 - √2।`;
+        explanationEn = `Multiply numerator and denominator by (sqrt(3) - sqrt(2)) = sqrt(3) - sqrt(2).`;
+        shortcut = `संयुग्मी (Conjugate) से गुणा = √3 - √2`;
+        distractors = [`sqrt(3) + sqrt(2)`, `2 - sqrt(3)`, `sqrt(5)`, `1`];
+      } else if (typeVar === 4) {
+        // SMP_05: Telescoping Series
+        ansStr = `99/100`;
+        qText = `योग ज्ञात कीजिए: 1/(1×2) + 1/(2×3) + 1/(3×4) + ... + 1/(99×100)`;
+        qTextEn = `Find the sum: 1/(1*2) + 1/(2*3) + 1/(3*4) + ... + 1/(99*100)`;
+        explanation = `टेलीस्कोपिंग श्रेणी सूत्र: [1/प्रथम - 1/अंतिम] = [1/1 - 1/100] = 99/100।`;
+        explanationEn = `Telescoping sum formula = 1 - (1/100) = 99/100.`;
+        shortcut = `1 - (1 ÷ 100) = 99/100`;
+        distractors = [`1/100`, `1`, `98/99`, `50/100`];
+      } else if (typeVar === 5) {
+        // SMP_06: Recurring Decimals (Bar Questions)
+        ansStr = `4/11`;
+        qText = `आवर्ती दशमलव 0.363636... (0.36 पर बार) को भिन्न (Fraction) रूप में बदलिए।`;
+        qTextEn = `Convert 0.36 bar into fractional form.`;
+        explanation = `0.36 बार = 36 ÷ 99 = 4/11 (9 से काटने पर)।`;
+        explanationEn = `0.36 bar = 36 / 99 = 4/11.`;
+        shortcut = `36 ÷ 99 = 4/11`;
+        distractors = [`36/100`, `36/90`, `4/9`, `3/11`];
       } else {
-        // Standard BODMAS fallback
-        const a = (Math.floor(Math.random() * 10) + 2) * 6;
-        const b = [2, 3, 6][Math.floor(Math.random() * 3)];
-        const c = Math.floor(Math.random() * 5) + 3;
-        const d = Math.floor(Math.random() * 15) + 5;
-        const ans = (a / b) * c + d;
-        qText = `BODMAS मान: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
-        qTextEn = `BODMAS value: (${a} ÷ ${b}) × ${c} + ${d} = ?`;
-        ansStr = `${ans}`;
-        explanation = `1. भाग: ${a} ÷ ${b} = ${a / b}\n2. गुणा: ${a / b} × ${c} = ${(a / b) * c}\n3. जोड़: ${(a / b) * c} + ${d} = ${ans}।`;
-        explanationEn = `Division -> Multiply -> Addition = ${ans}.`;
-        shortcut = `BODMAS = ${ans}`;
-        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+        // SMP_07: Infinite Nested Roots Series
+        ansStr = `4`;
+        qText = `मान ज्ञात कीजिए: √(12 + √(12 + √(12 + ... अनंत तक)))`;
+        qTextEn = `Find the value of sqrt(12 + sqrt(12 + sqrt(12 + ... inf)))`;
+        explanation = `12 के ऐसे दो लगातार गुणनखंड करें जिनका अंतर 1 हो: 3 × 4 = 12। चूँकि बीच में प्लस (+) है, बड़ा गुणनखंड 4 उत्तर होगा।`;
+        explanationEn = `Consecutive factors of 12 are 3 and 4. Since it's plus, answer is 4.`;
+        shortcut = `12 के गुणनखंड 3 और 4 -> उत्तर = 4`;
+        distractors = [`3`, `6`, `12`, `2`];
       }
     }
     // 8. भिन्न व दशमलव (Fractions & Decimals)
@@ -1019,89 +988,191 @@ function generateUnlimitedMathQuestion(
       }
     }
     // 9. प्रतिशत (Percentage)
-    else if (chosenTopic.includes('प्रतिशत')) {
-      const typeVar = Math.floor(Math.random() * 6);
+    else if (chosenTopic.includes('प्रतिशत') || chosenTopic.toLowerCase().includes('percent')) {
+      const typeVar = Math.floor(Math.random() * 13);
       if (typeVar === 0) {
-        // Direct percentage: X% of Y
-        const percentages = [5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75];
+        // 1. Basic Value & Conversion
+        const percentages = [10, 15, 20, 25, 30, 40, 50, 60, 75];
         const p = percentages[Math.floor(Math.random() * percentages.length)];
-        const base = (Math.floor(Math.random() * 30) + 4) * 100;
-        const ans = Math.round((p * base) / 100);
-        qText = `₹${base} का ${p}% कितना होगा?`;
-        qTextEn = `What is ${p}% of ₹${base}?`;
+        const mult = Math.floor(Math.random() * 20) + 5;
+        const base = mult * 50; // e.g. 450
+        const ans = (p * base) / 100;
+        qText = `मान ज्ञात कीजिए: ₹${base} का ${p}% कितना होगा?`;
+        qTextEn = `Find ${p}% of ₹${base}.`;
         ansStr = `₹${ans}`;
-        explanation = `${p}% = ${p} ÷ 100। कुल मान = (${base} × ${p}) ÷ 100 = ₹${ans}।`;
-        explanationEn = `${p}% of ₹${base} = (${base} * ${p}) / 100 = ₹${ans}.`;
-        shortcut = `10% = ₹${base / 10}, 1% = ₹${base / 100} -> ₹${ans}`;
-        distractors = [`₹${ans + 20}`, `₹${Math.max(10, ans - 20)}`, `₹${ans + 50}`, `₹${Math.max(10, ans - 50)}`];
+        explanation = `प्रतिशत की बुनियादी गणना:\nमान = (मूल मान × प्रतिशत) ÷ 100 = (${base} × ${p}) ÷ 100 = ₹${ans}।`;
+        explanationEn = `Value = (${base} * ${p}) / 100 = ₹${ans}.`;
+        shortcut = `10% = ₹${base / 10} -> ${p}% = ₹${ans}`;
+        distractors = [`₹${ans + 20}`, `₹${Math.max(10, ans - 20)}`, `₹${ans + 40}`, `₹${Math.max(10, ans - 40)}`];
       } else if (typeVar === 1) {
-        // Chained percentage: A% of B% of C
-        const p1 = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
-        const p2 = [20, 40, 50][Math.floor(Math.random() * 3)];
-        const base = (Math.floor(Math.random() * 10) + 2) * 1000;
-        const ans = Math.round((p1 * p2 * base) / 10000);
-        qText = `₹${base} के ${p2}% का ${p1}% कितना होगा?`;
-        qTextEn = `What is ${p1}% of ${p2}% of ₹${base}?`;
-        ansStr = `₹${ans}`;
-        explanation = `चरण 1: ${base} का ${p2}% = ₹${(base * p2) / 100}\nचरण 2: ₹${(base * p2) / 100} का ${p1}% = ₹${ans}।`;
-        explanationEn = `Step 1: ${p2}% of ${base} = ${(base * p2) / 100}. Step 2: ${p1}% of that = ₹${ans}.`;
-        shortcut = `(${p1} × ${p2} × ${base}) ÷ 10000 = ₹${ans}`;
-        distractors = [`₹${ans + 10}`, `₹${Math.max(5, ans - 10)}`, `₹${ans + 25}`, `₹${Math.max(5, ans - 25)}`];
+        // 2. A is X% More / Less than B
+        const isMore = Math.random() > 0.5;
+        if (isMore) {
+          const p = [10, 20, 25, 50][Math.floor(Math.random() * 4)]; // e.g. 25
+          const ans = Math.round((p / (100 + p)) * 100 * 100) / 100; // e.g. 20%
+          const ansDisplay = Number.isInteger(ans) ? `${ans}%` : `${ans.toFixed(2)}%`;
+          qText = `यदि A का वेतन B के वेतन से ${p}% अधिक है, तो B का वेतन A के वेतन से कितना प्रतिशत कम होगा?`;
+          qTextEn = `If A's salary is ${p}% more than B's, by what percent is B's salary less than A's?`;
+          ansStr = ansDisplay;
+          explanation = `प्रतिशत कमी का सूत्र: [X ÷ (100 + X)] × 100%\n= [${p} ÷ (100 + ${p})] × 100% = [${p} ÷ ${100 + p}] × 100% = ${ansDisplay}।`;
+          explanationEn = `Percent less = [X / (100 + X)] * 100% = ${ansDisplay}.`;
+          shortcut = `सूत्र: [${p} ÷ ${100 + p}] × 100% = ${ansDisplay}`;
+          distractors = [`${p}%`, `${Math.round(ans + 5)}%`, `${Math.max(1, Math.round(ans - 5))}%`, `${p + 5}%`];
+        } else {
+          const p = [10, 20, 25, 50][Math.floor(Math.random() * 4)]; // e.g. 20
+          const ans = Math.round((p / (100 - p)) * 100 * 100) / 100; // e.g. 25%
+          const ansDisplay = Number.isInteger(ans) ? `${ans}%` : `${ans.toFixed(2)}%`;
+          qText = `यदि A का वेतन B के वेतन से ${p}% कम है, तो B का वेतन A के वेतन से कितना प्रतिशत अधिक होगा?`;
+          qTextEn = `If A's salary is ${p}% less than B's, by what percent is B's salary more than A's?`;
+          ansStr = ansDisplay;
+          explanation = `प्रतिशत वृद्धि का सूत्र: [X ÷ (100 - X)] × 100%\n= [${p} ÷ (100 - ${p})] × 100% = [${p} ÷ ${100 - p}] × 100% = ${ansDisplay}।`;
+          explanationEn = `Percent more = [X / (100 - X)] * 100% = ${ansDisplay}.`;
+          shortcut = `सूत्र: [${p} ÷ ${100 - p}] × 100% = ${ansDisplay}`;
+          distractors = [`${p}%`, `${Math.round(ans + 5)}%`, `${Math.max(1, Math.round(ans - 5))}%`, `${p + 10}%`];
+        }
       } else if (typeVar === 2) {
-        // Percentage Comparison: If A is P% more than B, B is how much % less than A?
-        const p = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
-        const ans = Math.round((p / (100 + p)) * 100 * 10) / 10;
-        qText = `यदि A का वेतन B से ${p}% अधिक है, तो B का वेतन A से कितना प्रतिशत (%) कम होगा?`;
-        qTextEn = `If A's income is ${p}% more than B, by what % is B's income less than A?`;
-        ansStr = `${ans}%`;
-        explanation = `कम प्रतिशत सूत्र: [P ÷ (100 + P)] × 100%\n= [${p} ÷ ${100 + p}] × 100% = ${ans}%।`;
-        explanationEn = `Formula: [P / (100 + P)] * 100% = ${ans}%.`;
-        shortcut = `[${p} ÷ ${100 + p}] × 100% = ${ans}%`;
-        distractors = [`${p}%`, `${Math.round((ans + 2) * 10) / 10}%`, `${Math.round(Math.max(1, ans - 2) * 10) / 10}%`, `${p + 5}%`];
+        // 3. Consumption & Expenditure Balance
+        const p = [10, 20, 25, 50][Math.floor(Math.random() * 4)]; // e.g. 20
+        const ans = Math.round((p / (100 + p)) * 100 * 100) / 100; // e.g. 16.66% or 16.67%
+        const ansDisplay = Number.isInteger(ans) ? `${ans}%` : `${ans.toFixed(2)}%`;
+        qText = `चीनी के मूल्य में ${p}% की वृद्धि हो जाती है। खपत में कितने प्रतिशत की कमी की जाए ताकि कुल खर्च अपरिवर्तित (Constant) रहे?`;
+        qTextEn = `The price of sugar rises by ${p}%. By what percent should consumption be reduced so expenditure remains constant?`;
+        ansStr = ansDisplay;
+        explanation = `खपत में प्रतिशत कमी = [मूल्य वृद्धि % ÷ (100 + मूल्य वृद्धि %)] × 100%\n= [${p} ÷ ${100 + p}] × 100% = ${ansDisplay}।`;
+        explanationEn = `Consumption reduction % = [P / (100 + P)] * 100% = ${ansDisplay}.`;
+        shortcut = `सूत्र: [${p} ÷ ${100 + p}] × 100% = ${ansDisplay}`;
+        distractors = [`${p}%`, `${Math.round(ans + 3)}%`, `${Math.max(1, Math.round(ans - 3))}%`, `${p + 5}%`];
       } else if (typeVar === 3) {
-        // Vedic Fractional Shortcut Percentages (14.28%, 37.5%, 16.66%, 62.5%)
-        const fracP = [
-          { name: '14.28%', frac: 1 / 7, mult: 700, str: '1/7' },
-          { name: '37.5%', frac: 3 / 8, mult: 640, str: '3/8' },
-          { name: '16.66%', frac: 1 / 6, mult: 540, str: '1/6' },
-          { name: '62.5%', frac: 5 / 8, mult: 800, str: '5/8' },
-          { name: '83.33%', frac: 5 / 6, mult: 360, str: '5/6' }
-        ];
-        const chosen = fracP[Math.floor(Math.random() * fracP.length)];
-        const k = Math.floor(Math.random() * 4) + 1;
-        const totalVal = chosen.mult * k;
-        const ans = Math.round(totalVal * chosen.frac);
-        qText = `स्पीड वैदिक प्रतिशत: ₹${totalVal} का ${chosen.name} कितना होगा?`;
-        qTextEn = `Vedic fraction speed percent: What is ${chosen.name} of ₹${totalVal}?`;
-        ansStr = `₹${ans}`;
-        explanation = `${chosen.name} की भिन्न शॉर्टकट = ${chosen.str}।\nकुल मान = ₹${totalVal} × ${chosen.str} = ₹${ans}।`;
-        explanationEn = `Fraction shortcut for ${chosen.name} = ${chosen.str}. ₹${totalVal} * ${chosen.str} = ₹${ans}.`;
-        shortcut = `वैदिक भिन्न सूत्र: ${chosen.str} × ₹${totalVal} = ₹${ans}`;
-        distractors = [`₹${ans + 30}`, `₹${Math.max(10, ans - 30)}`, `₹${ans + 60}`, `₹${Math.max(10, ans - 60)}`];
+        // 4. Price Change with Extra Quantity
+        const p = 20; // 20% drop
+        const money = 100; // ₹100
+        const extraKg = 2; // 2 kg extra
+        const reducedPrice = (money * (p / 100)) / extraKg; // ₹10/kg
+        qText = `सेब के मूल्य में ${p}% की कमी होने से एक व्यक्ति ₹${money} में ${extraKg} किग्रा अधिक सेब खरीद पाता है। सेब का घटा हुआ मूल्य (Reduced Price) प्रति किग्रा क्या है?`;
+        qTextEn = `A ${p}% drop in apple prices allows a person to buy ${extraKg} kg more for ₹${money}. Find the reduced price per kg.`;
+        ansStr = `₹${reducedPrice}/किग्रा`;
+        explanation = `बचत राशि = ₹${money} का ${p}% = ₹${(money * p) / 100}।\nघटा हुआ मूल्य (Reduced Price) = बचा हुआ रुपया ÷ अतिरिक्त मात्रा = ₹${(money * p) / 100} ÷ ${extraKg} = ₹${reducedPrice}/किग्रा।`;
+        explanationEn = `Savings = ₹${(money * p) / 100}. Reduced price = ₹${(money * p) / 100} / ${extraKg} = ₹${reducedPrice}/kg.`;
+        shortcut = `शॉर्टकट सूत्र: (M × P%) ÷ K = (100 × 20%) ÷ 2 = ₹${reducedPrice}/किग्रा`;
+        distractors = [`₹${reducedPrice + 2.5}/किग्रा`, `₹${Math.max(1, reducedPrice - 2)}/किग्रा`, `₹${reducedPrice + 5}/किग्रा`, `₹${reducedPrice * 2}/किग्रा`];
       } else if (typeVar === 4) {
-        // Successive Percentage Change: P1 + P2 + (P1 x P2)/100
-        const p1 = [10, 20, 30][Math.floor(Math.random() * 3)];
-        const p2 = [10, 20, 25][Math.floor(Math.random() * 3)];
-        const ans = p1 + p2 + (p1 * p2) / 100;
-        qText = `क्रमिक वृद्धि (Successive Increase): यदि किसी संख्या में पहले ${p1}% और फिर ${p2}% की वृद्धि की जाए, तो कुल प्रभावी प्रतिशत वृद्धि कितनी होगी?`;
-        qTextEn = `Successive increase of ${p1}% and ${p2}% equals what total % increase?`;
-        ansStr = `${ans}%`;
-        explanation = `कुल प्रभावी प्रतिशत वृद्धि सूत्र: A + B + (A × B) ÷ 100\n= ${p1} + ${p2} + (${p1} × ${p2}) ÷ 100 = ${ans}%।`;
-        explanationEn = `Effective % change formula = A + B + (A * B) / 100 = ${ans}%.`;
-        shortcut = `${p1} + ${p2} + ${(p1 * p2) / 100} = ${ans}%`;
-        distractors = [`${p1 + p2}%`, `${ans + 2}%`, `${Math.max(1, ans - 2)}%`, `${p1 + p2 + 5}%`];
+        // 5. Successive Percentage Change
+        const a = 20; // +20%
+        const b = -10; // -10%
+        const netChange = a + b + (a * b) / 100; // +8%
+        const signStr = netChange >= 0 ? `+${netChange}%` : `${netChange}%`;
+        qText = `एक संख्या में पहले ${a}% की वृद्धि की जाती है और फिर ${Math.abs(b)}% की कमी की जाती है। संख्या में शुद्ध प्रतिशत परिवर्तन (Net Change) कितना होगा?`;
+        qTextEn = `A number is first increased by ${a}% and then decreased by ${Math.abs(b)}%. Find the net percentage change.`;
+        ansStr = `${signStr}`;
+        explanation = `सक्सेसिव फॉर्मूला: A + B + (A × B) ÷ 100\n= ${a} + (${b}) + (${a} × ${b}) ÷ 100 = 10 - 2 = +8% (8% की वृद्धि)।`;
+        explanationEn = `Net change = A + B + (A * B) / 100 = 20 - 10 - 2 = +8%.`;
+        shortcut = `सूत्र: ${a} - ${Math.abs(b)} - ${(a * Math.abs(b)) / 100} = +8%`;
+        distractors = [`+10%`, `-8%`, `+12%`, `0%`];
+      } else if (typeVar === 5) {
+        // 6. 2D / 3D Geometry Dimensions
+        const l = 10; // +10%
+        const b = 20; // +20%
+        const areaChange = l + b + (l * b) / 100; // +32%
+        qText = `यदि एक आयत (Rectangle) की लंबाई में ${l}% की वृद्धि तथा चौड़ाई में ${b}% की वृद्धि कर दी जाए, तो इसके क्षेत्रफल (Area) में कितने प्रतिशत का परिवर्तन होगा?`;
+        qTextEn = `If the length of a rectangle increases by ${l}% and breadth increases by ${b}%, find the percent change in area.`;
+        ansStr = `+${areaChange}%`;
+        explanation = `क्षेत्रफल में प्रभावी परिवर्तन = L + B + (L × B) ÷ 100\n= ${l} + ${b} + (${l} × ${b}) ÷ 100 = 30 + 2 = +32% (32% की वृद्धि)।`;
+        explanationEn = `Area change % = L + B + (L * B) / 100 = 10 + 20 + 2 = +32%.`;
+        shortcut = `${l} + ${b} + ${(l * b) / 100} = +32%`;
+        distractors = [`+30%`, `+28%`, `+35%`, `+25%`];
+      } else if (typeVar === 6) {
+        // 7. Exam Marks (Pass / Fail)
+        const p1 = 30; // 30%
+        const m1 = 15; // fails by 15
+        const p2 = 40; // 40%
+        const m2 = 35; // passes by 35
+        const maxMarks = Math.round(((m1 + m2) / (p2 - p1)) * 100); // 500
+        qText = `एक परीक्षा में छात्र A को ${p1}% अंक मिले और वह ${m1} अंकों से अनुत्तीर्ण (Fail) हो गया। छात्र B को ${p2}% अंक मिले जो उत्तीर्ण अंकों से ${m2} अधिक थे। परीक्षा के अधिकतम अंक (Maximum Marks) क्या हैं?`;
+        qTextEn = `A student gets ${p1}% marks and fails by ${m1} marks. Another gets ${p2}% marks and gets ${m2} marks more than pass marks. Find maximum marks.`;
+        ansStr = `${maxMarks}`;
+        explanation = `प्रतिशत का अंतर = ${p2}% - ${p1}% = ${p2 - p1}%\nअंकों का अंतर = ${m1} + ${m2} = ${m1 + m2} अंक।\n100% (अधिकतम अंक) = [(${m1 + m2}) ÷ (${p2 - p1})] × 100 = (${m1 + m2} ÷ ${p2 - p1}) × 100 = ${maxMarks} अंक।`;
+        explanationEn = `Diff in % = ${p2 - p1}%. Diff in marks = ${m1 + m2}. Max marks = (${m1 + m2} / ${p2 - p1}) * 100 = ${maxMarks}.`;
+        shortcut = `[(${m1} + ${m2}) ÷ (${p2} - ${p1})] × 100 = ${maxMarks}`;
+        distractors = [`${maxMarks + 100}`, `${Math.max(100, maxMarks - 100)}`, `${maxMarks + 50}`, `${Math.max(100, maxMarks - 50)}`];
+      } else if (typeVar === 7) {
+        // 8. Election & Vote Share
+        const w = 60; // 60%
+        const marginVotes = 1200;
+        const totalVotes = Math.round((marginVotes / (2 * w - 100)) * 100); // 6000
+        qText = `दो उम्मीदवारों वाले एक चुनाव में, जीतने वाले उम्मीदवार को ${w}% वैध मत मिले और वह ${marginVotes} मतों के बहुमत से जीत गया। चुनाव में डाले गए कुल मतों (Total Votes) की संख्या क्या थी?`;
+        qTextEn = `In a two-candidate election, the winner got ${w}% of votes and won by ${marginVotes} votes. Find total votes.`;
+        ansStr = `${totalVotes}`;
+        explanation = `विजेता = ${w}%, हारने वाला = ${100 - w}%\nजीत का अंतर % = ${w}% - ${100 - w}% = ${2 * w - 100}%\n${2 * w - 100}% = ${marginVotes} वोट -> 100% = (${marginVotes} ÷ ${2 * w - 100}) × 100 = ${totalVotes} वोट।`;
+        explanationEn = `Margin % = ${w - (100 - w)}% = ${2 * w - 100}%. Total votes = (${marginVotes} / ${2 * w - 100}) * 100 = ${totalVotes}.`;
+        shortcut = `[${marginVotes} ÷ (${w} - ${100 - w})] × 100 = ${totalVotes}`;
+        distractors = [`${totalVotes + 1000}`, `${Math.max(500, totalVotes - 1000)}`, `${totalVotes + 2000}`, `${Math.max(500, totalVotes - 2000)}`];
+      } else if (typeVar === 8) {
+        // 9. Income & Expenditure (Direct vs Remaining)
+        const rentP = 20; // 20% on rent
+        const foodPOfRem = 50; // 50% of remainder on food
+        const savings = 2400; // ₹2,400
+        // Remainder after rent = 80%. Food = 50% of 80% = 40%. Remaining = 40%.
+        const totalIncome = Math.round(savings / (((100 - rentP) * (100 - foodPOfRem)) / 10000)); // ₹6,000
+        qText = `एक व्यक्ति अपनी आय का ${rentP}% मकान के किराए पर खर्च करता है और शेष (Remainder) का ${foodPOfRem}% भोजन पर खर्च करता है। यदि वह ₹${savings} की बचत करता है, तो उसकी कुल आय (Total Income) कितनी है?`;
+        qTextEn = `A person spends ${rentP}% on rent and ${foodPOfRem}% of the remainder on food. If he saves ₹${savings}, find his total income.`;
+        ansStr = `₹${totalIncome}`;
+        explanation = `किराए के बाद शेष = 100% - ${rentP}% = 80%\nभोजन के बाद अंतिम बचत % = 80% का (100% - ${foodPOfRem}%) = 80% का 50% = 40%\n40% = ₹${savings} -> 100% आय = (₹${savings} ÷ 40) × 100 = ₹${totalIncome}।`;
+        explanationEn = `Remaining savings % = 80% * 50% = 40%. Total Income = (${savings} / 40) * 100 = ₹${totalIncome}.`;
+        shortcut = `₹${savings} ÷ (0.8 × 0.5) = ₹${totalIncome}`;
+        distractors = [`₹${totalIncome + 1000}`, `₹${Math.max(1000, totalIncome - 1000)}`, `₹${totalIncome + 2000}`, `₹${Math.max(1000, totalIncome - 2000)}`];
+      } else if (typeVar === 9) {
+        // 10. Population / Depreciation
+        const p0 = 10000;
+        const rate = 10;
+        const years = 2;
+        const pNew = Math.round(p0 * Math.pow(1 + rate / 100, years)); // 12,100
+        qText = `एक कस्बे की वर्तमान जनसंख्या ${p0} है। यदि इसमें ${rate}% वार्षिक दर से वृद्धि होती है, तो ${years} वर्ष पश्चात कस्बे की जनसंख्या क्या होगी?`;
+        qTextEn = `A town's population is ${p0} and grows at ${rate}% per year. What will it be after ${years} years?`;
+        ansStr = `${pNew}`;
+        explanation = `जनसंख्या सूत्र = P × (1 + R/100)ⁿ\n= ${p0} × (1.1)² = ${p0} × 1.21 = ${pNew}।`;
+        explanationEn = `New Population = ${p0} * (1.1)² = ${pNew}.`;
+        shortcut = `${p0} × 1.1 × 1.1 = ${pNew}`;
+        distractors = [`${pNew + 500}`, `${Math.max(1000, pNew - 500)}`, `${p0 + p0 * 0.2}`, `${pNew + 1000}`];
+      } else if (typeVar === 10) {
+        // 11. Venn Diagram (Both Pass / Fail)
+        const fHindi = 40; // 40% failed in Hindi
+        const fEnglish = 30; // 30% failed in English
+        const fBoth = 15; // 15% failed in both
+        const passBoth = 100 - (fHindi + fEnglish - fBoth); // 45%
+        qText = `एक परीक्षा में ${fHindi}% छात्र हिंदी में अनुत्तीर्ण (Fail) हुए, ${fEnglish}% छात्र अंग्रेजी में अनुत्तीर्ण हुए और ${fBoth}% छात्र दोनों विषयों में अनुत्तीर्ण हुए। दोनों विषयों में उत्तीर्ण (Pass) होने वाले छात्रों का प्रतिशत क्या है?`;
+        qTextEn = `In an exam, ${fHindi}% failed in Hindi, ${fEnglish}% failed in English, and ${fBoth}% failed in both. Find the percentage of students who passed both.`;
+        ansStr = `${passBoth}%`;
+        explanation = `कम से कम एक विषय में अनुत्तीर्ण (Fail) छात्र = (${fHindi} + ${fEnglish} - ${fBoth})% = ${fHindi + fEnglish - fBoth}%\nदोनों विषयों में उत्तीर्ण छात्र = 100% - ${fHindi + fEnglish - fBoth}% = ${passBoth}%।`;
+        explanationEn = `Total failed = ${fHindi} + ${fEnglish} - ${fBoth} = ${fHindi + fEnglish - fBoth}%. Passed both = 100 - ${fHindi + fEnglish - fBoth} = ${passBoth}%.`;
+        shortcut = `100 - (${fHindi} + ${fEnglish} - ${fBoth}) = ${passBoth}%`;
+        distractors = [`${passBoth + 10}%`, `${Math.max(1, passBoth - 10)}%`, `${passBoth + 5}%`, `${Math.max(1, passBoth - 5)}%`];
+      } else if (typeVar === 11) {
+        // 12. Constant Quantity (Fresh vs Dry Fruit)
+        const freshWaterP = 80; // 80% water -> 20% pulp
+        const dryWaterP = 20; // 20% water -> 80% pulp
+        const freshKg = 100; // 100 kg fresh fruit
+        const freshPulpKg = freshKg * ((100 - freshWaterP) / 100); // 20 kg
+        const dryKg = Math.round(freshPulpKg / ((100 - dryWaterP) / 100)); // 25 kg
+        qText = `ताजे फलों में ${freshWaterP}% पानी है और सूखे फलों में ${dryWaterP}% पानी है। ${freshKg} किग्रा ताजे फलों से कितना सूखा फल (Dry Fruit) प्राप्त किया जा सकता है?`;
+        qTextEn = `Fresh fruit contains ${freshWaterP}% water and dry fruit contains ${dryWaterP}% water. How much dry fruit can be made from ${freshKg} kg fresh fruit?`;
+        ansStr = `${dryKg} किग्रा`;
+        explanation = `गुदा (Pulp) की मात्रा सदैव स्थिर रहती है:\nताजे फल में गुदा = ${freshKg} का (100 - ${freshWaterP})% = 20 किग्रा।\nसूखे फल में गुदा = ${100 - dryWaterP}%\n80% गुदा = 20 किग्रा -> सूखे फल का कुल वजन = (20 ÷ 80) × 100 = ${dryKg} किग्रा।`;
+        explanationEn = `Pulp weight is constant = 20 kg. Dry fruit weight = 20 / 0.80 = ${dryKg} kg.`;
+        shortcut = `(${freshKg} × 20%) ÷ 80% = ${dryKg} किग्रा`;
+        distractors = [`${dryKg + 5} किग्रा`, `${Math.max(1, dryKg - 5)} किग्रा`, `${dryKg + 10} किग्रा`, `${Math.max(1, dryKg - 10)} किग्रा`];
       } else {
-        // Percentage increase/decrease on value
-        const base = Math.floor(Math.random() * 40) * 10 + 200;
-        const incP = [10, 15, 20, 25, 30, 50][Math.floor(Math.random() * 6)];
-        const ans = Math.round(base * (1 + incP / 100));
-        qText = `यदि संख्या ${base} में ${incP}% की वृद्धि की जाए, तो नई संख्या क्या होगी?`;
-        qTextEn = `If number ${base} is increased by ${incP}%, what is the new number?`;
-        ansStr = `${ans}`;
-        explanation = `वृद्धि = (${base} × ${incP}) ÷ 100 = ${Math.round((base * incP) / 100)}।\nनई संख्या = ${base} + ${Math.round((base * incP) / 100)} = ${ans}।`;
-        explanationEn = `New number = ${base} * (1 + ${incP}/100) = ${ans}.`;
-        shortcut = `${base} × ${100 + incP}% = ${ans}`;
-        distractors = [`${ans + 20}`, `${ans - 20}`, `${ans + 40}`, `${Math.max(1, ans - 40)}`];
+        // 13. Calculation Error
+        const num1 = 3, den1 = 5; // wrong: 3/5
+        const num2 = 5, den2 = 3; // correct: 5/3
+        // Correct value = 25, Wrong value = 9, Error = 16, % Error = 16/25 * 100 = 64%
+        const errP = 64;
+        qText = `एक छात्र ने किसी संख्या को ${num2}/${den2} से गुणा करने के बजाय गलती से ${num1}/${den1} से गुणा कर दिया। गणना में हुई त्रुटि का प्रतिशत (Percentage Error) ज्ञात कीजिए?`;
+        qTextEn = `A student multiplied a number by ${num1}/${den1} instead of ${num2}/${den2}. Find the percentage error.`;
+        ansStr = `${errP}%`;
+        explanation = `मान लीजिए संख्या = 3 और 5 का ल.स.प. = 15\nसही मान = 15 × (${num2}/${den2}) = 25\nगलत मान = 15 × (${num1}/${den1}) = 9\nत्रुटि = 25 - 9 = 16\nप्रतिशत त्रुटि = (16 ÷ 25) × 100 = 64%।`;
+        explanationEn = `Correct = 25, Wrong = 9, Error = 16. % Error = (16 / 25) * 100 = 64%.`;
+        shortcut = `[(25 - 9) ÷ 25] × 100 = 64%`;
+        distractors = [`50%`, `45%`, `36%`, `60%`];
       }
     }
     // 10. वर्ग व वर्गमूल (Squares & Roots)
@@ -1239,443 +1310,474 @@ function generateUnlimitedMathQuestion(
     }
     // 12. औसत (Average)
     else if (chosenTopic.includes('औसत')) {
-      const typeVar = Math.floor(Math.random() * 5);
+      const typeVar = Math.floor(Math.random() * 6);
       if (typeVar === 0) {
-        // AP Consecutive Average
-        const start = Math.floor(Math.random() * 40) + 10;
-        const diff = Math.floor(Math.random() * 5) + 2;
-        const nums = [start, start + diff, start + 2 * diff, start + 3 * diff, start + 4 * diff];
-        const avg = nums[2];
-        qText = `समानांतर श्रेणी की संख्याओं (${nums.join(', ')}) का औसत (Average) क्या होगा?`;
-        qTextEn = `What is the average of numbers (${nums.join(', ')})?`;
-        ansStr = `${avg}`;
-        explanation = `समानांतर श्रेणी (AP) में औसत सदैव मध्य पद होता है।\nमध्य पद = ${avg}।`;
-        explanationEn = `In AP series, average is always the middle term = ${avg}.`;
-        shortcut = `AP का मध्य पद ही औसत होता है = ${avg}`;
-        distractors = [`${avg + diff}`, `${avg - diff}`, `${avg + 1}`, `${Math.max(1, avg - 1)}`];
+        // AVG_01: Consecutive Numbers & Arithmetic Series
+        const n = 25;
+        const ans = 13;
+        qText = `प्रथम ${n} लगातार प्राकृतिक संख्याओं का औसत क्या होगा?`;
+        qTextEn = `Find the average of the first ${n} consecutive natural numbers.`;
+        ansStr = `${ans}`;
+        explanation = `प्रथम N प्राकृतिक संख्याओं का औसत = (N + 1) ÷ 2 = (25 + 1) ÷ 2 = 13।`;
+        explanationEn = `Average of first N natural numbers = (N + 1) / 2 = 13.`;
+        shortcut = `(25 + 1) ÷ 2 = 13`;
+        distractors = [`${ans + 2}`, `${Math.max(1, ans - 2)}`, `${ans + 4}`, `${Math.max(1, ans - 4)}`];
       } else if (typeVar === 1) {
-        // Average of first N natural, even, or odd numbers
-        const isOdd = Math.random() > 0.5;
-        const n = Math.floor(Math.random() * 50) + 20;
-        if (isOdd) {
-          ansStr = `${n}`;
-          qText = `प्रथम ${n} विषम (Odd) प्राकृत संख्याओं का औसत क्या होगा?`;
-          qTextEn = `What is the average of first ${n} odd numbers?`;
-          explanation = `प्रथम N विषम संख्याओं का औसत सूत्र = N\nअतः प्रथम ${n} विषम संख्याओं का औसत = ${n}।`;
-          explanationEn = `Average of first N odd numbers = N = ${n}.`;
-          shortcut = `प्रथम N विषम संख्याओं का औसत = N = ${n}`;
-          distractors = [`${n + 1}`, `${Math.max(1, n - 1)}`, `${n + 2}`, `${Math.max(1, n - 2)}`];
-        } else {
-          const ans = n + 1;
-          qText = `प्रथम ${n} सम (Even) प्राकृत संख्याओं का औसत क्या होगा?`;
-          qTextEn = `What is the average of first ${n} even numbers?`;
-          ansStr = `${ans}`;
-          explanation = `प्रथम N सम संख्याओं का औसत सूत्र = (N + 1)\nअतः ${n} + 1 = ${ans}।`;
-          explanationEn = `Average of first N even numbers = N + 1 = ${n + 1} = ${ans}.`;
-          shortcut = `सूत्र: N + 1 = ${n} + 1 = ${ans}`;
-          distractors = [`${n}`, `${ans + 2}`, `${Math.max(1, ans - 2)}`, `${ans + 5}`];
-        }
+        // AVG_02: Entry or Exit of Member (Teacher's Age)
+        const count = 24;
+        const oldAvg = 15;
+        const inc = 1;
+        const teacherAge = count * inc + (oldAvg + inc); // 24*1 + 16 = 40
+        qText = `${count} विद्यार्थियों की औसत आयु ${oldAvg} वर्ष है। यदि शिक्षक की आयु शामिल कर ली जाए, तो औसत 1 वर्ष बढ़ जाता है। शिक्षक की आयु ज्ञात कीजिए।`;
+        qTextEn = `The average age of ${count} students is ${oldAvg} years. If the teacher's age is included, average increases by ${inc} year. Find teacher's age.`;
+        ansStr = `${teacherAge} years`;
+        explanation = `शिक्षक की आयु = नया औसत + विद्यार्थी संख्या × वृद्धि = 16 + (24 × 1) = 40 वर्ष।`;
+        explanationEn = `Teacher age = New average + count * increase = 16 + 24 = 40 years.`;
+        shortcut = `16 + 24 = 40 years`;
+        distractors = [`${teacherAge + 5} years`, `${Math.max(10, teacherAge - 5)} years`, `${teacherAge + 10} years`, `${Math.max(10, teacherAge - 10)} years`];
       } else if (typeVar === 2) {
-        // Inclusion of member in average
-        const count = 5;
-        const oldAvg = Math.floor(Math.random() * 30) + 20;
-        const newMember = Math.floor(Math.random() * 40) + 40;
-        const newAvg = Math.round(((count * oldAvg + newMember) / (count + 1)) * 10) / 10;
-        qText = `${count} विद्यार्थियों का औसत वजन ${oldAvg} किग्रा है। यदि शिक्षक का वजन ${newMember} किग्रा जोड़ दिया जाए, तो नया औसत क्या होगा?`;
-        qTextEn = `Average weight of ${count} students is ${oldAvg} kg. If teacher weighing ${newMember} kg is added, new average?`;
-        ansStr = `${newAvg} किग्रा`;
-        explanation = `कुल वजन = (${count} × ${oldAvg}) + ${newMember} = ${count * oldAvg + newMember} किग्रा।\nनया औसत = ${count * oldAvg + newMember} ÷ ${count + 1} = ${newAvg} किग्रा।`;
-        explanationEn = `Total weight = (${count} * ${oldAvg}) + ${newMember}. New average = ${newAvg} kg.`;
-        shortcut = `कुल योग ÷ (N + 1) = ${newAvg} किग्रा`;
-        distractors = [`${Math.round((newAvg + 2) * 10) / 10} किग्रा`, `${Math.round(Math.max(1, newAvg - 2) * 10) / 10} किग्रा`, `${Math.round((newAvg + 4) * 10) / 10} किग्रा`, `${Math.round(Math.max(1, newAvg - 4) * 10) / 10} किग्रा`];
+        // AVG_03: Replacement of Member
+        const n = 8;
+        const incAvg = 2.5;
+        const oldWeight = 65;
+        const newWeight = oldWeight + n * incAvg; // 65 + 8*2.5 = 85
+        qText = `${n} व्यक्तियों का औसत वजन ${incAvg} किग्रा बढ़ जाता है जब ${oldWeight} किग्रा वाले एक व्यक्ति के स्थान पर नया व्यक्ति आता है। नए व्यक्ति का वजन ज्ञात कीजिए।`;
+        qTextEn = `The average weight of ${n} persons increases by ${incAvg} kg when a person weighing ${oldWeight} kg is replaced by a new person. Find weight of new person.`;
+        ansStr = `${newWeight} kg`;
+        explanation = `नए व्यक्ति का वजन = पुराना वजन + (व्यक्ति संख्या × औसत वृद्धि) = 65 + (8 × 2.5) = 85 किग्रा।`;
+        explanationEn = `New weight = Old weight + (n * increase) = 65 + 20 = 85 kg.`;
+        shortcut = `65 + 20 = 85 kg`;
+        distractors = [`${newWeight + 5} kg`, `${Math.max(10, newWeight - 5)} kg`, `${newWeight + 10} kg`, `${Math.max(10, newWeight - 10)} kg`];
       } else if (typeVar === 3) {
-        // Weighted average
-        const n1 = 10;
-        const a1 = Math.floor(Math.random() * 20) + 40;
-        const n2 = 15;
-        const a2 = Math.floor(Math.random() * 20) + 60;
-        const ans = Math.round((n1 * a1 + n2 * a2) / (n1 + n2));
-        qText = `${n1} वस्तुओं का औसत मूल्य ₹${a1} है तथा ${n2} अन्य वस्तुओं का औसत मूल्य ₹${a2} है। सभी वस्तुओं का संयुक्त औसत मूल्य क्या होगा?`;
-        qTextEn = `${n1} items have average cost ₹${a1} and ${n2} items have average cost ₹${a2}. Combined average cost?`;
-        ansStr = `₹${ans}`;
-        explanation = `संयुक्त औसत = [(${n1} × ${a1}) + (${n2} × ${a2})] ÷ (${n1} + ${n2}) = [${n1 * a1} + ${n2 * a2}] ÷ ${n1 + n2} = ₹${ans}।`;
-        explanationEn = `Combined average = [(${n1} * ${a1}) + (${n2} * ${a2})] / (${n1} + ${n2}) = ₹${ans}.`;
-        shortcut = `कुल योग ÷ कुल संख्या = ₹${ans}`;
-        distractors = [`₹${ans + 5}`, `₹${Math.max(1, ans - 5)}`, `₹${ans + 10}`, `₹${Math.max(1, ans - 10)}`];
+        // AVG_04: Wrong Entry / Error Correction
+        const n = 50;
+        const oldAvg = 68;
+        const wrongVal = 84;
+        const correctVal = 48;
+        const diff = correctVal - wrongVal; // -36
+        const correctAvg = Math.round((oldAvg + diff / n) * 100) / 100; // 67.28
+        qText = `${n} विद्यार्थियों के औसत अंक ${oldAvg} निकाले गए। बाद में पता चला कि अंक ${wrongVal} को गलती से पढ़ लिया गया था, जबकि सही अंक ${correctVal} था। सही औसत ज्ञात कीजिए।`;
+        qTextEn = `Average marks of ${n} students were ${oldAvg}. Later found that ${wrongVal} was misread instead of ${correctVal}. Find correct average.`;
+        ansStr = `${correctAvg}`;
+        explanation = `कुल योग में अंतर = ${correctVal} - ${wrongVal} = ${diff}\nऔसत में अंतर = ${diff} ÷ ${n} = ${diff / n}\nसही औसत = ${oldAvg} + (${diff / n}) = ${correctAvg}।`;
+        explanationEn = `Correct avg = ${oldAvg} + (${correctVal} - ${wrongVal}) / ${n} = ${correctAvg}.`;
+        shortcut = `${oldAvg} + (${diff} ÷ ${n}) = ${correctAvg}`;
+        distractors = [`${correctAvg + 1}`, `${Math.max(1, correctAvg - 1)}`, `${correctAvg + 2}`, `${Math.max(1, correctAvg - 2)}`];
+      } else if (typeVar === 4) {
+        // AVG_05: Batting and Bowling Average
+        const innings = 15;
+        const oldAvg = 40;
+        const score = 80;
+        // new avg = (15*40 + 80) / 16 = 680 / 16 = 42.5
+        const newAvg = (innings * oldAvg + score) / (innings + 1);
+        qText = `एक बल्लेबाज का ${innings} पारियों में औसत ${oldAvg} रन है। 16वीं पारी में वह ${score} रन बनाता है। उसका नया बल्लेबाजी औसत क्या होगा?`;
+        qTextEn = `A batsman has average of ${oldAvg} runs in ${innings} innings. He scores ${score} in 16th inning. New average?`;
+        ansStr = `${newAvg}`;
+        explanation = `कुल रन = ${innings} × ${oldAvg} + ${score} = ${innings * oldAvg + score}\nनया औसत = ${innings * oldAvg + score} ÷ 16 = ${newAvg}।`;
+        explanationEn = `Total runs = ${innings * oldAvg + score}. New average = ${newAvg}.`;
+        shortcut = `(${innings * oldAvg} + ${score}) ÷ 16 = ${newAvg}`;
+        distractors = [`${newAvg + 3}`, `${Math.max(1, newAvg - 3)}`, `${newAvg + 5}`, `${Math.max(1, newAvg - 5)}`];
       } else {
-        // Average Speed formula: 2*S1*S2 / (S1 + S2)
-        const s1 = 40;
-        const s2 = 60;
-        const ans = Math.round((2 * s1 * s2) / (s1 + s2));
-        qText = `एक कार A से B तक ${s1} किमी/घंटा की गति से जाती है तथा ${s2} किमी/घंटा की गति से वापस लौटती है। पूरी यात्रा में औसत चाल (Average Speed) क्या होगी?`;
-        qTextEn = `A car travels A to B at ${s1} km/h and returns at ${s2} km/h. What is average speed?`;
-        ansStr = `${ans} किमी/घंटा`;
-        explanation = `औसत चाल सूत्र (समान दूरी): (2 × S1 × S2) ÷ (S1 + S2)\n= (2 × ${s1} × ${s2}) ÷ (${s1} + ${s2}) = ${2 * s1 * s2} ÷ ${s1 + s2} = ${ans} किमी/घंटा।`;
-        explanationEn = `Average speed formula = (2 * S1 * S2) / (S1 + S2) = ${ans} km/h.`;
-        shortcut = `सूत्र: (2 × ${s1} × ${s2}) ÷ (${s1} + ${s2}) = ${ans} किमी/घंटा`;
-        distractors = [`${(s1 + s2) / 2} किमी/घंटा`, `${ans + 5} किमी/घंटा`, `${Math.max(1, ans - 5)} किमी/घंटा`, `${ans + 10} किमी/घंटा`];
+        // AVG_06: Weighted Average (Two Mixed Groups)
+        const n1 = 30;
+        const a1 = 70;
+        const n2 = 20;
+        const a2 = 80;
+        const combined = (n1 * a1 + n2 * a2) / (n1 + n2); // 74
+        qText = `30 छात्रों की कक्षा A का औसत स्कोर ${a1} है, और 20 छात्रों की कक्षा B का औसत स्कोर ${a2} है। संयुक्त औसत स्कोर ज्ञात कीजिए।`;
+        qTextEn = `Class A of ${n1} students has average ${a1}, Class B of ${n2} students has average ${a2}. Find combined average.`;
+        ansStr = `${combined}`;
+        explanation = `संयुक्त औसत = [(${n1} × ${a1}) + (${n2} × ${a2})] ÷ (${n1} + ${n2}) = [${n1 * a1} + ${n2 * a2}] ÷ 50 = ${combined}।`;
+        explanationEn = `Combined average = [30*70 + 20*80] / 50 = ${combined}.`;
+        shortcut = `[${n1 * a1} + ${n2 * a2}] ÷ 50 = ${combined}`;
+        distractors = [`${combined + 4}`, `${Math.max(1, combined - 4)}`, `${combined + 8}`, `${Math.max(1, combined - 8)}`];
       }
     }
     // 13. अनुपात व समानुपात (Ratio & Proportion)
     else if (chosenTopic.includes('अनुपात व समानुपात')) {
-      const typeVar = Math.floor(Math.random() * 5);
+      const typeVar = Math.floor(Math.random() * 7);
       if (typeVar === 0) {
-        // Share Division A : B
-        const r1 = Math.floor(Math.random() * 3) + 2;
-        const r2 = Math.floor(Math.random() * 3) + 3;
-        const unitVal = (Math.floor(Math.random() * 15) + 5) * 50;
-        const totalAmount = (r1 + r2) * unitVal;
-        const ansA = r1 * unitVal;
-        qText = `₹${totalAmount} की राशि को A और B में ${r1} : ${r2} के अनुपात में विभाजित किया गया। A का हिस्सा कितना होगा?`;
-        qTextEn = `Divide ₹${totalAmount} between A and B in ratio ${r1} : ${r2}. What is A's share?`;
-        ansStr = `₹${ansA}`;
-        explanation = `1 यूनिट = ₹${totalAmount} ÷ (${r1} + ${r2}) = ₹${unitVal}।\nA का हिस्सा = ${r1} × ₹${unitVal} = ₹${ansA}।`;
-        explanationEn = `1 unit = ₹${unitVal}. A's share = ${r1} * ₹${unitVal} = ₹${ansA}.`;
-        shortcut = `[${r1} ÷ (${r1} + ${r2})] × ₹${totalAmount} = ₹${ansA}`;
-        distractors = [`₹${r2 * unitVal}`, `₹${ansA + 100}`, `₹${Math.max(50, ansA - 100)}`, `₹${ansA + 200}`];
+        // RP_01: Merging Ratios (A:B and B:C to A:B:C)
+        ansStr = `8:12:15`;
+        qText = `यदि A : B = 2 : 3 तथा B : C = 4 : 5 है, तो अनुपात A : B : C ज्ञात कीजिए।`;
+        qTextEn = `If A:B = 2:3 and B:C = 4:5, find ratio A:B:C.`;
+        explanation = `B के मान को समान करने के लिए पहले अनुपात को 4 से तथा दूसरे को 3 से गुणा करें: A:B:C = 8:12:15।`;
+        explanationEn = `Equate B: A:B:C = (2*4):(3*4):(3*5) = 8:12:15.`;
+        shortcut = `(2×4) : (3×4) : (3×5) = 8:12:15`;
+        distractors = [`2:3:5`, `8:10:15`, `6:12:15`, `8:12:20`];
       } else if (typeVar === 1) {
-        // Mean Proportional (√ab) or Third Proportional (b²/a)
-        const isMean = Math.random() > 0.5;
-        if (isMean) {
-          const a = [4, 9, 16, 25, 36][Math.floor(Math.random() * 5)];
-          const b = [9, 16, 25, 36, 49][Math.floor(Math.random() * 5)];
-          const ans = Math.round(Math.sqrt(a * b));
-          qText = `${a} और ${b} का मध्यानुपाती (Mean Proportional) क्या होगा?`;
-          qTextEn = `What is the Mean Proportional of ${a} and ${b}?`;
-          ansStr = `${ans}`;
-          explanation = `मध्यानुपाती सूत्र = √(A × B)\n= √(${a} × ${b}) = √${a * b} = ${ans}।`;
-          explanationEn = `Mean Proportional = √(A * B) = √(${a} * ${b}) = ${ans}.`;
-          shortcut = `सूत्र: √(A × B) = ${ans}`;
-          distractors = [`${ans + 2}`, `${Math.max(1, ans - 2)}`, `${ans + 4}`, `${Math.max(1, ans - 4)}`];
-        } else {
-          // Third Proportional: b²/a
-          const a = 12;
-          const b = 18;
-          const ans = (b * b) / a;
-          qText = `${a} तथा ${b} का तृतीयानुपाती (Third Proportional) क्या होगा?`;
-          qTextEn = `What is the Third Proportional of ${a} and ${b}?`;
-          ansStr = `${ans}`;
-          explanation = `तृतीयानुपाती सूत्र = B² ÷ A\n= (${b})² ÷ ${a} = ${b * b} ÷ ${a} = ${ans}।`;
-          explanationEn = `Third Proportional = B² / A = ${b * b} / ${a} = ${ans}.`;
-          shortcut = `सूत्र: B² ÷ A = ${ans}`;
-          distractors = [`${ans + 3}`, `${Math.max(1, ans - 3)}`, `${ans + 6}`, `${Math.max(1, ans - 6)}`];
-        }
+        // RP_02: Proportion Rules (Mean, Third & Fourth Proportion)
+        const a = 9, b = 16;
+        const meanProp = Math.round(Math.sqrt(a * b)); // 12
+        ansStr = `${meanProp}`;
+        qText = `${a} और ${b} का मध्यानुपाती (Mean Proportional) ज्ञात कीजिए।`;
+        qTextEn = `Find the mean proportional between ${a} and ${b}.`;
+        explanation = `मध्यानुपाती = √(a × b) = √(${a} × ${b}) = √144 = 12।`;
+        explanationEn = `Mean proportional = √(9 * 16) = 12.`;
+        shortcut = `√(9 × 16) = 12`;
+        distractors = [`${meanProp + 3}`, `${Math.max(1, meanProp - 3)}`, `${meanProp + 6}`, `${Math.max(1, meanProp - 6)}`];
       } else if (typeVar === 2) {
-        // Combine Ratios: A:B = x:y and B:C = p:q -> A:B:C
-        const x = 2;
-        const y = 3;
-        const p = 4;
-        const q = 5;
-        // A:B = 2:3, B:C = 4:5 -> A:B:C = (2x4) : (3x4) : (3x5) = 8 : 12 : 15
-        ansStr = `8 : 12 : 15`;
-        qText = `यदि A : B = ${x} : ${y} तथा B : C = ${p} : ${q} है, तो संयुक्त अनुपात A : B : C का मान क्या होगा?`;
-        qTextEn = `If A : B = ${x} : ${y} and B : C = ${p} : ${q}, find A : B : C?`;
-        explanation = `B का मान समान बनाएं:\nA : B = (${x} × ${p}) : (${y} × ${p}) = 8 : 12\nB : C = (${p} × ${y}) : (${q} × ${y}) = 12 : 15\nसंयुक्त अनुपात = 8 : 12 : 15।`;
-        explanationEn = `Combine ratios by equating B: A : B : C = 8 : 12 : 15.`;
-        shortcut = `(x×p) : (y×p) : (y×q) = 8 : 12 : 15`;
-        distractors = [`2 : 3 : 5`, `8 : 10 : 15`, `6 : 12 : 15`, `8 : 12 : 20`];
+        // RP_03: Distribution of Amount Among Shares
+        const total = 1800;
+        const r1 = 2, r2 = 3, r3 = 4;
+        const sumR = r1 + r2 + r3;
+        const bShare = (r2 * total) / sumR; // 600
+        ansStr = `₹${bShare}`;
+        qText = `₹${total} को A, B और C में 2 : 3 : 4 के अनुपात में बांटा गया। B का हिस्सा ज्ञात कीजिए।`;
+        qTextEn = `Divide ₹${total} among A, B, and C in ratio 2:3:4. What is B's share?`;
+        explanation = `B का हिस्सा = [3 ÷ (2 + 3 + 4)] × 1800 = [3 ÷ 9] × 1800 = ₹600।`;
+        explanationEn = `B's share = (3 / 9) * 1800 = ₹600.`;
+        shortcut = `(3 ÷ 9) × 1800 = ₹600`;
+        distractors = [`₹${bShare + 100}`, `₹${Math.max(50, bShare - 100)}`, `₹${bShare + 200}`, `₹${Math.max(50, bShare - 200)}`];
       } else if (typeVar === 3) {
-        // Duplicate Ratio
-        const a = Math.floor(Math.random() * 5) + 2;
-        const b = Math.floor(Math.random() * 5) + 6;
-        ansStr = `${a * a} : ${b * b}`;
-        qText = `अनुपात ${a} : ${b} का वर्गानुपात (Duplicate Ratio) क्या होगा?`;
-        qTextEn = `What is the Duplicate Ratio of ${a} : ${b}?`;
-        explanation = `वर्गानुपात का सूत्र = (A)² : (B)²\n= (${a})² : (${b})² = ${a * a} : ${b * b}।`;
-        explanationEn = `Duplicate ratio formula = A² : B² = ${a * a} : ${b * b}.`;
-        shortcut = `${a}² : ${b}² = ${a * a} : ${b * b}`;
-        distractors = [`${a * 2} : ${b * 2}`, `${a * a + 1} : ${b * b}`, `${a * a} : ${b * b + 2}`, `${a * 3} : ${b * 3}`];
+        // RP_04: Coins and Value Combinations
+        const totalVal = 125;
+        // ratios 3:4:5 for ₹1, 50p, 25p -> values 3*1 + 4*0.5 + 5*0.25 = 3 + 2 + 1.25 = 6.25
+        // total units = 125 / 6.25 = 20
+        // 50p coins = 4 * 20 = 80
+        const coins50 = 80;
+        ansStr = `${coins50}`;
+        qText = `एक थैले में ₹1, 50 पैसे और 25 पैसे के सिक्के 3 : 4 : 5 के अनुपात में हैं, कुल मूल्य ₹${totalVal} है। 50 पैसे के सिक्कों की संख्या ज्ञात कीजिए।`;
+        qTextEn = `A bag contains ₹1, 50p, and 25p coins in ratio 3:4:5, totalling ₹${totalVal}. Find number of 50p coins.`;
+        explanation = `कुल मूल्य अनुपात = 3(1) + 4(0.5) + 5(0.25) = 6.25 यूनिट = ₹125 -> 1 यूनिट = 20। 50 पैसे के सिक्के = 4 × 20 = 80।`;
+        explanationEn = `Value units = 6.25 = ₹125 -> 1 unit = 20. 50p coins = 4 * 20 = 80.`;
+        shortcut = `125 ÷ 6.25 = 20 units -> 4 × 20 = 80`;
+        distractors = [`${coins50 + 20}`, `${Math.max(10, coins50 - 20)}`, `${coins50 + 40}`, `${Math.max(10, coins50 - 40)}`];
+      } else if (typeVar === 4) {
+        // RP_05: Age Based Ratio Problems
+        const ageA = 15;
+        qText = `A और B की आयु का अनुपात 3 : 4 है। 5 वर्ष बाद यह अनुपात 4 : 5 हो जाता है। A की वर्तमान आयु ज्ञात कीजिए।`;
+        qTextEn = `Ratio of ages of A and B is 3:4. After 5 years, ratio becomes 4:5. Find A's present age.`;
+        ansStr = `${ageA} years`;
+        explanation = `मान लीजिए आयु 3x और 4x है: (3x + 5)/(4x + 5) = 4/5 -> 15x + 25 = 16x + 20 -> x = 5। A की आयु = 3 × 5 = 15 वर्ष।`;
+        explanationEn = `Solving (3x+5)/(4x+5) = 4/5 gives x = 5. A's age = 15 years.`;
+        shortcut = `यूनिट अंतर विधि से x = 5 -> A = 15 years`;
+        distractors = [`${ageA + 5} years`, `${Math.max(5, ageA - 5)} years`, `${ageA + 10} years`, `${Math.max(5, ageA - 10)} years`];
+      } else if (typeVar === 5) {
+        // RP_06: Income, Expenditure & Savings Ratio
+        const incA = 4000;
+        qText = `A और B की आय का अनुपात 5 : 4 है और उनके व्यय का अनुपात 3 : 2 है। यदि प्रत्येक ₹1600 बचाता है, तो A की आय ज्ञात कीजिए।`;
+        qTextEn = `Income ratio of A and B is 5:4, expenditure ratio 3:2. Each saves ₹1600. Find A's income.`;
+        ansStr = `₹${incA}`;
+        explanation = `आय अनुपात अंतर = 5 - 3 = 2 यूनिट = बचत ₹1600 -> 1 यूनिट = ₹800। A की आय = 5 × 800 = ₹4000।`;
+        explanationEn = `Income unit diff = 5 - 3 = 2 = ₹1600 -> 1 unit = ₹800. A's income = 5 * 800 = ₹4000.`;
+        shortcut = `2 units = ₹1600 -> A's income = 5 × 800 = ₹4000`;
+        distractors = [`₹${incA + 800}`, `₹${Math.max(1000, incA - 800)}`, `₹${incA + 1600}`, `₹${Math.max(1000, incA - 1600)}`];
       } else {
-        // Direct Fourth Proportional: (b x c) / a
-        const a = 6;
-        const b = 14;
-        const c = 15;
-        const ans = (b * c) / a;
-        qText = `${a}, ${b} तथा ${c} का चतुर्थानुपाती (Fourth Proportional) क्या होगा?`;
-        qTextEn = `What is the Fourth Proportional of ${a}, ${b} and ${c}?`;
-        ansStr = `${ans}`;
-        explanation = `चतुर्थानुपाती सूत्र = (B × C) ÷ A\n= (${b} × ${c}) ÷ ${a} = ${b * c} ÷ ${a} = ${ans}।`;
-        explanationEn = `Fourth Proportional = (B * C) / A = ${b * c} / ${a} = ${ans}.`;
-        shortcut = `सूत्र: (B × C) ÷ A = ${ans}`;
-        distractors = [`${ans + 5}`, `${Math.max(1, ans - 5)}`, `${ans + 10}`, `${Math.max(1, ans - 10)}`];
+        // RP_07: Mixture Ratio & Replacement
+        const ansLitres = 5;
+        qText = `40 लीटर के मिश्रण में दूध और पानी का अनुपात 3 : 1 है। अनुपात 2 : 1 करने के लिए कितना पानी मिलाना चाहिए?`;
+        qTextEn = `A 40-liter mixture contains milk and water in ratio 3:1. How much water must be added to make ratio 2:1?`;
+        ansStr = `${ansLitres} liters`;
+        explanation = `दूध = 30 लीटर, पानी = 10 लीटर। 30 ÷ (10 + x) = 2 ÷ 1 -> 30 = 20 + 2x -> 2x = 10 -> x = 5 लीटर।`;
+        explanationEn = `Milk = 30L, Water = 10L. 30 / (10 + x) = 2/1 -> x = 5 liters.`;
+        shortcut = `30 ÷ (10 + x) = 2/1 -> x = 5 liters`;
+        distractors = [`${ansLitres + 3} liters`, `${Math.max(1, ansLitres - 3)} liters`, `${ansLitres + 6} liters`, `${Math.max(1, ansLitres - 6)} liters`];
       }
     }
-    // 14. साधारण ब्याज (Simple Interest)
-    else if (chosenTopic.includes('साधारण ब्याज')) {
-      const typeVar = Math.floor(Math.random() * 5);
+    // 14. साधारण व चक्रवृद्धि ब्याज (Simple & Compound Interest)
+    else if (chosenTopic.includes('साधारण ब्याज') || chosenTopic.includes('ब्याज')) {
+      const typeVar = Math.floor(Math.random() * 6);
       if (typeVar === 0) {
-        // Direct SI = P*R*T / 100
-        const principals = [2000, 3000, 4000, 5000, 6000, 8000, 10000];
-        const p = principals[Math.floor(Math.random() * principals.length)];
-        const r = [5, 6, 8, 10, 12][Math.floor(Math.random() * 5)];
-        const t = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
-        const si = Math.round((p * r * t) / 100);
-        qText = `₹${p} की राशि पर ${r}% वार्षिक साधारण ब्याज दर से ${t} वर्ष का ब्याज (SI) कितना होगा?`;
-        qTextEn = `Calculate Simple Interest on ₹${p} at ${r}% per annum for ${t} years?`;
+        // SICI_01: Direct SI Evaluation
+        const p = 5000, r = 8, t = 3;
+        const si = (p * r * t) / 100; // 1200
         ansStr = `₹${si}`;
-        explanation = `साधारण ब्याज (SI) = (P × R × T) ÷ 100\n= (${p} × ${r} × ${t}) ÷ 100 = ₹${si}।`;
-        explanationEn = `SI = (P * R * T) / 100 = ₹${si}.`;
-        shortcut = `सूत्र: (P × R × T) ÷ 100 = ₹${si}`;
-        distractors = [`₹${si + 100}`, `₹${Math.max(50, si - 100)}`, `₹${si + 200}`, `₹${Math.max(50, si - 200)}`];
-      } else if (typeVar === 1) {
-        // Find Principal P
-        const r = 10;
-        const t = 3;
-        const si = (Math.floor(Math.random() * 15) + 5) * 100;
-        const p = (si * 100) / (r * t);
-        qText = `वह मूलधन (Principal) ज्ञात कीजिए जिस पर ${r}% वार्षिक दर से ${t} वर्षों में ₹${si} का साधारण ब्याज प्राप्त होता है?`;
-        qTextEn = `Find principal that earns ₹${si} simple interest at ${r}% in ${t} years?`;
-        ansStr = `₹${p}`;
-        explanation = `मूलधन सूत्र P = (SI × 100) ÷ (R × T)\n= (${si} × 100) ÷ (${r} × ${t}) = ₹${p}।`;
-        explanationEn = `P = (SI * 100) / (R * T) = ₹${p}.`;
-        shortcut = `P = (${si} × 100) ÷ ${r * t} = ₹${p}`;
-        distractors = [`₹${p + 500}`, `₹${Math.max(500, p - 500)}`, `₹${p + 1000}`, `₹${Math.max(500, p - 1000)}`];
+        qText = `₹${p} की राशि पर 8% वार्षिक दर से 3 वर्ष का साधारण ब्याज ज्ञात कीजिए।`;
+        qTextEn = `Find simple interest on ₹${p} at ${r}% per annum for ${t} years.`;
+        explanation = `SI = (P × R × T) ÷ 100 = (5000 × 8 × 3) ÷ 100 = ₹1200।`;
+        explanationEn = `SI = (5000 * 8 * 3) / 100 = ₹1200.`;
+        shortcut = `(5000 × 8 × 3) ÷ 100 = ₹1200`;
+        distractors = [`₹${si + 200}`, `₹${Math.max(100, si - 200)}`, `₹${si + 400}`, `₹${Math.max(100, si - 400)}`];
       } else if (typeVar === 2) {
-        // Money doubling rule: T = 100 / R
-        const r = [5, 8, 10, 12.5, 20][Math.floor(Math.random() * 5)];
-        const ansT = Math.round((100 / r) * 10) / 10;
-        qText = `कितने वर्षों में कोई राशि ${r}% वार्षिक साधारण ब्याज की दर से स्वयं की दोगुनी (Double) हो जाएगी?`;
-        qTextEn = `In how many years will a sum double itself at ${r}% simple interest per annum?`;
-        ansStr = `${ansT} वर्ष`;
-        explanation = `राशि दोगुनी होने का शॉर्टकट सूत्र: समय (T) = 100 ÷ R\n= 100 ÷ ${r} = ${ansT} वर्ष।`;
-        explanationEn = `Doubling formula: Time = 100 / R = ${ansT} years.`;
-        shortcut = `शॉर्टकट सूत्र: T = 100 ÷ R = ${ansT} वर्ष`;
-        distractors = [`${ansT + 2} वर्ष`, `${Math.max(1, ansT - 2)} वर्ष`, `${ansT + 5} वर्ष`, `${Math.max(1, ansT - 5)} वर्ष`];
+        // SICI_03: Direct CI Evaluation
+        const p = 8000, r = 10, t = 2;
+        const ci = Math.round(p * Math.pow(1 + r / 100, t) - p); // 1680
+        ansStr = `₹${ci}`;
+        qText = `₹${8000} पर 10% वार्षिक चक्रवृद्धि ब्याज की दर से 2 वर्ष का चक्रवृद्धि ब्याज (CI) ज्ञात कीजिए।`;
+        qTextEn = `Find compound interest on ₹8000 at 10% per annum compounded annually for 2 years.`;
+        explanation = `CI = P[(1 + r/100)ᵗ - 1] = 8000 × [(1.1)² - 1] = 8000 × 0.21 = ₹1680।`;
+        explanationEn = `CI = 8000 * (1.21 - 1) = ₹1680.`;
+        shortcut = `8000 × 0.21 = ₹1680`;
+        distractors = [`₹${ci + 200}`, `₹${Math.max(100, ci - 200)}`, `₹${ci + 350}`, `₹${Math.max(100, ci - 350)}`];
+      } else if (typeVar === 4) {
+        // SICI_05: Difference Between CI and SI (2 Years)
+        const p = 10000, r = 10, t = 2;
+        const diff = Math.round((p * r * r) / 10000); // 100
+        ansStr = `₹${diff}`;
+        qText = `₹${p} पर 10% वार्षिक दर से 2 वर्ष के चक्रवृद्धि ब्याज और साधारण ब्याज का अंतर ज्ञात कीजिए।`;
+        qTextEn = `Difference between CI and SI on ₹${p} at ${r}% per annum for ${t} years?`;
+        explanation = `अंतर (2 वर्ष) = P × (R ÷ 100)² = 10000 × (10 ÷ 100)² = ₹100।`;
+        explanationEn = `Diff = P * (R/100)² = 10000 * (0.1)² = ₹100.`;
+        shortcut = `10000 × 0.01 = ₹100`;
+        distractors = [`₹${diff + 50}`, `₹${Math.max(10, diff - 50)}`, `₹${diff + 150}`, `₹${Math.max(10, diff - 150)}`];
+      } else if (typeVar === 1) {
+        // SICI_02: Sum Becoming N Times under SI
+        const t1 = 5, n1 = 2, n2 = 4;
+        const t2 = t1 * ((n2 - 1) / (n1 - 1)); // 15
+        ansStr = `${t2} years`;
+        qText = `एक धनराशि साधारण ब्याज पर 5 वर्ष में दोगुनी हो जाती है। कितने वर्षों में यह 4 गुना हो जाएगी?`;
+        qTextEn = `A sum of money doubles in 5 years at SI. In how many years will it become 4 times?`;
+        ansStr = `15 years`;
+        explanation = `समय सूत्र: T2 = T1 × [(n2 - 1) ÷ (n1 - 1)] = 5 × [(4 - 1) ÷ (2 - 1)] = 15 वर्ष।`;
+        explanationEn = `T2 = 5 * (3 / 1) = 15 years.`;
+        shortcut = `5 × (3 ÷ 1) = 15 years`;
+        distractors = [`20 years`, `10 years`, `25 years`, `12 years`];
       } else if (typeVar === 3) {
-        // Total Amount A = P + SI
-        const p = 5000;
-        const r = 8;
-        const t = 3;
-        const si = (p * r * t) / 100;
-        const a = p + si;
-        qText = `₹${p} का ${r}% वार्षिक ब्याज दर से ${t} वर्ष पश्चात मिश्रधन (Total Amount) कितना होगा?`;
-        qTextEn = `What is total amount on ₹${p} at ${r}% for ${t} years?`;
-        ansStr = `₹${a}`;
-        explanation = `ब्याज = (${p} × ${r} × ${t}) ÷ 100 = ₹${si}।\nमिश्रधन A = P + SI = ${p} + ${si} = ₹${a}।`;
-        explanationEn = `SI = ₹${si}. Amount = P + SI = ₹${a}.`;
-        shortcut = `मिश्रधन = ${p} + ${si} = ₹${a}`;
-        distractors = [`₹${si}`, `₹${a + 200}`, `₹${Math.max(500, a - 200)}`, `₹${a + 500}`];
+        // SICI_04: Sum Becoming N Times under CI
+        const t1 = 4, n1 = 3, n2 = 27;
+        const t2 = t1 * 3; // 12
+        ansStr = `12 years`;
+        qText = `चक्रवृद्धि ब्याज पर एक राशि 4 वर्ष में 3 गुनी हो जाती है। कितने वर्षों में यह 27 गुनी हो जाएगी?`;
+        qTextEn = `A sum becomes 3 times in 4 years at CI. In how many years will it become 27 times?`;
+        explanation = `27 = 3³, अतः समय = 4 × 3 = 12 वर्ष।`;
+        explanationEn = `27 = 3³, so time = 4 * 3 = 12 years.`;
+        shortcut = `4 × 3 = 12 years`;
+        distractors = [`16 years`, `10 years`, `15 years`, `20 years`];
       } else {
-        // Difference in SI
-        const p = 8000;
-        const t = 2;
-        const r1 = 6;
-        const r2 = 9;
-        const diffRate = r2 - r1;
-        const diffSI = (p * diffRate * t) / 100;
-        qText = `₹${p} पर 2 वर्ष के लिए साधारण ब्याज दर ${r1}% से बढ़ाकर ${r2}% कर दी जाती है। ब्याज में कितने रुपयों की वृद्धि (Increase) होगी?`;
-        qTextEn = `On ₹${p} for 2 years, rate increases from ${r1}% to ${r2}%. Find increase in SI?`;
-        ansStr = `₹${diffSI}`;
-        explanation = `दरों का अंतर = ${r2}% - ${r1}% = ${diffRate}%।\nब्याज वृद्धि = (P × दर अंतर × T) ÷ 100 = (${p} × ${diffRate} × ${t}) ÷ 100 = ₹${diffSI}।`;
-        explanationEn = `Rate diff = ${diffRate}%. SI diff = (${p} * ${diffRate} * ${t}) / 100 = ₹${diffSI}.`;
-        shortcut = `(${p} × ${diffRate} × ${t}) ÷ 100 = ₹${diffSI}`;
-        distractors = [`₹${diffSI + 80}`, `₹${Math.max(20, diffSI - 80)}`, `₹${diffSI + 160}`, `₹${Math.max(20, diffSI - 160)}`];
+        // SICI_06: Installment Problems
+        ansStr = `₹1210`;
+        qText = `₹2100 की राशि को 10% वार्षिक चक्रवृद्धि ब्याज पर 2 समान वार्षिक किस्तों में चुकाना है। प्रत्येक किस्त की राशि ज्ञात कीजिए।`;
+        qTextEn = `A sum of ₹2100 is paid back in 2 equal annual installments at 10% CI. Find each installment.`;
+        explanation = `किस्त फॉर्मूला से प्रत्येक किस्त ₹1210 होगी।`;
+        explanationEn = `Each installment = ₹1210.`;
+        shortcut = `किस्त = ₹1210`;
+        distractors = [`₹1100`, `₹1330`, `₹1250`, `₹1150`];
       }
     }
     // 15. लाभ व हानि (Profit & Loss)
     else if (chosenTopic.includes('लाभ व हानि')) {
-      const typeVar = Math.floor(Math.random() * 5);
+      const typeVar = Math.floor(Math.random() * 7);
       if (typeVar === 0) {
-        // SP = CP * (1 + Profit%/100)
-        const cp = (Math.floor(Math.random() * 15) + 5) * 100; // e.g. 1200
-        const profitP = [10, 15, 20, 25, 30][Math.floor(Math.random() * 5)];
-        const profit = (cp * profitP) / 100;
-        const sp = cp + profit;
-        qText = `एक वस्तु का क्रय मूल्य (CP) ₹${cp} है। इसे ${profitP}% लाभ पर बेचने पर विक्रय मूल्य (SP) क्या होगा?`;
-        qTextEn = `Cost price is ₹${cp}. Selling price at ${profitP}% profit?`;
-        ansStr = `₹${sp}`;
-        explanation = `लाभ = (${cp} × ${profitP}) ÷ 100 = ₹${profit}।\nविक्रय मूल्य (SP) = ${cp} + ${profit} = ₹${sp}।`;
-        explanationEn = `Profit = ₹${profit}. SP = CP + Profit = ₹${sp}.`;
-        shortcut = `SP = ${cp} × (${100 + profitP} ÷ 100) = ₹${sp}`;
-        distractors = [`₹${sp + 50}`, `₹${Math.max(50, sp - 50)}`, `₹${sp + 100}`, `₹${Math.max(50, sp - 100)}`];
+        // PL_01: Basic CP, SP & Profit/Loss %
+        const cp = 400, sp = 480;
+        const profitP = 20;
+        ansStr = `20%`;
+        qText = `एक वस्तु ₹400 में खरीदी गई और ₹480 में बेची गई। लाभ प्रतिशत ज्ञात कीजिए।`;
+        qTextEn = `An article is bought for ₹400 and sold for ₹480. Find profit percentage.`;
+        explanation = `लाभ = 480 - 400 = ₹80। प्रतिशत लाभ = (80 ÷ 400) × 100 = 20%।`;
+        explanationEn = `Profit % = (80 / 400) * 100 = 20%.`;
+        shortcut = `(80 ÷ 400) × 100 = 20%`;
+        distractors = [`15%`, `25%`, `10%`, `30%`];
       } else if (typeVar === 1) {
-        // Finding CP when SP & Loss % given
-        const lossP = 20;
-        const cp = (Math.floor(Math.random() * 10) + 4) * 100;
-        const sp = cp * (1 - lossP / 100);
-        qText = `एक वस्तु को ₹${sp} में बेचने पर ${lossP}% की हानि होती है। वस्तु का क्रय मूल्य (CP) क्या था?`;
-        qTextEn = `Item sold for ₹${sp} at ${lossP}% loss. Find cost price (CP)?`;
-        ansStr = `₹${cp}`;
-        explanation = `क्रय मूल्य सूत्र CP = (SP × 100) ÷ (100 - Loss%)\n= (${sp} × 100) ÷ 80 = ₹${cp}।`;
-        explanationEn = `CP = (SP * 100) / (100 - Loss%) = (${sp} * 100) / 80 = ₹${cp}.`;
-        shortcut = `CP = (${sp} × 100) ÷ 80 = ₹${cp}`;
-        distractors = [`₹${cp + 100}`, `₹${Math.max(100, cp - 100)}`, `₹${cp + 200}`, `₹${Math.max(100, cp - 200)}`];
+        // PL_02: CP of X items equals SP of Y items
+        const x = 15, y = 12;
+        const profitP = 25;
+        ansStr = `25%`;
+        qText = `यदि 15 पेन का क्रय मूल्य 12 पेन के विक्रय मूल्य के बराबर है, तो लाभ प्रतिशत ज्ञात कीजिए।`;
+        qTextEn = `If cost price of 15 pens equals selling price of 12 pens, find profit percent.`;
+        explanation = `लाभ % = [(X - Y) ÷ Y] × 100 = [(15 - 12) ÷ 12] × 100 = 25%।`;
+        explanationEn = `Profit % = [(15 - 12) / 12] * 100 = 25%.`;
+        shortcut = `[(15 - 12) ÷ 12] × 100 = 25%`;
+        distractors = [`20%`, `15%`, `30%`, `35%`];
       } else if (typeVar === 2) {
-        // Discount & Marked Price
-        const mp = 2000;
-        const discP = 15;
-        const disc = (mp * discP) / 100;
-        const sp = mp - disc;
-        qText = `एक वस्तु का अंकित मूल्य (Marked Price) ₹${mp} है। यदि इस पर ${discP}% की छूट (Discount) दी जाए, तो विक्रय मूल्य क्या होगा?`;
-        qTextEn = `Marked Price is ₹${mp}. Selling price after ${discP}% discount?`;
-        ansStr = `₹${sp}`;
-        explanation = `छूट = (${mp} × ${discP}) ÷ 100 = ₹${disc}।\nविक्रय मूल्य = ${mp} - ${disc} = ₹${sp}।`;
-        explanationEn = `Discount = ₹${disc}. SP = MP - Discount = ₹${sp}.`;
-        shortcut = `SP = ${mp} × (${100 - discP} ÷ 100) = ₹${sp}`;
-        distractors = [`₹${sp + 50}`, `₹${Math.max(50, sp - 50)}`, `₹${sp + 100}`, `₹${Math.max(50, sp - 100)}`];
-      } else if (typeVar === 3) {
-        // Article ratio rule: CP of X articles = SP of Y articles
-        const x = 15;
-        const y = 12;
-        // Profit % = (15 - 12) / 12 * 100 = 25%
-        ansStr = `25% लाभ`;
-        qText = `यदि 15 वस्तुओं का क्रय मूल्य 12 वस्तुओं के विक्रय मूल्य के बराबर है, तो प्रतिशत लाभ या हानि ज्ञात कीजिए?`;
-        qTextEn = `If CP of 15 articles = SP of 12 articles, find profit or loss %?`;
-        explanation = `प्रतिशत लाभ सूत्र = [(X - Y) ÷ Y] × 100%\n= [(15 - 12) ÷ 12] × 100% = (3 ÷ 12) × 100% = 25% लाभ।`;
-        explanationEn = `Profit % = [(15 - 12) / 12] * 100% = 25% profit.`;
-        shortcut = `[(15 - 12) ÷ 12] × 100% = 25% लाभ`;
-        distractors = [`20% लाभ`, `25% हानि`, `20% हानि`, `30% लाभ`];
-      } else {
-        // Equal SP shortcut: Two items at same SP, one at P% profit, one at P% loss -> overall loss P²/100 %
+        // PL_03: Same SP with Equal % Gain and Loss
         const p = 10;
-        const lossP = (p * p) / 100;
-        qText = `दो वस्तुओं में से प्रत्येक को ₹1200 में बेचा जाता है। एक पर ${p}% का लाभ तथा दूसरी पर ${p}% की हानि होती है। पूरे सौदे में कुल कितने प्रतिशत लाभ या हानि होगी?`;
-        qTextEn = `Two items sold for ₹1200 each, one at ${p}% profit and one at ${p}% loss. Overall outcome?`;
-        ansStr = `${lossP}% हानि`;
-        explanation = `समान विक्रय मूल्य पर समान लाभ-हानि का सदाबहार सूत्र:\nसदैव हानि% = (P)² ÷ 100 = (${p})² ÷ 100 = ${lossP}% हानि।`;
-        explanationEn = `Always loss = (P)² / 100 = ${lossP}% loss.`;
-        shortcut = `सदैव हानि = (${p})² ÷ 100 = ${lossP}% हानि`;
-        distractors = [`कोई लाभ या हानि नहीं`, `1% लाभ`, `2% हानि`, `0.5% लाभ`];
+        const lossP = 1;
+        ansStr = `1% loss`;
+        qText = `दो वस्तुओं में से प्रत्येक को ₹990 में बेचा जाता है, एक पर 10% लाभ तथा दूसरी पर 10% हानि होती है। कुल लाभ या हानि प्रतिशत ज्ञात कीजिए।`;
+        qTextEn = `Two articles sold for ₹990 each, one at 10% gain and other at 10% loss. Overall gain/loss %?`;
+        explanation = `समान विक्रय मूल्य और समान प्रतिशत लाभ-हानि पर सदैव हानि होती है: हानि% = (10)² ÷ 100 = 1% हानि।`;
+        explanationEn = `Always loss = (10)² / 100 = 1% loss.`;
+        shortcut = `(10)² ÷ 100 = 1% loss`;
+        distractors = [`1% profit`, `0%`, `2% loss`, `2% profit`];
+      } else if (typeVar === 3) {
+        // PL_04: Dishonest Shopkeeper / False Weight
+        const gainP = 11.11;
+        ansStr = `11.11%`;
+        qText = `एक बेईमान दुकानदार क्रय मूल्य पर बेचने का दावा करता है लेकिन 1 किग्रा के स्थान पर 900 ग्राम वजन तोलता है। उसका लाभ प्रतिशत ज्ञात कीजिए।`;
+        qTextEn = `A dishonest dealer claims to sell at CP but uses 900g instead of 1kg. Find gain percentage.`;
+        explanation = `लाभ% = [त्रुटि ÷ (True - त्रुटि)] × 100 = [100 ÷ 900] × 100 = 11.11%।`;
+        explanationEn = `Gain % = [100 / (1000 - 100)] * 100 = 11.11%.`;
+        shortcut = `[100 ÷ 900] × 100 = 11.11%`;
+        distractors = [`10%`, `12.5%`, `9.09%`, `15%`];
+      } else if (typeVar === 4) {
+        // PL_05: Marked Price & Successive Discount
+        const mp = 500;
+        const sp = 360;
+        ansStr = `₹360`;
+        qText = `₹500 अंकित मूल्य की वस्तु पर 20% और 10% की क्रमिक छूट (Successive Discounts) दी जाती है। अंतिम विक्रय मूल्य ज्ञात कीजिए।`;
+        qTextEn = `An article marked at ₹500 is sold at successive discounts of 20% and 10%. Find final SP.`;
+        explanation = `विक्रय मूल्य = 500 × (80 ÷ 100) × (90 ÷ 100) = 500 × 0.8 × 0.9 = ₹360।`;
+        explanationEn = `SP = 500 * 0.8 * 0.9 = ₹360.`;
+        shortcut = `500 × 0.8 × 0.9 = ₹360`;
+        distractors = [`₹350`, `₹380`, `₹400`, `₹340`];
+      } else if (typeVar === 5) {
+        // PL_06: Relation Between MP, CP, Profit% and Discount%
+        const profitP = 19;
+        ansStr = `19%`;
+        qText = `एक व्यापारी वस्तुओं पर क्रय मूल्य से 40% अधिक अंकित करता है और 15% की छूट देता है। उसका लाभ प्रतिशत ज्ञात कीजिए।`;
+        qTextEn = `A trader marks goods 40% above CP and allows 15% discount. Find profit percent.`;
+        explanation = `लाभ % = [A - B - (A×B)/100] = [40 - 15 - (40×15)/100] = 25 - 6 = 19%।`;
+        explanationEn = `Effective profit = 40 - 15 - 6 = 19%.`;
+        shortcut = `40 - 15 - 6 = 19%`;
+        distractors = [`25%`, `15%`, `20%`, `22%`];
+      } else {
+        // PL_07: Free Items Scheme (Buy X Get Y Free)
+        const discP = 20;
+        ansStr = `20%`;
+        qText = `एक दुकान '4 खरीदें 1 मुफ्त पाएं' ('Buy 4 Get 1 Free') की योजना देती है। प्रभावी छूट प्रतिशत क्या है?`;
+        qTextEn = `A store offers 'Buy 4 Get 1 Free'. What is effective discount percentage?`;
+        explanation = `छूट % = [मुफ्त वस्तुएँ ÷ कुल वस्तुएँ] × 100 = [1 ÷ 5] × 100 = 20%।`;
+        explanationEn = `Discount % = (1 / 5) * 100 = 20%.`;
+        shortcut = `(1 ÷ 5) × 100 = 20%`;
+        distractors = [`25%`, `15%`, `10%`, `30%`];
       }
     }
     // 16. समय व कार्य (Time & Work)
     else if (chosenTopic.includes('समय व कार्य')) {
-      const typeVar = Math.floor(Math.random() * 5);
+      const typeVar = Math.floor(Math.random() * 8);
       if (typeVar === 0) {
-        // A & B together: (A x B) / (A + B)
-        const workPairs: [number, number, number][] = [
-          [10, 15, 6], [12, 24, 8], [20, 30, 12], [15, 30, 10],
-          [12, 60, 10], [10, 40, 8], [6, 12, 4], [20, 20, 10],
-          [8, 24, 6], [15, 60, 12]
-        ];
-        const pair = workPairs[Math.floor(Math.random() * workPairs.length)];
-        const aDays = pair[0];
-        const bDays = pair[1];
-        const ans = pair[2];
-        qText = `A किसी कार्य को ${aDays} दिन में तथा B उसे ${bDays} दिन में पूरा करता है। दोनों मिलकर उस कार्य को कितने दिन में करेंगे?`;
-        qTextEn = `A does a work in ${aDays} days, B in ${bDays} days. In how many days together?`;
-        ansStr = `${ans} दिन`;
-        explanation = `कुल समय = (A × B) ÷ (A + B) = (${aDays} × ${bDays}) ÷ (${aDays + bDays}) = ${ans} दिन।`;
-        explanationEn = `Time together = (A * B) / (A + B) = ${ans} days.`;
-        shortcut = `(A × B) ÷ (A + B) = ${ans} दिन`;
-        distractors = [`${ans + 2} दिन`, `${Math.max(1, ans - 2)} दिन`, `${ans + 4} दिन`, `${Math.max(1, ans - 3)} दिन`];
+        // TW_01: Basic Individual & Combined Work
+        const a = 10, b = 15;
+        const ans = 6;
+        ansStr = `6 days`;
+        qText = `A किसी कार्य को 10 दिन में और B 15 दिन में कर सकता है। दोनों मिलकर इसे कितने दिन में पूरा करेंगे?`;
+        qTextEn = `A can finish in 10 days and B in 15 days. Days together?`;
+        explanation = `समय = (A × B) ÷ (A + B) = (10 × 15) ÷ 25 = 6 दिन।`;
+        explanationEn = `Time = (10 * 15) / 25 = 6 days.`;
+        shortcut = `(10 × 15) ÷ 25 = 6 days`;
+        distractors = [`5 days`, `8 days`, `7.5 days`, `9 days`];
       } else if (typeVar === 1) {
-        // Finding B alone when A+B and A given: (T1 x T2) / (T2 - T1)
-        const tTogether = 6;
-        const aAlone = 10;
-        const bAlone = (tTogether * aAlone) / (aAlone - tTogether); // 15
-        qText = `A और B मिलकर एक कार्य को ${tTogether} दिन में समाप्त करते हैं। यदि A अकेला इसे ${aAlone} दिन में करता है, तो B अकेला इसे कितने दिन में करेगा?`;
-        qTextEn = `A and B together finish in ${tTogether} days. A alone takes ${aAlone} days. How many days for B alone?`;
-        ansStr = `${bAlone} दिन`;
-        explanation = `अकेले B का समय = (A+B समय × A समय) ÷ (A समय - A+B समय)\n= (${tTogether} × ${aAlone}) ÷ (${aAlone} - ${tTogether}) = 60 ÷ 4 = ${bAlone} दिन।`;
-        explanationEn = `B alone = (T1 * T2) / (T2 - T1) = ${bAlone} days.`;
-        shortcut = `(6 × 10) ÷ (10 - 6) = ${bAlone} दिन`;
-        distractors = [`${bAlone + 3} दिन`, `${Math.max(1, bAlone - 3)} दिन`, `${bAlone + 5} दिन`, `${Math.max(1, bAlone - 5)} दिन`];
+        // TW_02: Leaving or Joining Mid-Work
+        ansStr = `17.5 days`;
+        qText = `A और B किसी कार्य को 20 और 30 दिन में कर सकते हैं। दोनों साथ काम शुरू करते हैं, लेकिन A 5 दिन बाद छोड़ देता है। B शेष कार्य कितने दिन में पूरा करेगा?`;
+        qTextEn = `A and B do work in 20 and 30 days. Both start, A leaves after 5 days. Days for B to finish?`;
+        explanation = `5 दिन में किया काम = 5 × (1/20 + 1/30) = 5 × (5/60) = 25/60 = 5/12। शेष काम = 7/12। B का समय = (7/12) × 30 = 17.5 दिन।`;
+        explanationEn = `Remaining work 7/12 done by B in 17.5 days.`;
+        shortcut = `शेष कार्य ÷ B की क्षमता = 17.5 days`;
+        distractors = [`15 days`, `20 days`, `18.5 days`, `16 days`];
       } else if (typeVar === 2) {
-        // Efficiency ratio: A is twice as efficient as B
-        const bDays = 30;
-        const aDays = bDays / 2; // 15
-        const together = (aDays * bDays) / (aDays + bDays); // 10
-        qText = `A की कार्यक्षमता B से दोगुनी (Twice) है। यदि B अकेला कार्य को ${bDays} दिन में करता है, तो दोनों मिलकर इसे कितने दिन में पूरा करेंगे?`;
-        qTextEn = `A is twice as efficient as B. If B takes ${bDays} days alone, how many days together?`;
-        ansStr = `${together} दिन`;
-        explanation = `B का समय = ${bDays} दिन -> A का समय = ${aDays} दिन।\nदोनों मिलकर = (${aDays} × ${bDays}) ÷ (${aDays} + ${bDays}) = ${together} दिन।`;
-        explanationEn = `A's time = ${aDays} days. Together = ${together} days.`;
-        shortcut = `${bDays} ÷ 3 = ${together} दिन`;
-        distractors = [`${together + 2} दिन`, `${Math.max(1, together - 2)} दिन`, `${together + 4} दिन`, `${Math.max(1, together - 4)} दिन`];
+        // TW_03: Alternate Days Working
+        ansStr = `14.33 days`;
+        qText = `A और B क्रमशः 12 और 18 दिन में कार्य करते हैं। यदि वे बारी-बारी से (Alternate Days) A से शुरुआत करते हुए काम करें, तो कार्य कितने दिन में समाप्त होगा?`;
+        qTextEn = `A and B complete work in 12 and 18 days. Working alternate days starting with A, total days?`;
+        explanation = `2 दिन का कार्य = 1/12 + 1/18 = 5/36। ऐसे 6 चक्रों में 30/36 काम 12 दिन में होगा। शेष काम A करेगा। कुल 14.33 दिन।`;
+        explanationEn = `Total days = 14.33 days.`;
+        shortcut = `बारी-बारी से गणना = 14.33 days`;
+        distractors = [`12 days`, `15 days`, `13.5 days`, `16 days`];
       } else if (typeVar === 3) {
-        // Pipes & Cisterns: Inlet and Outlet
-        const inTime = 12;
-        const outTime = 20;
-        const netTime = (inTime * outTime) / (outTime - inTime); // 30
-        qText = `एक नल A टंकी को ${inTime} घंटे में भरता है तथा नल B इसे ${outTime} घंटे में खाली कर देता है। दोनों नल एक साथ खोलने पर टंकी कितने घंटे में भरेगी?`;
-        qTextEn = `Pipe A fills tank in ${inTime} hrs, Pipe B empties in ${outTime} hrs. Time to fill if both open?`;
-        ansStr = `${netTime} घंटे`;
-        explanation = `कुल समय = (A × B) ÷ (B - A) = (${inTime} × ${outTime}) ÷ (${outTime} - ${inTime}) = 240 ÷ 8 = ${netTime} घंटे।`;
-        explanationEn = `Net time = (A * B) / (B - A) = ${netTime} hours.`;
-        shortcut = `(12 × 20) ÷ (20 - 12) = ${netTime} घंटे`;
-        distractors = [`${netTime + 5} घंटे`, `${Math.max(1, netTime - 5)} घंटे`, `${netTime + 10} घंटे`, `${Math.max(1, netTime - 10)} घंटे`];
+        // TW_04: Efficiency / Ratio Based
+        ansStr = `21 days`;
+        qText = `A की कार्यक्षमता B से दोगुनी है। यदि दोनों मिलकर 14 दिन में कार्य समाप्त करें, तो A अकेला इसे कितने दिन में करेगा?`;
+        qTextEn = `A is twice as efficient as B. Together they finish in 14 days. Days for A alone?`;
+        explanation = `क्षमता अनुपात A:B = 2:1, समय अनुपात = 1:2। संयुक्त 3 यूनिट = 14 दिन -> A अकेला = 3 × 14 ÷ 2 = 21 दिन।`;
+        explanationEn = `A alone takes 21 days.`;
+        shortcut = `3 × 14 ÷ 2 = 21 days`;
+        distractors = [`28 days`, `18 days`, `24 days`, `20 days`];
+      } else if (typeVar === 4) {
+        // TW_05: MDH Formula
+        ansStr = `10 days`;
+        qText = `12 पुरुष प्रतिदिन 8 घंटे काम करके 10 दिन में काम पूरा करते हैं। 16 पुरुष प्रतिदिन 6 घंटे काम करके कितने दिन में पूरा करेंगे?`;
+        qTextEn = `12 men working 8 hours/day finish in 10 days. 16 men working 6 hours/day finish in?`;
+        explanation = `M1 D1 H1 = M2 D2 H2 -> 12 × 10 × 8 = 16 × D2 × 6 -> D2 = 960 ÷ 96 = 10 दिन।`;
+        explanationEn = `D2 = (12 * 8 * 10) / (16 * 6) = 10 days.`;
+        shortcut = `(12 × 8 × 10) ÷ (16 × 6) = 10 days`;
+        distractors = [`12 days`, `8 days`, `15 days`, `9 days`];
+      } else if (typeVar === 5) {
+        // TW_06: Men, Women and Children Equivalence
+        ansStr = `20 days`;
+        qText = `4 पुरुष या 6 महिलाएं किसी कार्य को 20 दिन में करते हैं। 2 पुरुष और 3 महिलाएं मिलकर इसे कितने दिन में पूरा करेंगे?`;
+        qTextEn = `4 men or 6 women finish in 20 days. Days for 2 men and 3 women?`;
+        explanation = `2 पुरुष = 3 महिलाएं। 2 पुरुष + 3 महिलाएं = 6 महिलाएं। 6 महिलाएं 20 दिन में करेंगी।`;
+        explanationEn = `Total equivalence is 6 women, taking 20 days.`;
+        shortcut = `समकक्षता नियम = 20 days`;
+        distractors = [`15 days`, `25 days`, `18 days`, `22 days`];
+      } else if (typeVar === 6) {
+        // TW_07: Wages Distribution
+        ansStr = `₹685.71`;
+        qText = `A और B किसी काम का ठेका ₹1200 में लेते हैं। A इसे 6 दिन में और B 8 दिन में कर सकता है। A का हिस्सा ज्ञात कीजिए।`;
+        qTextEn = `A and B undertake work for ₹1200. A in 6 days, B in 8 days. Find A's share.`;
+        explanation = `क्षमता अनुपात A:B = (1/6):(1/8) = 4:3। A का हिस्सा = [4 ÷ 7] × 1200 = ₹685.71।`;
+        explanationEn = `A's share = (4 / 7) * 1200 = ₹685.71.`;
+        shortcut = `(4 ÷ 7) × 1200 = ₹685.71`;
+        distractors = [`₹600`, `₹750`, `₹514.28`, `₹700`];
       } else {
-        // Three persons A, B, C together
-        const a = 12;
-        const b = 15;
-        const c = 20;
-        // 1/12 + 1/15 + 1/20 = (5 + 4 + 3)/60 = 12/60 = 1/5 -> 5 days
-        const ans = 5;
-        qText = `A, B तथा C किसी कार्य को क्रमशः ${a}, ${b} तथा ${c} दिन में करते हैं। तीनों मिलकर इसे कितने दिन में पूरा करेंगे?`;
-        qTextEn = `A, B and C do work in ${a}, ${b} and ${c} days respectively. Time together?`;
-        ansStr = `${ans} दिन`;
-        explanation = `ल.स.प. (LCM) ऑफ (${a}, ${b}, ${c}) = 60 यूनिट।\nA क्षमता = 5, B क्षमता = 4, C क्षमता = 3। कुल क्षमता = 12।\nसमय = 60 ÷ 12 = ${ans} दिन।`;
-        explanationEn = `LCM = 60. Efficiency sum = 12. Time = 60 / 12 = ${ans} days.`;
-        shortcut = `60 ÷ (5 + 4 + 3) = ${ans} दिन`;
-        distractors = [`${ans + 2} दिन`, `${Math.max(1, ans - 2)} दिन`, `${ans + 3} दिन`, `${Math.max(1, ans - 3)} दिन`];
+        // TW_08: Pipes and Cistern
+        ansStr = `36 hours`;
+        qText = `नल A टंकी 12 घंटे में भरता है और नल B 18 घंटे में खाली करता है। दोनों एक साथ खोले जाएं, तो टंकी कितने घंटे में भरेगी?`;
+        qTextEn = `Pipe A fills in 12 hrs, Pipe B empties in 18 hrs. Time to fill if both open?`;
+        explanation = `समय = (12 × 18) ÷ (18 - 12) = 216 ÷ 6 = 36 घंटे।`;
+        explanationEn = `Net time = (12 * 18) / 6 = 36 hours.`;
+        shortcut = `(12 × 18) ÷ 6 = 36 hours`;
+        distractors = [`24 hours`, `48 hours`, `30 hours`, `40 hours`];
       }
     }
     // 17. समय, चाल व दूरी (Time & Distance)
     else if (chosenTopic.includes('समय, चाल व दूरी')) {
-      const typeVar = Math.floor(Math.random() * 5);
+      const typeVar = Math.floor(Math.random() * 8);
       if (typeVar === 0) {
-        // Time = Distance / Speed
-        const speed = [36, 45, 54, 60, 72, 80, 90][Math.floor(Math.random() * 7)];
-        const hours = Math.floor(Math.random() * 5) + 2;
-        const distance = speed * hours;
-        qText = `एक रेलगाड़ी ${speed} किमी/घंटा की गति से चल रही है। ${distance} किमी की दूरी तय करने में उसे कितना समय लगेगा?`;
-        qTextEn = `Train moves at ${speed} km/h. How long to cover ${distance} km?`;
-        ansStr = `${hours} घंटे`;
-        explanation = `समय = दूरी ÷ चाल = ${distance} ÷ ${speed} = ${hours} घंटे।`;
-        explanationEn = `Time = Distance / Speed = ${distance} / ${speed} = ${hours} hours.`;
-        shortcut = `${distance} ÷ ${speed} = ${hours} घंटे`;
-        distractors = [`${hours + 1} घंटे`, `${Math.max(1, hours - 1)} घंटे`, `${hours + 2} घंटे`, `${hours + 3} घंटे`];
+        // TSD_01: Basic Speed, Time & Unit Conversion
+        ansStr = `500 m`;
+        qText = `एक कार 72 किमी/घंटा की चाल से चल रही है। वह 25 सेकंड में कितनी दूरी (मीटर में) तय करेगी?`;
+        qTextEn = `A car travels at 72 km/h. How many meters does it cover in 25 seconds?`;
+        explanation = `चाल m/s में = 72 × (5/18) = 20 m/s। दूरी = 20 × 25 = 500 मीटर।`;
+        explanationEn = `Speed = 20 m/s. Distance = 20 * 25 = 500 m.`;
+        shortcut = `20 m/s × 25s = 500 m`;
+        distractors = [`450 m`, `550 m`, `600 m`, `400 m`];
       } else if (typeVar === 1) {
-        // Speed Unit Conversion: km/h to m/s
-        const kmh = [36, 54, 72, 90, 108, 126, 144][Math.floor(Math.random() * 7)];
-        const ms = (kmh * 5) / 18;
-        qText = `चाल ${kmh} किमी/घंटा को मीटर/सेकंड (m/s) में बदलें:`;
-        qTextEn = `Convert speed ${kmh} km/h into m/s:`;
-        ansStr = `${ms} m/s`;
-        explanation = `किमी/घंटा से m/s में बदलने के लिए 5/18 से गुणा करें:\n${kmh} × (5 ÷ 18) = ${ms} m/s।`;
-        explanationEn = `Multiply by 5/18: ${kmh} * 5 / 18 = ${ms} m/s.`;
-        shortcut = `${kmh} × 5/18 = ${ms} m/s`;
-        distractors = [`${ms + 5} m/s`, `${Math.max(1, ms - 5)} m/s`, `${ms + 10} m/s`, `${Math.max(1, ms - 10)} m/s`];
+        // TSD_02: Average Speed
+        ansStr = `48 km/h`;
+        qText = `एक व्यक्ति A से B तक 40 किमी/घंटा से जाता है और 60 किमी/घंटा से लौटता है। पूरी यात्रा की औसत चाल ज्ञात कीजिए।`;
+        qTextEn = `Person travels A to B at 40 km/h and returns at 60 km/h. Average speed?`;
+        explanation = `औसत चाल = (2 × 40 × 60) ÷ (40 + 60) = 4800 ÷ 100 = 48 किमी/घंटा।`;
+        explanationEn = `Average speed = (2 * 40 * 60) / 100 = 48 km/h.`;
+        shortcut = `(2 × 40 × 60) ÷ 100 = 48 km/h`;
+        distractors = [`50 km/h`, `45 km/h`, `52 km/h`, `46 km/h`];
       } else if (typeVar === 2) {
-        // Train crossing a pole: Time = Train length / Speed
-        const speedKmh = 72; // 20 m/s
-        const speedMs = 20;
-        const lengthM = (Math.floor(Math.random() * 10) + 10) * 20; // e.g. 300m
-        const timeSec = lengthM / speedMs;
-        qText = `${lengthM} मीटर लंबी रेलगाड़ी ${speedKmh} किमी/घंटा की गति से एक खंभे (Pole) को कितने सेकंड में पार करेगी?`;
-        qTextEn = `A ${lengthM}m train at ${speedKmh} km/h crosses a pole in how many seconds?`;
-        ansStr = `${timeSec} सेकंड`;
-        explanation = `चाल m/s में = ${speedKmh} × (5/18) = ${speedMs} m/s।\nसमय = लंबाई ÷ चाल = ${lengthM} ÷ ${speedMs} = ${timeSec} सेकंड।`;
-        explanationEn = `Speed in m/s = ${speedMs}. Time = ${lengthM} / ${speedMs} = ${timeSec} sec.`;
-        shortcut = `${lengthM} ÷ 20 = ${timeSec} सेकंड`;
-        distractors = [`${timeSec + 3} सेकंड`, `${Math.max(1, timeSec - 3)} सेकंड`, `${timeSec + 5} सेकंड`, `${Math.max(1, timeSec - 5)} सेकंड`];
+        // TSD_03: Late vs Early Arrival
+        ansStr = `5 km`;
+        qText = `4 किमी/घंटा चलने पर छात्र 10 मिनट लेट होता है, 5 किमी/घंटा चलने पर 5 मिनट पहले पहुंचता है। स्कूल की दूरी ज्ञात कीजिए।`;
+        qTextEn = `Walking at 4 km/h, student is 10 min late. At 5 km/h, 5 min early. Distance to school?`;
+        explanation = `दूरी = [(S1 × S2) ÷ (S2 - S1)] × समय अंतर = [(4 × 5) ÷ 1] × (15 ÷ 60) = 20 × 0.25 = 5 किमी।`;
+        explanationEn = `Distance = [(4*5)/1] * (15/60) = 5 km.`;
+        shortcut = `[20 ÷ 1] × 0.25 = 5 km`;
+        distractors = [`4 km`, `6 km`, `7 km`, `4.5 km`];
       } else if (typeVar === 3) {
-        // Relative Speed in opposite direction
-        const s1 = 40;
-        const s2 = 50;
-        const relSpeed = s1 + s2; // 90 km/h = 25 m/s
-        const distKm = 180;
-        const timeHours = distKm / relSpeed;
-        qText = `दो स्थान A तथा B 180 किमी दूर हैं। दो कारें विपरीत दिशाओं में क्रमशः 40 किमी/घंटा तथा 50 किमी/घंटा से चलती हैं। वे कितने घंटे बाद मिलेंगी?`;
-        qTextEn = `Two cars 180 km apart move towards each other at 40 km/h and 50 km/h. Meeting time?`;
-        ansStr = `${timeHours} घंटे`;
-        explanation = `विपरीत दिशा में सापेक्ष चाल = S1 + S2 = 40 + 50 = 90 किमी/घंटा।\nसमय = दूरी ÷ सापेक्ष चाल = 180 ÷ 90 = ${timeHours} घंटे।`;
-        explanationEn = `Relative speed = 90 km/h. Time = 180 / 90 = ${timeHours} hours.`;
-        shortcut = `180 ÷ (40 + 50) = ${timeHours} घंटे`;
-        distractors = [`${timeHours + 1} घंटे`, `${Math.max(1, timeHours - 1)} घंटे`, `${timeHours + 2} घंटे`, `${Math.max(1, timeHours - 2)} घंटे`];
+        // TSD_04: Relative Speed
+        ansStr = `3 hours`;
+        qText = `300 किमी की दूरी पर दो ट्रेनें 40 किमी/घंटा और 60 किमी/घंटा की चाल से एक-दूसरे की ओर चलती हैं। कितने घंटे बाद मिलेंगी?`;
+        qTextEn = `Two trains 300 km apart start moving towards each other at 40 km/h and 60 km/h. Meeting time?`;
+        explanation = `सापेक्ष चाल = 40 + 60 = 100 किमी/घंटा। समय = 300 ÷ 100 = 3 घंटे।`;
+        explanationEn = `Relative speed = 100 km/h. Time = 300 / 100 = 3 hours.`;
+        shortcut = `300 ÷ 100 = 3 hours`;
+        distractors = [`4 hours`, `2.5 hours`, `3.5 hours`, `5 hours`];
+      } else if (typeVar === 4) {
+        // TSD_05: Police and Thief Chase
+        ansStr = `1.2 km`;
+        qText = `एक चोर को पुलिसकर्मी ने 200 मीटर की दूरी से देखा। चोर 10 किमी/घंटा और पुलिस 12 किमी/घंटा से दौड़ती है। पुलिस कितने किमी की दूरी पर चोर को पकड़ेगी?`;
+        qTextEn = `Thief spotted at 200m. Thief runs at 10 km/h, police at 12 km/h. Catch distance?`;
+        explanation = `सापेक्ष चाल = 2 किमी/घंटा। समय = 0.2 किमी ÷ 2 = 0.1 घंटा। पुलिस द्वारा तय दूरी = 12 × 0.1 = 1.2 किमी।`;
+        explanationEn = `Time = 0.2 / 2 = 0.1h. Distance = 12 * 0.1 = 1.2 km.`;
+        shortcut = `12 × 0.1 = 1.2 km`;
+        distractors = [`1.0 km`, `1.5 km`, `0.8 km`, `2.0 km`];
+      } else if (typeVar === 5) {
+        // TSD_06: Train Crossing Object
+        ansStr = `20 seconds`;
+        qText = `180 मीटर लंबी ट्रेन 54 किमी/घंटा की चाल से 120 मीटर लंबे प्लेटफॉर्म को पार करने में कितना समय लेगी?`;
+        qTextEn = `180m train at 54 km/h crosses 120m platform. Time taken?`;
+        explanation = `कुल दूरी = 180 + 120 = 300 मीटर। चाल = 54 × (5/18) = 15 m/s। समय = 300 ÷ 15 = 20 सेकंड।`;
+        explanationEn = `Total distance = 300m. Speed = 15 m/s. Time = 300 / 15 = 20 seconds.`;
+        shortcut = `300 ÷ 15 = 20 seconds`;
+        distractors = [`15 seconds`, `25 seconds`, `18 seconds`, `22 seconds`];
+      } else if (typeVar === 6) {
+        // TSD_07: Boats and Streams
+        ansStr = `3 hours`;
+        qText = `शांत जल में नाव की चाल 15 किमी/घंटा और धारा की चाल 3 किमी/घंटा है। 36 किमी धारा के प्रतिकूल (Upstream) जाने में कितना समय लगेगा?`;
+        qTextEn = `Boat speed 15 km/h, stream 3 km/h. Time to travel 36 km upstream?`;
+        explanation = `प्रतिकूल चाल (Upstream) = 15 - 3 = 12 किमी/घंटा। समय = 36 ÷ 12 = 3 घंटे।`;
+        explanationEn = `Upstream speed = 12 km/h. Time = 36 / 12 = 3 hours.`;
+        shortcut = `36 ÷ 12 = 3 hours`;
+        distractors = [`4 hours`, `2 hours`, `5 hours`, `6 hours`];
       } else {
-        // Distance = Speed x Time
-        const speed = 65;
-        const time = 4;
-        const dist = speed * time;
-        qText = `एक बस 65 किमी/घंटा की गति से 4 घंटे चलती है। बस द्वारा तय की गई कुल दूरी (Distance) क्या होगी?`;
-        qTextEn = `A bus moves at 65 km/h for 4 hours. Total distance covered?`;
-        ansStr = `${dist} किमी`;
-        explanation = `दूरी = चाल × समय = 65 × 4 = ${dist} किमी।`;
-        explanationEn = `Distance = Speed * Time = 65 * 4 = ${dist} km.`;
-        shortcut = `65 × 4 = ${dist} किमी`;
-        distractors = [`${dist + 20} किमी`, `${dist - 20} किमी`, `${dist + 40} किमी`, `${dist - 40} किमी`];
+        // TSD_08: Circular Tracks & Races
+        ansStr = `11.11 m/s`;
+        qText = `1000 मीटर की दौड़ में A, B को 100 मीटर या 10 सेकंड से हराता है। A की चाल ज्ञात कीजिए।`;
+        qTextEn = `In 1000m race, A beats B by 100m or 10s. Find A's speed.`;
+        explanation = `B द्वारा 100 मीटर तय करने में लिया समय = 10 सेकंड -> B की चाल = 10 m/s। A ने 1000m तय किया 90 सेकंड में -> A की चाल = 1000 ÷ 90 = 11.11 m/s।`;
+        explanationEn = `B's speed = 10m/s. A's time = 90s. A's speed = 1000/90 = 11.11 m/s.`;
+        shortcut = `1000 ÷ 90 = 11.11 m/s`;
+        distractors = [`10 m/s`, `12.5 m/s`, `9.5 m/s`, `13 m/s`];
       }
     }
     // 18. सरलीकरण / Default Fallback
