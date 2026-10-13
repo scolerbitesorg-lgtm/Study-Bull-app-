@@ -2002,6 +2002,8 @@ export default function App() {
   const [calcCount, setCalcCount] = useState<number | 'Infinite'>(10);
   const [calcDifficulty, setCalcDifficulty] = useState<'सरल' | 'मध्यम' | 'कठिन' | 'प्रो'>('मध्यम');
   const [calcTopic, setCalcTopic] = useState<string>('मिश्रित (सभी विषय)');
+  const [isCustomTopicMode, setIsCustomTopicMode] = useState<boolean>(false);
+  const [selectedCustomTopics, setSelectedCustomTopics] = useState<string[]>([]);
 
   // Calculation Practice State
   const [calcQuestions, setCalcQuestions] = useState<QuizQuestion[]>([]);
@@ -2575,10 +2577,18 @@ export default function App() {
   const generateCalculationSet = () => {
     const totalQ = calcCount === 'Infinite' ? 20 : Number(calcCount);
     const generated: QuizQuestion[] = [];
+    const baseTopics = ALL_MATH_TOPICS.filter(t => !t.includes('मिश्रित'));
 
     for (let i = 0; i < totalQ; i++) {
+      let targetTopic = calcTopic;
+      if (isCustomTopicMode && selectedCustomTopics.length > 0) {
+        targetTopic = selectedCustomTopics[Math.floor(Math.random() * selectedCustomTopics.length)];
+      } else if (calcTopic.includes('मिश्रित')) {
+        targetTopic = baseTopics[Math.floor(Math.random() * baseTopics.length)];
+      }
+
       const q = generateUnlimitedMathQuestion(
-        calcTopic,
+        targetTopic,
         i + 1,
         calcDifficulty,
         seenMathSignaturesRef.current
@@ -4016,26 +4026,70 @@ export default function App() {
                 </div>
 
                 {/* Mathematics Subjects */}
-                <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                       <Calculator className="w-4 h-4 text-blue-600" /> {langHindi ? 'विषय चुनें (Math Topics)' : 'Select Math Topic'}
                     </h3>
-                    <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                      {langHindi ? `${ALL_MATH_TOPICS.length} विषय उपलब्ध` : `${ALL_MATH_TOPICS.length} topics available`}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1">
-                    {ALL_MATH_TOPICS.map((top) => (
+                    <div className="flex items-center gap-2">
                       <button
-                        key={top}
-                        onClick={() => setCalcTopic(top)}
-                        className={"p-3 rounded-xl text-left font-bold text-xs sm:text-sm border transition flex items-center gap-2.5 active:scale-98 cursor-pointer " + (calcTopic === top ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100')}
+                        onClick={() => {
+                          setIsCustomTopicMode(!isCustomTopicMode);
+                          if (!isCustomTopicMode && selectedCustomTopics.length === 0) {
+                            const base = ALL_MATH_TOPICS.filter(t => !t.includes('मिश्रित'));
+                            setSelectedCustomTopics(base.slice(0, 3));
+                          }
+                        }}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border cursor-pointer active:scale-95 ${isCustomTopicMode ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'}`}
                       >
-                        <span className={"w-2.5 h-2.5 rounded-full shrink-0 " + (calcTopic === top ? 'bg-blue-600 ring-4 ring-blue-100' : 'bg-slate-300')}></span>
-                        <span className="truncate">{top}</span>
+                        <span>🎛️</span>
+                        <span>{langHindi ? (isCustomTopicMode ? 'सिंगल मोड' : 'कस्टम मिक्स (Multi)') : (isCustomTopicMode ? 'Single Mode' : 'Custom Mix (Multi)')}</span>
                       </button>
-                    ))}
+                      <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                        {isCustomTopicMode ? (langHindi ? `${selectedCustomTopics.length} चुने गए` : `${selectedCustomTopics.length} selected`) : (langHindi ? `${ALL_MATH_TOPICS.length} विषय` : `${ALL_MATH_TOPICS.length} topics`)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {isCustomTopicMode && (
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-3 text-xs text-indigo-800 font-medium">
+                      💡 {langHindi ? 'अपनी पसंद के जितने चाहें उतने चैप्टर्स पर क्लिक करें। प्रश्न सिर्फ इन्हीं चुने गए चैप्टर्स से मिक्स होकर आएंगे।' : 'Click multiple chapters of your choice. Questions will be randomly mixed from your selected chapters.'}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1">
+                    {ALL_MATH_TOPICS.filter(t => !t.includes('मिश्रित')).map((top) => {
+                      const isSelected = isCustomTopicMode ? selectedCustomTopics.includes(top) : calcTopic === top;
+                      return (
+                        <button
+                          key={top}
+                          onClick={() => {
+                            if (isCustomTopicMode) {
+                              if (selectedCustomTopics.includes(top)) {
+                                if (selectedCustomTopics.length > 1) {
+                                  setSelectedCustomTopics(selectedCustomTopics.filter(t => t !== top));
+                                }
+                              } else {
+                                setSelectedCustomTopics([...selectedCustomTopics, top]);
+                              }
+                            } else {
+                              setCalcTopic(top);
+                            }
+                          }}
+                          className={"p-3 rounded-xl text-left font-bold text-xs sm:text-sm border transition flex items-center justify-between gap-2.5 active:scale-98 cursor-pointer " + (isSelected ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100')}
+                        >
+                          <div className="flex items-center gap-2.5 truncate">
+                            <span className={"w-2.5 h-2.5 rounded-full shrink-0 " + (isSelected ? 'bg-blue-600 ring-4 ring-blue-100' : 'bg-slate-300')}></span>
+                            <span className="truncate">{top}</span>
+                          </div>
+                          {isCustomTopicMode && (
+                            <span className={`w-5 h-5 rounded-md flex items-center justify-center text-xs border ${isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-slate-300'}`}>
+                              {isSelected ? '✓' : ''}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
