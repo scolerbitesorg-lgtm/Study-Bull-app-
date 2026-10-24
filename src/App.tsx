@@ -166,6 +166,33 @@ interface Chapter {
   content: string;
 }
 
+// Admin panel saves the answer as `correctIndex`; older/imported data may use `correct` or `answerIndex`.
+function resolveCorrectIndex(q: any): number {
+  for (const v of [q?.correctIndex, q?.correct, q?.answerIndex]) {
+    const n = typeof v === 'string' && v.trim() !== '' ? Number(v) : v;
+    if (typeof n === 'number' && Number.isInteger(n) && n >= 0) return n;
+  }
+  return 0;
+}
+
+// Mock duration as set in the admin panel (durationMinutes, default 60 min), in seconds.
+function resolveMockDurationSec(node: any): number {
+  const m = Number(node?.durationMinutes);
+  return Number.isFinite(m) && m > 0 ? Math.round(m * 60) : 3600;
+}
+
+function findFirstMockNode(nodes: any[]): any | null {
+  if (!Array.isArray(nodes)) return null;
+  for (const item of nodes) {
+    const kind = String(item?.kind || item?.type || '').toLowerCase();
+    const target = String(item?.view || item?.target_view || '').toLowerCase();
+    if (kind === 'mock' || target.includes('mock')) return item;
+    const found = findFirstMockNode(item?.children);
+    if (found) return found;
+  }
+  return null;
+}
+
 // Dynamic Extractor Helpers - Extract Notes, Quiz Subjects, and Mock Questions purely from Admin Nodes
 function getNotesChaptersFromAdmin(nodes: any[]): Chapter[] {
   const chapters: Chapter[] = [];
@@ -236,7 +263,7 @@ function getQuizSubjectsFromAdmin(nodes: any[]): any[] {
             questionEn: q.questionEn || q.question_en || q.question || 'Question',
             options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
             optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
-            correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+            correct: resolveCorrectIndex(q),
             explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
             explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
           }));
@@ -287,7 +314,7 @@ function getMockQuestionsFromAdmin(nodes: any[]): QuizQuestion[] {
             questionEn: q.questionEn || q.question_en || q.question || 'Question',
             options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
             optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
-            correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+            correct: resolveCorrectIndex(q),
             explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
             explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
           }));
@@ -2024,7 +2051,8 @@ export default function App() {
   const [mockQuestions, setMockQuestions] = useState<QuizQuestion[]>([]);
   const [mockIndex, setMockIndex] = useState(0);
   const [userMockAnswers, setUserMockAnswers] = useState<(number | null)[]>([]);
-  const [mockTimer, setMockTimer] = useState(600);
+  const [mockTimer, setMockTimer] = useState(3600);
+  const [mockDurationSec, setMockDurationSec] = useState(3600);
   const [mockTimerActive, setMockTimerActive] = useState(false);
 
   // Calculation Setup State
@@ -2260,7 +2288,7 @@ export default function App() {
         questionEn: q.questionEn || q.question_en || q.question || 'Question',
         options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
         optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
-        correct: typeof q.correct === 'number' ? q.correct : (typeof q.answerIndex === 'number' ? q.answerIndex : 0),
+        correct: resolveCorrectIndex(q),
         explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
         explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
       }));
@@ -2282,9 +2310,12 @@ export default function App() {
       setIsAnswerRevealed(false);
 
       if (kind === 'mock' || target.includes('mock')) {
+        const durSec = resolveMockDurationSec(btn);
+        setMockQuestions(normalizedQs);
         setMockIndex(0);
         setUserMockAnswers(new Array(normalizedQs.length).fill(null));
-        setMockTimer(600);
+        setMockDurationSec(durSec);
+        setMockTimer(durSec);
         setMockTimerActive(true);
         navigateTo('mock_play');
       } else {
@@ -2348,10 +2379,12 @@ export default function App() {
     if (target.includes('mock')) {
       const mockQs = getMockQuestionsFromAdmin(adminNodes);
       if (mockQs.length > 0) {
+        const durSec = resolveMockDurationSec(findFirstMockNode(adminNodes));
         setMockQuestions(mockQs);
         setMockIndex(0);
         setUserMockAnswers(new Array(mockQs.length).fill(null));
-        setMockTimer(600);
+        setMockDurationSec(durSec);
+        setMockTimer(durSec);
         setMockTimerActive(true);
         navigateTo('mock_play');
       } else {
@@ -3742,7 +3775,7 @@ export default function App() {
                               playGentleSound('celebrate', soundMuted);
                               recordUserAttempt('mock', {
                                 answers: userMockAnswers,
-                                timeTaken: 600 - mockTimer
+                                timeTaken: mockDurationSec - mockTimer
                               });
                               navigateTo('mock_result');
                             }
@@ -3851,7 +3884,7 @@ export default function App() {
                     onClick={() => {
                       setUserMockAnswers(new Array(mockQuestions.length).fill(null));
                       setMockIndex(0);
-                      setMockTimer(600);
+                      setMockTimer(mockDurationSec);
                       setMockTimerActive(true);
                       navigateTo('mock_play');
                     }}
