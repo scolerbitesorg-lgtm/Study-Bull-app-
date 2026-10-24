@@ -184,6 +184,20 @@ function resolveMockDurationSec(node: any): number {
   return Number.isFinite(m) && m > 0 ? Math.round(m * 60) : 3600;
 }
 
+// Marks per question as set in the admin panel (positiveMarks / negativeMarks); fallback +1 / 0.
+function resolveMockMarks(node: any): { pos: number; neg: number } {
+  const p = Number(node?.positiveMarks);
+  const n = Number(node?.negativeMarks);
+  return {
+    pos: Number.isFinite(p) && p > 0 ? p : 1,
+    neg: Number.isFinite(n) ? Math.abs(n) : 0
+  };
+}
+
+function fmtMarks(v: number): string {
+  return String(Math.round(v * 100) / 100);
+}
+
 function findFirstMockNode(nodes: any[]): any | null {
   if (!Array.isArray(nodes)) return null;
   for (const item of nodes) {
@@ -267,6 +281,7 @@ function getQuizSubjectsFromAdmin(nodes: any[]): any[] {
             options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
             optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
             correct: resolveCorrectIndex(q),
+            category: q.section || q.subject || q.category || undefined,
             explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
             explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
           }));
@@ -318,6 +333,7 @@ function getMockQuestionsFromAdmin(nodes: any[]): QuizQuestion[] {
             options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
             optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
             correct: resolveCorrectIndex(q),
+            category: q.section || q.subject || q.category || undefined,
             explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
             explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
           }));
@@ -2056,6 +2072,7 @@ export default function App() {
   const [userMockAnswers, setUserMockAnswers] = useState<(number | null)[]>([]);
   const [mockTimer, setMockTimer] = useState(3600);
   const [mockDurationSec, setMockDurationSec] = useState(3600);
+  const [mockMarks, setMockMarks] = useState<{ pos: number; neg: number }>({ pos: 1, neg: 0 });
   const [mockTimerActive, setMockTimerActive] = useState(false);
 
   // Calculation Setup State
@@ -2292,6 +2309,7 @@ export default function App() {
         options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
         optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
         correct: resolveCorrectIndex(q),
+        category: q.section || q.subject || q.category || undefined,
         explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
         explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
       }));
@@ -2318,6 +2336,7 @@ export default function App() {
         setMockIndex(0);
         setUserMockAnswers(new Array(normalizedQs.length).fill(null));
         setMockDurationSec(durSec);
+        setMockMarks(resolveMockMarks(btn));
         setMockTimer(durSec);
         setMockTimerActive(true);
         navigateTo('mock_play');
@@ -2382,7 +2401,9 @@ export default function App() {
     if (target.includes('mock')) {
       const mockQs = getMockQuestionsFromAdmin(adminNodes);
       if (mockQs.length > 0) {
-        const durSec = resolveMockDurationSec(findFirstMockNode(adminNodes));
+        const firstMock = findFirstMockNode(adminNodes);
+        const durSec = resolveMockDurationSec(firstMock);
+        setMockMarks(resolveMockMarks(firstMock));
         setMockQuestions(mockQs);
         setMockIndex(0);
         setUserMockAnswers(new Array(mockQs.length).fill(null));
@@ -3939,15 +3960,30 @@ export default function App() {
                   let correct = 0;
                   let wrong = 0;
                   let unattempted = 0;
+                  const secMap: Record<string, { total: number; correct: number; wrong: number }> = {};
                   mockQuestions.forEach((q, idx) => {
                     const ans = userMockAnswers[idx];
+                    const sec = String(q.category || '');
+                    if (!secMap[sec]) secMap[sec] = { total: 0, correct: 0, wrong: 0 };
+                    secMap[sec].total++;
                     if (ans === null || ans === undefined) unattempted++;
-                    else if (ans === q.correct) correct++;
-                    else wrong++;
+                    else if (ans === q.correct) { correct++; secMap[sec].correct++; }
+                    else { wrong++; secMap[sec].wrong++; }
                   });
+                  const marksScore = correct * mockMarks.pos - wrong * mockMarks.neg;
+                  const marksTotal = mockQuestions.length * mockMarks.pos;
+                  const secNames = Object.keys(secMap);
+                  const showSections = secNames.length > 1;
 
                   return (
                     <>
+                      <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200" data-testid="mock-marks">
+                        <p className="text-xs text-blue-700 font-bold">{langHindi ? 'कुल अंक (Marks)' : 'Total Marks'}</p>
+                        <p className="text-3xl font-bold text-blue-900 mt-1">{langHindi ? 'अंक: ' : 'Marks: '}{fmtMarks(marksScore)} / {fmtMarks(marksTotal)}</p>
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          {langHindi ? `सही +${fmtMarks(mockMarks.pos)}, गलत −${fmtMarks(mockMarks.neg)}, छोड़े 0` : `Correct +${fmtMarks(mockMarks.pos)}, Wrong −${fmtMarks(mockMarks.neg)}, Skipped 0`}
+                        </p>
+                      </div>
                       <div className="grid grid-cols-3 gap-3">
                         <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200">
                           <p className="text-xs text-emerald-700 font-bold">{langHindi ? 'सही (Correct)' : 'Correct'}</p>
@@ -3962,6 +3998,25 @@ export default function App() {
                           <p className="text-2xl font-bold text-slate-800 mt-1">{unattempted}</p>
                         </div>
                       </div>
+
+                      {showSections && (
+                        <div className="text-left border border-slate-200 rounded-2xl overflow-hidden text-xs">
+                          <div className="grid grid-cols-4 gap-1 bg-slate-50 px-3 py-2 font-bold text-slate-600">
+                            <span>{langHindi ? 'सेक्शन' : 'Section'}</span><span className="text-center">{langHindi ? 'सही' : 'Correct'}</span><span className="text-center">{langHindi ? 'गलत' : 'Wrong'}</span><span className="text-right">{langHindi ? 'अंक' : 'Marks'}</span>
+                          </div>
+                          {secNames.map(name => {
+                            const r = secMap[name];
+                            return (
+                              <div key={name || '-'} className="grid grid-cols-4 gap-1 px-3 py-2 border-t border-slate-100 text-slate-800">
+                                <span className="truncate">{name || (langHindi ? 'अन्य' : 'Other')}</span>
+                                <span className="text-center text-emerald-700">{r.correct}</span>
+                                <span className="text-center text-rose-700">{r.wrong}</span>
+                                <span className="text-right font-bold">{fmtMarks(r.correct * mockMarks.pos - r.wrong * mockMarks.neg)} / {fmtMarks(r.total * mockMarks.pos)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
 
                       {/* Mock Detailed Review */}
                       <div className="text-left border-t border-slate-100 pt-4">
