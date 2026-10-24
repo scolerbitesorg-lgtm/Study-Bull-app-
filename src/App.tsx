@@ -15,6 +15,7 @@ import {
   syncExistingContentToSupabase
 } from './lib/supabase.ts';
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
+import { EligibilityList, EligibilityExam } from './components/EligibilityChecker';
 
 // Error Boundary to prevent any blank or white screen crashes
 interface ErrorBoundaryProps {
@@ -145,7 +146,9 @@ type ViewState =
   | 'typing_setup' 
   | 'typing_practice' 
   | 'typing_result'
-  | 'custom_node';
+  | 'custom_node'
+  | 'eligibility'
+  | 'eligibility_exam';
 
 export interface QuizQuestion {
   id: number;
@@ -2462,6 +2465,7 @@ export default function App() {
     return {};
   });
 
+  const [eligibilityExamId, setEligibilityExamId] = useState<string | null>(null);
   const [isDbLoaded, setIsDbLoaded] = useState<boolean>(() => {
     try {
       const cached = localStorage.getItem('studybull_user_cache') || localStorage.getItem('studybull_cached_nodes');
@@ -2894,6 +2898,9 @@ export default function App() {
       case 'typing_practice':
       case 'typing_result':
         return langHindi ? 'टाइपिंग लैब' : 'Typing Lab';
+      case 'eligibility':
+      case 'eligibility_exam':
+        return langHindi ? 'पात्रता जाँच' : 'Eligibility Checker';
       default:
         return defaultAppName;
     }
@@ -3475,12 +3482,48 @@ export default function App() {
                           </button>
                         );
                       })}
+
+                    {/* Code-defined tile (not from admin data): Eligibility Checker — always after the admin tiles */}
+                    {(isDbLoaded || adminNodes.length > 0) && (
+                      <button
+                        key="eligibility-checker-tile"
+                        onClick={() => navigateTo('eligibility')}
+                        className="col-span-2 sm:col-span-2 md:col-span-3 relative bg-gradient-to-r from-emerald-50 via-emerald-50/90 to-teal-100/80 rounded-2xl p-4 border border-emerald-300 shadow-sm hover:shadow-md transition active:scale-[0.98] cursor-pointer flex items-center justify-between text-left"
+                      >
+                        <div className="flex items-center space-x-3.5 min-w-0">
+                          <div className="w-11 h-11 rounded-xl bg-emerald-200/90 text-emerald-900 flex items-center justify-center text-2xl shrink-0 shadow-sm">✅</div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-extrabold text-emerald-950 text-base sm:text-lg tracking-tight truncate">
+                                {langHindi ? 'पात्रता जाँच' : 'Eligibility Checker'}
+                              </h3>
+                              <span className="px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-extrabold rounded-md shrink-0">NEW</span>
+                            </div>
+                            <p className="text-xs text-emerald-800/90 font-medium truncate mt-0.5">
+                              {langHindi ? 'Eligibility Checker · आप किन परीक्षाओं के लिए पात्र हैं?' : 'Which exams can you apply for?'}
+                            </p>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-emerald-700 shrink-0 ml-2" />
+                      </button>
+                    )}
                     </div>
                   </motion.div>
               </>
             )}
 
             {/* 2. QUIZ SUBJECT CATEGORIES */}
+            {currentView === 'eligibility' && (
+              <EligibilityList
+                onOpenExam={(id) => {
+                  setEligibilityExamId(id);
+                  navigateTo('eligibility_exam');
+                }}
+              />
+            )}
+
+            {currentView === 'eligibility_exam' && <EligibilityExam examId={eligibilityExamId} />}
+
             {currentView === 'quiz_categories' && (
               <motion.div
                 key="quiz-categories"
