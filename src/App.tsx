@@ -16,6 +16,7 @@ import {
 } from './lib/supabase.ts';
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
 import { EligibilityList, EligibilityExam } from './components/EligibilityChecker';
+import { JobAlert } from './components/JobAlert';
 
 // Error Boundary to prevent any blank or white screen crashes
 interface ErrorBoundaryProps {
@@ -148,7 +149,8 @@ type ViewState =
   | 'typing_result'
   | 'custom_node'
   | 'eligibility'
-  | 'eligibility_exam';
+  | 'eligibility_exam'
+  | 'job_alert';
 
 export interface QuizQuestion {
   id: number;
@@ -2901,6 +2903,8 @@ export default function App() {
       case 'eligibility':
       case 'eligibility_exam':
         return langHindi ? 'पात्रता जाँच' : 'Eligibility Checker';
+      case 'job_alert':
+        return langHindi ? 'जॉब अलर्ट' : 'Job Alert';
       default:
         return defaultAppName;
     }
@@ -3507,6 +3511,29 @@ export default function App() {
                         <ChevronRight className="w-5 h-5 text-emerald-700 shrink-0 ml-2" />
                       </button>
                     )}
+                    {/* Code-defined tile (not from admin data): Job Alert — right after the Eligibility Checker */}
+                    {(isDbLoaded || adminNodes.length > 0) && (
+                      <button
+                        key="job-alert-tile"
+                        onClick={() => navigateTo('job_alert')}
+                        className="col-span-2 sm:col-span-2 md:col-span-3 relative bg-gradient-to-r from-orange-50 via-orange-50/90 to-amber-100/80 rounded-2xl p-4 border border-orange-300 shadow-sm hover:shadow-md transition active:scale-[0.98] cursor-pointer flex items-center justify-between text-left"
+                      >
+                        <div className="flex items-center space-x-3.5 min-w-0">
+                          <div className="w-11 h-11 rounded-xl bg-orange-200/90 text-orange-900 flex items-center justify-center text-2xl shrink-0 shadow-sm">🔔</div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-extrabold text-orange-950 text-base sm:text-lg tracking-tight truncate">
+                                {langHindi ? 'Job Alert — सरकारी नौकरी' : 'Job Alert — Govt Jobs'}
+                              </h3>
+                            </div>
+                            <p className="text-xs text-orange-800/90 font-medium truncate mt-0.5">
+                              {langHindi ? 'ताज़ा भर्तियाँ • अंतिम तिथि व आवेदन लिंक' : 'Latest vacancies • last dates & apply links'}
+                            </p>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-orange-700 shrink-0 ml-2" />
+                      </button>
+                    )}
                     </div>
                   </motion.div>
               </>
@@ -3523,6 +3550,8 @@ export default function App() {
             )}
 
             {currentView === 'eligibility_exam' && <EligibilityExam examId={eligibilityExamId} />}
+
+            {currentView === 'job_alert' && <JobAlert />}
 
             {currentView === 'quiz_categories' && (
               <motion.div
