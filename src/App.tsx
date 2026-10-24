@@ -127,6 +127,9 @@ const playGentleSound = (type: 'tap' | 'correct' | 'wrong' | 'celebrate', muted:
   }
 };
 
+// One entry of the in-app navigation stack (mirrors browser history entries)
+type NavSnapshot = { view: ViewState; node: any; folders: any[]; chapter: any };
+
 type ViewState = 
   | 'home' 
   | 'quiz_categories' 
@@ -2213,13 +2216,12 @@ export default function App() {
       return;
     }
 
+    // Parents of the page being opened (for breadcrumbs): the open folder and its own parents
+    const nextFolderStack = (currentView === 'custom_node' && activeCustomNode) ? [...folderStack, activeCustomNode] : [];
+
     // IF THIS BUTTON HAS SUB-BUTTONS OR IS MARKED AS A FOLDER, OPEN AS A FOLDER VIEW SO ALL INSIDE BUTTONS ARE ACCESSIBLE
     if (isFolderNode(btn) || (Array.isArray(btn.children) && btn.children.length > 0)) {
-      if (currentView === 'custom_node' && activeCustomNode) {
-        setFolderStack(prev => [...prev, activeCustomNode]);
-      } else {
-        setFolderStack([]);
-      }
+      setFolderStack(nextFolderStack);
       setActiveCustomNode(btn);
       setHtmlReloadKey(0);
       setHtmlIsFullscreen(false);
@@ -2256,6 +2258,7 @@ export default function App() {
     );
 
     if (isHtmlNode) {
+      setFolderStack(nextFolderStack);
       setActiveCustomNode(btn);
       setHtmlReloadKey(0);
       setHtmlIsFullscreen(false);
@@ -2411,6 +2414,7 @@ export default function App() {
     }
 
     // 7. CUSTOM HTML CODE PAGE / OTHER
+    setFolderStack(nextFolderStack);
     setActiveCustomNode(btn);
     setHtmlReloadKey(0);
     setHtmlIsFullscreen(false);
@@ -2524,22 +2528,144 @@ export default function App() {
     document.title = title;
   }, [adminSettings?.appName]);
 
-  // Synchronize browser history with views so hardware/browser back NEVER produces a white screen
-  useEffect(() => {
-    const handlePopState = () => {
-      // Safely navigate backwards inside the app
-      if (currentView !== 'home') {
-        handleBack();
+  // ---- Navigation stack synced with browser history ----
+  // Every page the user opens is one entry here AND one browser-history entry, so the in-app
+  // "वापस" button and the phone/browser back gesture both go exactly ONE level up
+  // (content -> topic/subject list -> button page -> home). At home, back leaves the site normally.
+  const navStackRef = useRef<NavSnapshot[]>([]);
+  const navIndexRef = useRef(0);
+  const liveNavRef = useRef<NavSnapshot>({ view: 'home', node: null, folders: [], chapter: null });
+  liveNavRef.current = { view: currentView, node: activeCustomNode, folders: folderStack, chapter: selectedChapter };
+
+  const PLAY_VIEWS: ViewState[] = ['quiz_play', 'mock_play', 'calc_practice', 'typing_practice'];
+  const RESULT_VIEWS: ViewState[] = ['quiz_result', 'mock_result', 'calc_result', 'typing_result'];
+  const HUB_VIEWS: ViewState[] = ['home', 'quiz_categories', 'notes_lib', 'calc_setup', 'typing_setup'];
+
+  const stopActivityTimers = (from: ViewState, to: ViewState) => {
+    if (from === to) return;
+    if (from === 'mock_play' || from === 'mock_result') setMockTimerActive(false);
+    if (from === 'calc_practice' || from === 'calc_result') setCalcTimerActive(false);
+    if (from === 'typing_practice' || from === 'typing_result') setTypingStarted(false);
+  };
+
+  const restoreNav = (snap: NavSnapshot) => {
+    stopActivityTimers(liveNavRef.current.view, snap.view);
+    liveNavRef.current = { ...snap };
+    setFolderStack(Array.isArray(snap.folders) ? snap.folders : []);
+    setActiveCustomNode(snap.view === 'home' ? null : snap.node);
+    if (snap.chapter !== undefined) setSelectedChapter(snap.chapter);
+    setHtmlIsFullscreen(false);
+    setCurrentView(snap.view);
+  };
+
+  // Move to stack entry i through browser history (popstate below does the restore)
+  const goToNavIndex = (i: number) => {
+    const before = navIndexRef.current;
+    if (i === before || i < 0 || i >= navStackRef.current.length) return;
+    try {
+      window.history.go(i - before);
+    } catch {
+      // ignore, fallback below
+    }
+    // Safety net: if the browser did not move (popstate never came), restore in-app anyway
+    window.setTimeout(() => {
+      if (navIndexRef.current === before) {
+        const stack = navStackRef.current;
+        stack[before] = { ...liveNavRef.current };
+        navIndexRef.current = i;
+        restoreNav(stack[i]);
       }
+    }, 700);
+  };
+
+  useEffect(() => {
+    navStackRef.current = [{ ...liveNavRef.current }];
+    navIndexRef.current = 0;
+    try {
+      window.history.replaceState({ ...(window.history.state || {}), sbNav: 0 }, '');
+    } catch {
+      // ignore
+    }
+
+    const handlePopState = (e: PopStateEvent) => {
+      const stack = navStackRef.current;
+      if (!stack.length) return;
+      const raw = e.state && typeof e.state.sbNav === 'number' ? e.state.sbNav : 0;
+      const target = Math.max(0, Math.min(raw, stack.length - 1));
+      const cur = navIndexRef.current;
+      if (target === cur) return;
+      if (cur < stack.length) stack[cur] = { ...liveNavRef.current };
+      navIndexRef.current = target;
+      restoreNav(stack[target]);
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [currentView]);
+  }, []);
 
   // Navigate view with history state
   const navigateTo = (view: ViewState) => {
-    window.history.pushState({ view }, '');
+    const stack = navStackRef.current;
+    if (!stack.length) {
+      stack.push({ ...liveNavRef.current });
+      navIndexRef.current = 0;
+    }
+    if (view === 'home') {
+      goHomeNav();
+      return;
+    }
+    const cur = navIndexRef.current;
+    const from = liveNavRef.current.view;
+
+    // A result screen (or "try again" from a result) replaces the current page instead of adding one
+    if (RESULT_VIEWS.includes(view) || (RESULT_VIEWS.includes(from) && PLAY_VIEWS.includes(view))) {
+      setCurrentView(view);
+      return;
+    }
+
+    // Going to a list/setup page that is already below us (home, notes list, setup) = go back to it
+    if (HUB_VIEWS.includes(view) && view !== from) {
+      for (let i = cur - 1; i >= 0; i--) {
+        if (stack[i].view === view) {
+          goToNavIndex(i);
+          return;
+        }
+      }
+    }
+
+    stack[cur] = { ...liveNavRef.current };
+    stack.length = cur + 1;
+    stack.push({ ...liveNavRef.current, view });
+    navIndexRef.current = cur + 1;
+    try {
+      window.history.pushState({ sbNav: cur + 1 }, '');
+    } catch {
+      // ignore
+    }
     setCurrentView(view);
+  };
+
+  // Breadcrumb helpers: jump back to home / to an open parent folder (one history move)
+  const goHomeNav = () => {
+    if (navIndexRef.current > 0) {
+      goToNavIndex(0);
+      return;
+    }
+    setActiveCustomNode(null);
+    setFolderStack([]);
+    setCurrentView('home');
+  };
+
+  const goToFolderNav = (parent: any, idx: number) => {
+    const stack = navStackRef.current;
+    for (let i = navIndexRef.current - 1; i >= 0; i--) {
+      const n = stack[i].node;
+      if (stack[i].view === 'custom_node' && n && (n === parent || (n.id != null && n.id === parent?.id))) {
+        goToNavIndex(i);
+        return;
+      }
+    }
+    setFolderStack(s => s.slice(0, idx));
+    setActiveCustomNode(parent);
   };
 
   // Mock Timer
@@ -2620,6 +2746,12 @@ export default function App() {
   // Rock-Solid Safe Back Button Handler
   // Never unmounts unexpectedly and always maps to a stable parent view
   const handleBack = () => {
+    // One level up through the shared navigation stack / browser history
+    if (navIndexRef.current > 0) {
+      goToNavIndex(navIndexRef.current - 1);
+      return;
+    }
+    // Fallback (page reached without a history entry): old parent mapping
     switch (currentView) {
       case 'custom_node':
         if (folderStack.length > 0) {
@@ -2825,11 +2957,7 @@ export default function App() {
           {/* Interactive Open Tab & Location Banner */}
           <div className="bg-slate-900 text-white text-xs px-4 py-2 flex items-center space-x-2 overflow-x-auto whitespace-nowrap border-b border-slate-800 shrink-0 shadow-inner">
             <button
-              onClick={() => {
-                setActiveCustomNode(null);
-                setFolderStack([]);
-                setCurrentView('home');
-              }}
+              onClick={goHomeNav}
               className="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 font-medium cursor-pointer border border-slate-700/80"
             >
               <span>🏠</span>
@@ -2840,10 +2968,7 @@ export default function App() {
               <React.Fragment key={parent.id || idx}>
                 <span className="text-slate-500 font-extrabold text-sm">›</span>
                 <button
-                  onClick={() => {
-                    setFolderStack(s => s.slice(0, idx));
-                    setActiveCustomNode(parent);
-                  }}
+                  onClick={() => goToFolderNav(parent, idx)}
                   className="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 font-medium cursor-pointer border border-slate-700/80"
                 >
                   <span>📌</span>
@@ -3430,7 +3555,7 @@ export default function App() {
                             : 'Add questions for this quiz from Admin Panel.'}
                         </p>
                         <button
-                          onClick={() => setCurrentView('quiz_categories')}
+                          onClick={() => navigateTo('quiz_categories')}
                           className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
                         >
                           {langHindi ? 'श्रेणियां देखें' : 'View Categories'}
@@ -3679,7 +3804,7 @@ export default function App() {
                             : 'Add a new mock test or MCQs from Admin Panel.'}
                         </p>
                         <button
-                          onClick={() => setCurrentView('home')}
+                          onClick={() => navigateTo('home')}
                           className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
                         >
                           {langHindi ? 'होम पर वापस जाएं' : 'Back to Home'}
