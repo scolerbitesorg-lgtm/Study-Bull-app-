@@ -3487,51 +3487,54 @@ export default function App() {
                         );
                       })}
 
-                    {/* Code-defined tile (not from admin data): Eligibility Checker — always after the admin tiles */}
+                    {/* Code-defined block tiles (not from admin data), same card as the admin button tiles: Eligibility Checker, then Job Alert */}
                     {(isDbLoaded || adminNodes.length > 0) && (
                       <button
                         key="eligibility-checker-tile"
                         onClick={() => navigateTo('eligibility')}
-                        className="col-span-2 sm:col-span-2 md:col-span-3 relative bg-gradient-to-r from-emerald-50 via-emerald-50/90 to-teal-100/80 rounded-2xl p-4 border border-emerald-300 shadow-sm hover:shadow-md transition active:scale-[0.98] cursor-pointer flex items-center justify-between text-left"
+                        className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                       >
-                        <div className="flex items-center space-x-3.5 min-w-0">
-                          <div className="w-11 h-11 rounded-xl bg-emerald-200/90 text-emerald-900 flex items-center justify-center text-2xl shrink-0 shadow-sm">✅</div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-extrabold text-emerald-950 text-base sm:text-lg tracking-tight truncate">
-                                {langHindi ? 'पात्रता जाँच' : 'Eligibility Checker'}
-                              </h3>
-                              <span className="px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-extrabold rounded-md shrink-0">NEW</span>
-                            </div>
-                            <p className="text-xs text-emerald-800/90 font-medium truncate mt-0.5">
-                              {langHindi ? 'Eligibility Checker · आप किन परीक्षाओं के लिए पात्र हैं?' : 'Which exams can you apply for?'}
-                            </p>
-                          </div>
+                        <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
+                              <span className="px-1.5 py-0.5 bg-emerald-600 text-white text-[9px] font-extrabold rounded-md leading-none">NEW</span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-emerald-700 shrink-0 ml-2" />
+
+                        <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
+                          ✅
+                        </div>
+
+                        <div className="w-full">
+                          <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-sm sm:text-base leading-snug line-clamp-1">
+                            {langHindi ? 'पात्रता जाँच' : 'Eligibility Checker'}
+                          </h3>
+                          <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
+                            {langHindi ? 'कौन-सी परीक्षा दे सकते हैं?' : 'Which exams can you apply for?'}
+                          </p>
+                        </div>
                       </button>
                     )}
-                    {/* Code-defined tile (not from admin data): Job Alert — right after the Eligibility Checker */}
                     {(isDbLoaded || adminNodes.length > 0) && (
                       <button
                         key="job-alert-tile"
                         onClick={() => navigateTo('job_alert')}
-                        className="col-span-2 sm:col-span-2 md:col-span-3 relative bg-gradient-to-r from-orange-50 via-orange-50/90 to-amber-100/80 rounded-2xl p-4 border border-orange-300 shadow-sm hover:shadow-md transition active:scale-[0.98] cursor-pointer flex items-center justify-between text-left"
+                        className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                       >
-                        <div className="flex items-center space-x-3.5 min-w-0">
-                          <div className="w-11 h-11 rounded-xl bg-orange-200/90 text-orange-900 flex items-center justify-center text-2xl shrink-0 shadow-sm">🔔</div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-extrabold text-orange-950 text-base sm:text-lg tracking-tight truncate">
-                                {langHindi ? 'Job Alert — सरकारी नौकरी' : 'Job Alert — Govt Jobs'}
-                              </h3>
-                            </div>
-                            <p className="text-xs text-orange-800/90 font-medium truncate mt-0.5">
-                              {langHindi ? 'ताज़ा भर्तियाँ • अंतिम तिथि व आवेदन लिंक' : 'Latest vacancies • last dates & apply links'}
-                            </p>
-                          </div>
+                        <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-orange-700 shrink-0 ml-2" />
+
+                        <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
+                          🔔
+                        </div>
+
+                        <div className="w-full">
+                          <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-sm sm:text-base leading-snug line-clamp-1">
+                            {langHindi ? 'Job Alert' : 'Job Alert'}
+                          </h3>
+                          <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
+                            {langHindi ? 'सरकारी नौकरी • अंतिम तिथि' : 'Govt jobs • last dates'}
+                          </p>
+                        </div>
                       </button>
                     )}
                     </div>
