@@ -4353,15 +4353,7 @@ export default function App() {
                             <span className="truncate max-w-[150px]">{nextChapter.title}</span>
                             <span>→</span>
                           </button>
-                        ) : (
-                          <button
-                            onClick={() => navigateTo('notes_lib')}
-                            className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center gap-2 cursor-pointer shadow-xs ml-auto"
-                          >
-                            <span>{langHindi ? 'सभी नोट्स देखें' : 'View All Notes'}</span>
-                            <span>✓</span>
-                          </button>
-                        )}
+                        ) : null}
                       </div>
                     </>
                   );
