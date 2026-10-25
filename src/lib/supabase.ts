@@ -237,7 +237,7 @@ export function normalizeNode(n: any): StudyBullNode {
 
 // 1. शुरुआती डेटा (Buttons, Folders, Quizzes, Settings) लोड करने के लिए:
 // Dual strategy: Direct native fetch (100% resilient on Vercel) + Supabase JS Client fallback
-export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any; raw?: any; error?: string }> {
+export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any; raw?: any; error?: string; updatedAt?: string }> {
   const { url, anonKey } = getSupabaseCredentials();
   if (!url || !anonKey) {
     return {
@@ -250,7 +250,8 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
   // Strategy A: Ultra-fast native HTTPS fetch (bypasses all client SDK packaging/websocket issues on Vercel)
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 6000);
+    // The state row is several MB: a 6 s abort cut slow mobile downloads off and then re-downloaded it via the SDK
+    const timer = setTimeout(() => controller.abort(), 30000);
     const endpoint = `${url}/rest/v1/studybull_app_state?select=nodes,settings,updated_at&order=updated_at.desc&limit=1`;
     const response = await fetch(endpoint, {
       method: 'GET',
@@ -272,8 +273,8 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
         const publishedNodes = rawNodes.filter(isNodeActive).map(normalizeNode);
 
         try {
+          localStorage.removeItem('studybull_cached_nodes');
           localStorage.setItem('studybull_user_cache', JSON.stringify(publishedNodes));
-          localStorage.setItem('studybull_cached_nodes', JSON.stringify(publishedNodes));
           if (latestRow.settings) {
             localStorage.setItem('studybull_cached_settings', JSON.stringify(latestRow.settings));
           }
@@ -283,6 +284,7 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
           nodes: publishedNodes,
           settings: latestRow.settings || {},
           raw: latestRow,
+          updatedAt: latestRow.updated_at,
         };
       }
     }
@@ -334,8 +336,8 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
       const publishedNodes = rawNodes.filter(isNodeActive).map(normalizeNode);
 
       try {
+        localStorage.removeItem('studybull_cached_nodes');
         localStorage.setItem('studybull_user_cache', JSON.stringify(publishedNodes));
-        localStorage.setItem('studybull_cached_nodes', JSON.stringify(publishedNodes));
         if (row.settings) {
           localStorage.setItem('studybull_cached_settings', JSON.stringify(row.settings));
         }
@@ -345,6 +347,7 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
         nodes: publishedNodes,
         settings: row.settings || {},
         raw: row,
+        updatedAt: row.updated_at,
       };
     }
 
@@ -382,6 +385,26 @@ function getCachedSettings(): any {
   return {};
 }
 
+// Cheap freshness check: only the row's updated_at (~100 bytes) instead of the whole multi-MB state
+export async function fetchStudyBullStamp(): Promise<string | null> {
+  const { url, anonKey } = getSupabaseCredentials();
+  if (!url || !anonKey) return null;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(`${url}/rest/v1/studybull_app_state?select=updated_at&order=updated_at.desc&limit=1`, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return Array.isArray(rows) && rows[0]?.updated_at ? String(rows[0].updated_at) : null;
+  } catch {
+    return null;
+  }
+}
+
 // 2. Admin में बदलाव होते ही User App में तुरंत लाइव अपडेट करने के लिए:
 export function subscribeToAdminUpdates(onUpdate: (data: { nodes: any[]; settings: any }) => void) {
   const client = getSupabaseClient();
@@ -399,14 +422,21 @@ export function subscribeToAdminUpdates(onUpdate: (data: { nodes: any[]; setting
         },
         (payload: any) => {
           const row = payload.new as any;
+          if (row && !Array.isArray(row.nodes)) {
+            // Large rows reach realtime truncated (nodes dropped): refetch instead of showing an empty app
+            loadStudyBullApp().then((d) => {
+              if (Array.isArray(d.nodes) && d.nodes.length > 0) onUpdate({ nodes: d.nodes, settings: d.settings || {} });
+            }).catch(() => {});
+            return;
+          }
           if (row) {
             const rawNodes = Array.isArray(row.nodes) ? row.nodes : [];
             const published = rawNodes.filter(isNodeActive).map(normalizeNode);
 
             // Update localStorage cache simultaneously
             try {
+              localStorage.removeItem('studybull_cached_nodes');
               localStorage.setItem('studybull_user_cache', JSON.stringify(published));
-              localStorage.setItem('studybull_cached_nodes', JSON.stringify(published));
               if (row.settings) {
                 localStorage.setItem('studybull_cached_settings', JSON.stringify(row.settings));
               }

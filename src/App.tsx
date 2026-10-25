@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   loadStudyBullApp, 
   subscribeToAdminUpdates, 
+  fetchStudyBullStamp,
   recordUserAttempt,
   syncExistingContentToSupabase
 } from './lib/supabase.ts';
@@ -2439,8 +2440,8 @@ export default function App() {
     if (Array.isArray(nodes)) {
       setAdminNodes(nodes);
       try {
+        localStorage.removeItem('studybull_cached_nodes');
         localStorage.setItem('studybull_user_cache', JSON.stringify(nodes));
-        localStorage.setItem('studybull_cached_nodes', JSON.stringify(nodes));
       } catch {}
     }
     if (settings && Object.keys(settings).length > 0) {
@@ -2458,9 +2459,13 @@ export default function App() {
   useEffect(() => {
     let isMounted = true;
 
+    // Last applied state version (row updated_at) — lets the background sync skip unchanged data
+    let lastStamp: string | null = null;
+
     // 1. Initial background fetch & normalization from Supabase
     loadStudyBullApp().then((appData) => {
       if (!isMounted) return;
+      if (appData.updatedAt) lastStamp = appData.updatedAt;
       if (Array.isArray(appData.nodes) && (appData.nodes.length > 0 || !appData.error)) {
         applyLiveAdminData(appData.nodes, appData.settings || {});
       } else {
@@ -2477,19 +2482,32 @@ export default function App() {
       applyLiveAdminData(data.nodes || [], data.settings || {});
     });
 
-    // 3. Fallback sync to guarantee instant update if realtime socket blips
-    const timer = setInterval(() => {
-      loadStudyBullApp().then((appData) => {
-        if (!isMounted) return;
-        if (appData && Array.isArray(appData.nodes)) {
-          applyLiveAdminData(appData.nodes, appData.settings || {});
-        }
-      }).catch(() => {});
-    }, 4000);
+    // 3. Fallback sync: check only the tiny updated_at stamp (was: re-download the whole multi-MB
+    //    state every 4 s), and fetch the full state only when the admin actually saved something.
+    let syncing = false;
+    const syncIfChanged = () => {
+      if (!isMounted || syncing) return;
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      syncing = true;
+      fetchStudyBullStamp().then((stamp) => {
+        if (!isMounted || !stamp || stamp === lastStamp) return;
+        return loadStudyBullApp().then((appData) => {
+          if (!isMounted) return;
+          if (appData && Array.isArray(appData.nodes) && (appData.nodes.length > 0 || !appData.error)) {
+            if (appData.updatedAt) lastStamp = appData.updatedAt;
+            applyLiveAdminData(appData.nodes, appData.settings || {});
+          }
+        });
+      }).catch(() => {}).finally(() => { syncing = false; });
+    };
+    const timer = setInterval(syncIfChanged, 15000);
+    const onVisible = () => { if (document.visibilityState === 'visible') syncIfChanged(); };
+    document.addEventListener('visibilitychange', onVisible);
 
     return () => {
       isMounted = false;
       clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
       if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, []);
