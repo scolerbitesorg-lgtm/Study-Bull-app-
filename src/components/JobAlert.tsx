@@ -19,6 +19,8 @@ type Job = {
   link?: string;
   link_display?: string;
   unconfirmed?: string[];
+  category?: string;
+  state?: string;
 };
 
 const DATA = JOBS_DATA as unknown as { updatedAt: string; jobs: Job[] };
@@ -75,8 +77,28 @@ const Row: React.FC<{ label: string; value?: string | null; flag?: boolean }> = 
 
 type Filter = 'all' | 'open' | 'upcoming';
 
+// Category chips (Aarav, 24 Oct 2026: "Usi me hi rakho ye category state vgera ki")
+const CATEGORIES: { key: string; label: string }[] = [
+  { key: 'all', label: 'सभी' },
+  { key: 'Defence', label: '🪖 Defence' },
+  { key: 'Police', label: '👮 Police' },
+  { key: 'SSC', label: '📝 SSC' },
+  { key: 'Railway', label: '🚆 Railway' },
+  { key: 'Bank', label: '🏦 Bank' },
+  { key: 'UPSC', label: '🏛️ UPSC' },
+  { key: 'Teaching', label: '📚 Teaching' },
+  { key: 'State', label: '🗺️ State' },
+  { key: 'Other', label: '📌 Other' },
+];
+const CAT_LABEL: Record<string, string> = Object.fromEntries(CATEGORIES.map((c) => [c.key, c.label]));
+const ALL_INDIA = 'All India';
+const catOf = (j: Job) => j.category || 'Other';
+const stateOf = (j: Job) => j.state || ALL_INDIA;
+
 export const JobAlert: React.FC = () => {
   const [filter, setFilter] = useState<Filter>('all');
+  const [cat, setCat] = useState<string>('all');
+  const [stateSel, setStateSel] = useState<string>('all');
   const today = todayMidnight();
 
   useEffect(() => {
@@ -105,12 +127,27 @@ export const JobAlert: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [today.getTime()]);
 
+  const stateOptions = useMemo(() => {
+    const set = new Set(jobs.map(({ j }) => stateOf(j)));
+    const rest = [...set].filter((s) => s !== ALL_INDIA).sort((a, b) => a.localeCompare(b));
+    return set.has(ALL_INDIA) ? [ALL_INDIA, ...rest] : rest;
+  }, [jobs]);
+
+  const matchCat = (j: Job) => cat === 'all' || catOf(j) === cat;
+  const matchState = (j: Job) => stateSel === 'all' || stateOf(j) === stateSel;
+  const matchStatus = (st: Job['status']) => filter === 'all' || st === filter;
+
+  // Each row's counts honour the other filters, so the numbers always add up to what you'd see.
+  const base = jobs.filter(({ j }) => matchCat(j) && matchState(j));
   const counts = {
-    all: jobs.length,
-    open: jobs.filter((x) => x.st === 'open').length,
-    upcoming: jobs.filter((x) => x.st === 'upcoming').length,
+    all: base.length,
+    open: base.filter((x) => x.st === 'open').length,
+    upcoming: base.filter((x) => x.st === 'upcoming').length,
   };
-  const shown = jobs.filter((x) => filter === 'all' || x.st === filter);
+  const catCount = (key: string) =>
+    jobs.filter(({ j, st }) => matchStatus(st) && matchState(j) && (key === 'all' || catOf(j) === key)).length;
+  const visibleCats = CATEGORIES.filter((c) => c.key !== 'Other' || catCount('Other') > 0 || cat === 'Other');
+  const shown = jobs.filter(({ j, st }) => matchStatus(st) && matchCat(j) && matchState(j));
 
   const chip = (key: Filter, label: string) => (
     <button
@@ -140,8 +177,61 @@ export const JobAlert: React.FC = () => {
         {chip('upcoming', '🟡 जल्द')}
       </div>
 
+      <div className="-mx-1 px-1 overflow-x-auto overscroll-x-contain" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }} data-testid="job-cat-row">
+        <div className="flex gap-2 w-max pb-1">
+          {visibleCats.map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              data-cat={c.key}
+              onClick={() => setCat(c.key)}
+              className={`shrink-0 whitespace-nowrap px-3 py-2 rounded-full border text-[13px] font-bold transition active:scale-95 cursor-pointer ${
+                cat === c.key ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-700 border-slate-200'
+              }`}
+            >
+              {c.label} ({catCount(c.key)})
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 min-w-0">
+        <label htmlFor="job-state" className="shrink-0 text-[13px] font-bold text-slate-600">📍 राज्य</label>
+        <select
+          id="job-state"
+          data-testid="job-state"
+          value={stateSel}
+          onChange={(e) => setStateSel(e.target.value)}
+          className="flex-1 min-w-0 w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-[14px] font-semibold text-slate-800"
+        >
+          <option value="all">सभी राज्य</option>
+          {stateOptions.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="text-[13px] font-extrabold text-slate-700" data-testid="job-count">
+        🔎 {shown.length} भर्तियाँ मिलीं
+        {(cat !== 'all' || stateSel !== 'all' || filter !== 'all') && (
+          <button
+            type="button"
+            onClick={() => {
+              setCat('all');
+              setStateSel('all');
+              setFilter('all');
+            }}
+            className="ml-2 text-[12px] font-bold text-orange-700 underline cursor-pointer"
+          >
+            फ़िल्टर हटाएँ
+          </button>
+        )}
+      </div>
+
       {shown.length === 0 && (
-        <div className="text-center text-sm text-slate-500 py-8">इस श्रेणी में अभी कोई भर्ती नहीं।</div>
+        <div className="text-center text-sm text-slate-500 py-8">इस फ़िल्टर में अभी कोई भर्ती नहीं।</div>
       )}
 
       {shown.map(({ j, st }) => {
@@ -167,7 +257,11 @@ export const JobAlert: React.FC = () => {
                 </span>
               )}
             </div>
-            <h3 className="mt-2 font-extrabold text-slate-900 text-[15px] leading-snug break-words">{j.name_hi}</h3>
+            <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-bold">
+              <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">{CAT_LABEL[catOf(j)] || catOf(j)}</span>
+              <span className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 border border-sky-200 break-words">📍 {stateOf(j)}</span>
+            </div>
+            <h3 className="mt-1.5 font-extrabold text-slate-900 text-[15px] leading-snug break-words">{j.name_hi}</h3>
             <p className="text-[12px] text-slate-500 font-medium leading-snug break-words">{j.name_en}</p>
 
             <div
