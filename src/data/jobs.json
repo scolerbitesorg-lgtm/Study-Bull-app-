@@ -1,6 +1,6 @@
 {
- "updatedAt": "25 अक्टूबर 2026, सुबह 8:10 बजे",
- "updatedAtIso": "2026-10-25T08:10+05:30",
+ "updatedAt": "25 अक्टूबर 2026, शाम 7:45 बजे",
+ "updatedAtIso": "2026-10-25T19:45+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -228,7 +228,7 @@
    "source": "https://nationalinsurance.nic.co.in/sites/default/files/2026-10/NICL%20AO%20Recruitment%20Advertisment%202026-27.pdf",
    "source_note": "आधिकारिक अधिसूचना",
    "unconfirmed": [],
-   "checked_at": "2026-10-25T08:10+05:30",
+   "checked_at": "2026-10-25T19:45+05:30",
    "category": "Bank",
    "state": "All India"
   },
@@ -521,7 +521,7 @@
    "source": "https://www.rrbapply.gov.in/ + CEN 06/2026 official PDF",
    "source_note": "Dates on rrbapply.gov.in; posts/age/fee from the official CEN PDF",
    "unconfirmed": [],
-   "checked_at": "2026-10-24T23:00+05:30",
+   "checked_at": "2026-10-25T19:45+05:30",
    "link_display": "rrbapply.gov.in",
    "category": "Railway",
    "state": "All India"
@@ -691,7 +691,7 @@
     "posts",
     "age"
    ],
-   "checked_at": "2026-10-24T23:00+05:30",
+   "checked_at": "2026-10-25T19:45+05:30",
    "link_display": "rrbapply.gov.in",
    "category": "Railway",
    "state": "All India"
@@ -802,6 +802,33 @@
    "state": "All India"
   },
   {
+   "id": "rrb-station-master-cen08-2026",
+   "status": "upcoming",
+   "name_hi": "RRB स्टेशन मास्टर भर्ती 2026 (CEN 08/2026)",
+   "name_en": "RRB Station Master Recruitment 2026, CEN 08/2026 (Short Notice)",
+   "posts": "1250",
+   "qualification": "ग्रेजुएशन (किसी भी विषय में)",
+   "age": "विस्तृत CEN के अनुसार (आयु 01.01.2027 को गिनी जाएगी)",
+   "fee": "विस्तृत CEN में घोषित होगी",
+   "start": "2026-10-27",
+   "last": "2026-11-25",
+   "last_note": "संक्षिप्त सूचना की तारीखें — विस्तृत CEN आने पर पक्की होंगी",
+   "exam": "CBT + दस्तावेज़ सत्यापन (तारीख बाद में)",
+   "link": "https://www.rrbapply.gov.in/",
+   "link_display": "rrbapply.gov.in",
+   "source": "https://www.freejobalert.com/articles/rrb-station-master-recruitment-2026-3074679",
+   "source_note": "Short notice reported 22 Oct; not yet listed on rrbapply.gov.in 'Latest Updates' at 7:30 PM 25 Oct — posts/dates from secondary page",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "start",
+    "last"
+   ],
+   "checked_at": "2026-10-25T19:45+05:30",
+   "category": "Railway",
+   "state": "All India"
+  },
+  {
    "id": "appsc-group-ii",
    "status": "upcoming",
    "name_hi": "APPSC ग्रुप-II सेवा भर्ती 2026 (विज्ञापन सं. 37/2026)",
@@ -872,6 +899,32 @@
    "state": "Uttar Pradesh"
   },
   {
+   "id": "rrb-isolated-cen09-2026",
+   "status": "upcoming",
+   "name_hi": "RRB आइसोलेटेड कैटेगरी भर्ती 2026 (CEN 09/2026)",
+   "name_en": "RRB Various Posts of Isolated Categories, CEN 09/2026 (Indicative Notice)",
+   "posts": "लगभग 195 (सभी RRB, अस्थायी)",
+   "qualification": "पद के अनुसार — विस्तृत CEN देखें",
+   "age": "विस्तृत CEN के अनुसार (आयु 01.01.2027 को)",
+   "fee": "विस्तृत CEN में घोषित होगी",
+   "start": "2026-11-05",
+   "last": "2026-12-04",
+   "last_note": "सूचना में दोनों तारीखें 'अस्थायी (Tentative)' लिखी हैं",
+   "exam": "विस्तृत CEN में घोषित होगी",
+   "link": "https://rrb.indianrailways.gov.in/",
+   "link_display": "rrb.indianrailways.gov.in",
+   "source": "https://img2.freejobalert.com/news/2026/10/54855656-6ad88c652ef0f65729859.pdf",
+   "source_note": "Copy of RRB indicative notice No. RRB/GHY/Advt./CEN/09/2026 dated 24/10/2026 (pay level 2 & 7; dates tentative); detailed CEN not yet on RRB sites",
+   "unconfirmed": [
+    "qualification",
+    "start",
+    "last"
+   ],
+   "checked_at": "2026-10-25T19:45+05:30",
+   "category": "Railway",
+   "state": "All India"
+  },
+  {
    "id": "upsc-nda1-2027",
    "status": "upcoming",
    "name_hi": "UPSC NDA व NA परीक्षा (I) 2027",
@@ -887,7 +940,7 @@
    "source": "https://www.upsc.gov.in/sites/default/files/Calendar-Year-2027-Engl-200526_0.pdf",
    "source_note": "UPSC Annual Calendar 2027 (official)",
    "unconfirmed": [],
-   "checked_at": "2026-10-24T23:00+05:30",
+   "checked_at": "2026-10-25T19:45+05:30",
    "link_display": "upsconline.nic.in",
    "category": "UPSC",
    "state": "All India"
@@ -908,7 +961,7 @@
    "source": "https://www.upsc.gov.in/sites/default/files/Calendar-Year-2027-Engl-200526_0.pdf",
    "source_note": "UPSC Annual Calendar 2027 (official)",
    "unconfirmed": [],
-   "checked_at": "2026-10-24T23:00+05:30",
+   "checked_at": "2026-10-25T19:45+05:30",
    "link_display": "upsconline.nic.in",
    "category": "UPSC",
    "state": "All India"
@@ -927,9 +980,9 @@
    "exam": "जनवरी–मार्च 2027 (SSC कैलेंडर)",
    "link": "https://ssc.gov.in/",
    "source": "https://ssc.gov.in/for-candidates/examination-calendar",
-   "source_note": "SSC tentative calendar 2026-27 lists advertisement Sept 2026 / closing Oct 2026 / exam Jan–Mar 2027; as of 24 Oct 2026 the notification is not on the SSC notice board",
+   "source_note": "SSC tentative calendar 2026-27 lists advertisement Sept 2026 / closing Oct 2026 / exam Jan–Mar 2027; as of 25 Oct 2026 7:30 PM IST the notification is not on the SSC notice board",
    "unconfirmed": [],
-   "checked_at": "2026-10-24T23:00+05:30",
+   "checked_at": "2026-10-25T19:45+05:30",
    "link_display": "ssc.gov.in",
    "last_note": "नोटिफिकेशन आने पर (SSC कैलेंडर में सितंबर–अक्टूबर 2026 था, अभी जारी नहीं)",
    "category": "SSC",
@@ -957,7 +1010,7 @@
     "exam",
     "qualification"
    ],
-   "checked_at": "2026-10-24T23:00+05:30",
+   "checked_at": "2026-10-25T19:45+05:30",
    "link_display": "joinindiancoastguard.cdac.in",
    "category": "Defence",
    "state": "All India"
