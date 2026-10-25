@@ -17,6 +17,7 @@ import {
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
 import { EligibilityList, EligibilityExam } from './components/EligibilityChecker';
 import { JobAlert } from './components/JobAlert';
+import { playSound, initSound, type SoundType } from './lib/sound';
 
 // Error Boundary to prevent any blank or white screen crashes
 interface ErrorBoundaryProps {
@@ -71,63 +72,13 @@ class SafeErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState
   }
 }
 
-// Gentle, Soft Sound System
-const playGentleSound = (type: 'tap' | 'correct' | 'wrong' | 'celebrate', muted: boolean) => {
-  if (muted) return;
-  try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    // Soft, delicate volume with clear audibility
-    if (type === 'tap') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      gain.gain.setValueAtTime(0.02, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
-    } else if (type === 'correct') {
-      // Distinct Happy Ascending Chime with smooth ramps
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-      osc.frequency.linearRampToValueAtTime(659.25, ctx.currentTime + 0.08); // E5
-      osc.frequency.linearRampToValueAtTime(783.99, ctx.currentTime + 0.16); // G5
-      gain.gain.setValueAtTime(0.04, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.35);
-    } else if (type === 'wrong') {
-      // Distinct Soft Descending Thud with smooth ramp
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(280, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.15);
-      gain.gain.setValueAtTime(0.035, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.25);
-    } else if (type === 'celebrate') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(440, ctx.currentTime); // A4
-      osc.frequency.linearRampToValueAtTime(554.37, ctx.currentTime + 0.08); // C#5
-      osc.frequency.linearRampToValueAtTime(659.25, ctx.currentTime + 0.16); // E5
-      osc.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.24); // A5
-      gain.gain.setValueAtTime(0.03, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.4);
-    }
-  } catch {
-    // Graceful fallback for audio policy
-  }
+// Sound system: one shared, gesture-unlocked Web Audio context (see src/lib/sound.ts).
+// Old version created a NEW AudioContext on every sound (never closed) — browsers cap these,
+// so sounds stopped after a while, timer sounds stayed silent, and some were cut mid-way.
+const playGentleSound = (type: SoundType, muted: boolean) => {
+  playSound(type, muted);
 };
+initSound();
 
 // One entry of the in-app navigation stack (mirrors browser history entries)
 type NavSnapshot = { view: ViewState; node: any; folders: any[]; chapter: any };
@@ -2121,6 +2072,9 @@ export default function App() {
   const [activeTypingTitle, setActiveTypingTitle] = useState<string>('');
   const passageText = activeTypingPassage || '';
   const [typedInput, setTypedInput] = useState('');
+  // latest typed text for the timer (keeps the 1 s countdown from restarting on every keystroke)
+  const typedInputRef = useRef('');
+  typedInputRef.current = typedInput;
   const [typingStarted, setTypingStarted] = useState(false);
   const [typingTimeLeft, setTypingTimeLeft] = useState(120);
   const typingScrollRef = useRef<HTMLDivElement>(null);
@@ -2705,7 +2659,7 @@ export default function App() {
         setMockTimer(prev => {
           if (prev <= 1) {
             setMockTimerActive(false);
-            playGentleSound('celebrate', soundMuted);
+            playGentleSound('timeup', soundMuted);
             setCurrentView('mock_result');
             return 0;
           }
@@ -2714,6 +2668,13 @@ export default function App() {
       }, 1000);
     }
     return () => clearInterval(interval);
+  }, [mockTimerActive, mockTimer, soundMuted]);
+
+  // Soft countdown tick in the last 10 seconds of a mock test
+  useEffect(() => {
+    if (mockTimerActive && mockTimer > 0 && mockTimer <= 10) {
+      playGentleSound('tick', soundMuted);
+    }
   }, [mockTimerActive, mockTimer, soundMuted]);
 
   // Calc Timer
@@ -2735,13 +2696,13 @@ export default function App() {
             if (prev <= 1) {
               setTypingStarted(false);
               playGentleSound('celebrate', soundMuted);
-              const words = typedInput.trim().split(/\s+/).filter(Boolean).length;
+              const words = typedInputRef.current.trim().split(/\s+/).filter(Boolean).length;
               const durationSec = typeof typingDuration === 'number' ? typingDuration * 60 : 120;
               const finalWpm = Math.round((words / (durationSec / 60))) || 0;
               recordUserAttempt('typing', {
                 wpm: finalWpm,
                 timeTaken: durationSec,
-                characters: typedInput.length
+                characters: typedInputRef.current.length
               });
               setCurrentView('typing_result');
               return 0;
@@ -2752,7 +2713,7 @@ export default function App() {
       }
     }
     return () => clearInterval(interval);
-  }, [typingStarted, typingTimeLeft, typingDuration, soundMuted, typedInput]);
+  }, [typingStarted, typingTimeLeft, typingDuration, soundMuted]);
 
   // Smooth, stable auto-scroll strictly contained within the text box
   // NEVER scrolls the window or causes screen jumping when mobile keyboard is open
@@ -3706,7 +3667,7 @@ export default function App() {
                               key={idx}
                               onClick={() => {
                                 if (!isAnswerRevealed) {
-                                  playGentleSound('tap', soundMuted);
+                                  // (tap sound dropped here: the correct/wrong sound plays at the same moment)
                                   const updated = [...userQuizAnswers];
                                   updated[quizIndex] = idx;
                                   setUserQuizAnswers(updated);
@@ -4647,7 +4608,7 @@ export default function App() {
                               key={idx}
                               onClick={() => {
                                 if (!calcAnswered) {
-                                  playGentleSound('tap', soundMuted);
+                                  // (tap sound dropped here: the correct/wrong sound plays at the same moment)
                                   setCalcSelected(idx);
                                   setCalcAnswered(true);
                                   const isCorrect = idx === currentCalcQ.correct;
