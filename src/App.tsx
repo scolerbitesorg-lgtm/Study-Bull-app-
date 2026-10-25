@@ -2552,7 +2552,9 @@ export default function App() {
   // Synchronize document.title with live Admin App Name
   useEffect(() => {
     const title = adminSettings?.appName?.trim() || 'Study Bull';
-    document.title = title;
+    // SEO: keep the full keyword title (same as index.html) so Google's rendered title stays descriptive.
+    const brand = title.replace(/\s+/g, '').toLowerCase() === 'studybull' ? 'StudyBull' : `${title} | StudyBull`;
+    document.title = `${brand} — SSC GD, Agniveer, Police, Railway Free Mock Test, Notes, PYQ & Current Affairs (Hindi)`;
   }, [adminSettings?.appName]);
 
   // ---- Navigation stack synced with browser history ----

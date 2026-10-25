@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://studybull.vercel.app/sitemap.xml
