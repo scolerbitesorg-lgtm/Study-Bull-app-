@@ -549,22 +549,11 @@ export async function checkSupabaseConnection(): Promise<ConnectionTestResult> {
 }
 
 // User attempt tracking
-export async function recordUserAttempt(type: 'quiz' | 'mock' | 'calc' | 'typing', payload: Record<string, any>) {
-  const client = await getSupabaseClient();
-  if (!client) return null;
-  try {
-    const { data, error } = await client
-      .from('user_attempts')
-      .insert([{ type, data: payload, created_at: new Date().toISOString() }]);
-    if (error) {
-      console.warn('Supabase record attempt error:', error.message);
-      return null;
-    }
-    return data;
-  } catch (err) {
-    console.warn('Supabase error:', err);
-    return null;
-  }
+// The 'user_attempts' table does not exist in Supabase (every insert answered 404 and showed a red
+// console error at each quiz/typing end), and since the Oct 26 2026 RLS lock the public client may
+// not write anything anyway. So this is a no-op: no network request, nothing written. (Tab, Oct 26 2026)
+export async function recordUserAttempt(_type: 'quiz' | 'mock' | 'calc' | 'typing', _payload: Record<string, any>) {
+  return null;
 }
 
 // 4. App Snippets / Button Previews Realtime Sync (Admin Code Editor to User App Preview)
