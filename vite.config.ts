@@ -6,6 +6,12 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
+    build: {
+      // Older Android WebViews / in-app browsers (Instagram, Facebook) still in use: lower modern syntax
+      // (?., ??, class fields…) so the app starts there too; missing APIs are polyfilled in index.html.
+      target: ['es2018', 'chrome64', 'safari12', 'firefox67', 'edge79'],
+      cssTarget: ['chrome64', 'safari12'],
+    },
     resolve: {
       alias: {
         '@': path.resolve('.'),

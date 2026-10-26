@@ -35,13 +35,81 @@
     <meta name="twitter:image" content="https://studybull.vercel.app/og.jpg" />
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "StudyBull", "alternateName": ["Study Bull", "स्टडी बुल", "StudyBull App"], "url": "https://studybull.vercel.app/", "inLanguage": ["hi-IN", "en-IN"], "description": "Free Hindi exam preparation portal for SSC GD, Agniveer, Police Constable and Railway: mock tests, quizzes, notes, PYQ-style practice, current affairs, typing test, speed math and job alerts."}</script>
     <script type="application/ld+json">{"@context": "https://schema.org", "@type": "EducationalOrganization", "name": "StudyBull", "alternateName": "Study Bull", "url": "https://studybull.vercel.app/", "logo": "https://studybull.vercel.app/logo.png", "image": "https://studybull.vercel.app/og.jpg", "description": "StudyBull — परीक्षा तैयारी पोर्टल: SSC GD, Agniveer, Police, Railway की फ्री तैयारी हिंदी में।"}</script>
+    <style>
+      #sb-splash{font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:40px 20px;text-align:center;color:#0f172a}
+      #sb-splash .bar{width:160px;height:4px;margin:16px auto 0;border-radius:4px;background:#e2e8f0;overflow:hidden;position:relative}
+      #sb-splash .bar i{position:absolute;left:-40%;top:0;bottom:0;width:40%;border-radius:4px;background:#0f766e;animation:sbbar 1.1s ease-in-out infinite}
+      @keyframes sbbar{0%{left:-40%}100%{left:100%}}
+      #sb-boot-msg{display:none;margin:18px auto 0;font-size:14px;color:#334155}
+      #sb-boot-msg button{margin-top:10px;padding:10px 22px;border:0;border-radius:12px;background:#0f766e;color:#fff;font-size:15px;font-weight:700}
+    </style>
+    <script>
+      /* StudyBull boot guard (classic script, runs before the app bundle):
+         1) small polyfills for older Android WebViews / in-app browsers (Instagram, Facebook);
+         2) in-memory localStorage when the browser blocks it (otherwise the app cannot start);
+         3) if the app has not started after 10 s, or a script error happens before it starts,
+            show a "दोबारा लोड करें" button instead of an endless loader. */
+      (function () {
+        try {
+          if (!Object.hasOwn) Object.hasOwn = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+          if (!Array.prototype.at) Object.defineProperty(Array.prototype, 'at', { configurable: true, writable: true, value: function (n) { n = Math.trunc(n) || 0; if (n < 0) n += this.length; return n < 0 || n >= this.length ? undefined : this[n]; } });
+          if (!String.prototype.at) Object.defineProperty(String.prototype, 'at', { configurable: true, writable: true, value: function (n) { n = Math.trunc(n) || 0; if (n < 0) n += this.length; return n < 0 || n >= this.length ? undefined : this.charAt(n); } });
+          if (!Array.prototype.findLast) Object.defineProperty(Array.prototype, 'findLast', { configurable: true, writable: true, value: function (f, t) { for (var i = this.length - 1; i >= 0; i--) if (f.call(t, this[i], i, this)) return this[i]; } });
+          if (!Array.prototype.findLastIndex) Object.defineProperty(Array.prototype, 'findLastIndex', { configurable: true, writable: true, value: function (f, t) { for (var i = this.length - 1; i >= 0; i--) if (f.call(t, this[i], i, this)) return i; return -1; } });
+          if (!Array.prototype.flat) Object.defineProperty(Array.prototype, 'flat', { configurable: true, writable: true, value: function (d) { d = d === undefined ? 1 : Math.floor(d); var out = []; (function walk(a, l) { for (var i = 0; i < a.length; i++) { if (Array.isArray(a[i]) && l > 0) walk(a[i], l - 1); else out.push(a[i]); } })(this, d); return out; } });
+          if (!Array.prototype.flatMap) Object.defineProperty(Array.prototype, 'flatMap', { configurable: true, writable: true, value: function (f, t) { return Array.prototype.map.call(this, f, t).flat(1); } });
+          if (!Object.fromEntries) Object.fromEntries = function (it) { var o = {}; Array.from(it).forEach(function (e) { o[e[0]] = e[1]; }); return o; };
+          if (!String.prototype.replaceAll) Object.defineProperty(String.prototype, 'replaceAll', { configurable: true, writable: true, value: function (s, r) { if (s instanceof RegExp) return this.replace(s, r); return this.split(s).join(typeof r === 'function' ? r(s) : r); } });
+          if (typeof globalThis === 'undefined') window.globalThis = window;
+          if (!window.structuredClone) window.structuredClone = function (v) { return v === undefined ? v : JSON.parse(JSON.stringify(v)); };
+          if (!window.requestIdleCallback) window.requestIdleCallback = function (cb) { return setTimeout(function () { cb({ didTimeout: false, timeRemaining: function () { return 0; } }); }, 1); };
+        } catch (e) {}
+        try {
+          var ok = false;
+          try { var ls = window.localStorage; ls.setItem('__sb_t', '1'); ls.removeItem('__sb_t'); ok = true; } catch (e) {
+            /* a full storage still works for reads; only replace it when it is missing or blocked */
+            try { ok = !!window.localStorage && window.localStorage.getItem('__sb_none') === null && e && /quota/i.test(String(e.name || e)); } catch (e2) { ok = false; }
+          }
+          if (!ok) {
+            var mem = {};
+            var shim = {
+              getItem: function (k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; },
+              setItem: function (k, v) { mem[k] = String(v); },
+              removeItem: function (k) { delete mem[k]; },
+              clear: function () { mem = {}; },
+              key: function (i) { return Object.keys(mem)[i] || null; },
+              get length() { return Object.keys(mem).length; }
+            };
+            Object.defineProperty(window, 'localStorage', { configurable: true, get: function () { return shim; } });
+          }
+        } catch (e) {}
+        var shown = false;
+        function show(text) {
+          if (window.__sbMounted || shown) return;
+          var m = document.getElementById('sb-boot-msg');
+          if (!m) return;
+          shown = true;
+          m.querySelector('span').textContent = text;
+          m.style.display = 'block';
+        }
+        window.__sbBootFail = show;
+        window.addEventListener('error', function (e) {
+          var t = e && e.target;
+          if (t && t !== window && t.tagName) { if (t.tagName === 'SCRIPT' || t.tagName === 'LINK') show('पेज पूरा लोड नहीं हुआ (नेटवर्क धीमा है)।'); return; }
+          show('पेज खुलने में दिक्कत आई।');
+        }, true);
+        setTimeout(function () { show('नेटवर्क धीमा लग रहा है — पेज अभी लोड हो रहा है।'); }, 10000);
+      })();
+    </script>
   </head>
   <body>
     <div id="root">
-      <main style="font-family:system-ui,sans-serif;max-width:640px;margin:0 auto;padding:40px 20px;text-align:center;color:#0f172a">
-        <img src="/logo.png" alt="StudyBull logo" width="72" height="72" style="border-radius:18px" />
+      <main id="sb-splash">
+        <img src="data:image/png;base64,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" alt="StudyBull logo" width="72" height="72" style="display:block;margin:0 auto;border-radius:18px" />
         <h1 style="font-size:22px;margin:12px 0 4px">StudyBull — परीक्षा तैयारी पोर्टल</h1>
         <p style="font-size:14px;color:#475569;margin:0">SSC GD, Agniveer, Police, Railway की फ्री तैयारी: Mock Test, Quiz, Notes, PYQ, करंट अफेयर्स, Job Alert • लोड हो रहा है…</p>
+        <div class="bar"><i></i></div>
+        <div id="sb-boot-msg"><span></span><br /><button type="button" onclick="location.reload()">दोबारा लोड करें</button></div>
       </main>
     </div>
     <noscript>

@@ -53,6 +53,11 @@ function lsSet(key: string, value: any): boolean {
     localStorage.setItem(key, JSON.stringify(value));
     return true;
   } catch {
+    // Storage full (in-app browsers often allow less) or blocked: drop that cached copy so an old version
+    // is not shown next time, and keep running from memory.
+    try {
+      localStorage.removeItem(key);
+    } catch {}
     return false;
   }
 }
@@ -192,7 +197,8 @@ class SplitStore {
   private async prefetchBig() {
     try {
       const conn = (navigator as any).connection;
-      if (conn && (conn.saveData || /(^|-)2g$/.test(String(conn.effectiveType || '')))) return;
+      // Slow line (2G/3G) or data saver: don't spend the user's bandwidth on tiles they may not open.
+      if (conn && (conn.saveData || /(^|-)[23]g$/.test(String(conn.effectiveType || '')))) return;
     } catch {}
     if (this.mode !== 'split' || !this.index) return;
     const nodes = this.index.nodes || [];
