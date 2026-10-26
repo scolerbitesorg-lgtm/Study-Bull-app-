@@ -14,6 +14,7 @@ import {
 } from './lib/supabase.ts';
 import { splitStore } from './lib/splitStore';
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
+import { LevelList, buildPyqFolder, pyqSourceFor, pyqTagOf, stripPyq, PyqBadge } from './components/LevelList';
 
 // Code-defined screens load as separate chunks only when opened (smaller first download)
 const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
@@ -134,6 +135,7 @@ export interface QuizQuestion {
   explanationEn: string;
   shortcut?: string;
   category?: string;
+  pyq?: string; // real past-year tag, e.g. "SSC GD 2023" (badge)
 }
 
 interface Chapter {
@@ -252,14 +254,15 @@ function getQuizSubjectsFromAdmin(nodes: any[]): any[] {
         if (validQs.length > 0) {
           const normalizedQs: QuizQuestion[] = validQs.map((q: any, i: number) => ({
             id: q.id || i + 1,
-            question: q.question || q.qText || q.title || 'Question',
-            questionEn: q.questionEn || q.question_en || q.question || 'Question',
+            question: stripPyq(q.question || q.qText || q.title || 'Question'),
+            questionEn: stripPyq(q.questionEn || q.question_en || q.question || 'Question'),
+            pyq: pyqTagOf(q) || undefined,
             options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
             optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
             correct: resolveCorrectIndex(q),
             category: q.section || q.subject || q.category || undefined,
-            explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
-            explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+            explanation: stripPyq(q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।'),
+            explanationEn: stripPyq(q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.')
           }));
 
           subjects.push({
@@ -304,14 +307,15 @@ function getMockQuestionsFromAdmin(nodes: any[]): QuizQuestion[] {
         if (validQs.length > 0) {
           const normalizedQs: QuizQuestion[] = validQs.map((q: any, i: number) => ({
             id: q.id || i + 1,
-            question: q.question || q.qText || q.title || 'Question',
-            questionEn: q.questionEn || q.question_en || q.question || 'Question',
+            question: stripPyq(q.question || q.qText || q.title || 'Question'),
+            questionEn: stripPyq(q.questionEn || q.question_en || q.question || 'Question'),
+            pyq: pyqTagOf(q) || undefined,
             options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
             optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
             correct: resolveCorrectIndex(q),
             category: q.section || q.subject || q.category || undefined,
-            explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
-            explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+            explanation: stripPyq(q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।'),
+            explanationEn: stripPyq(q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.')
           }));
           mockQs = mockQs.concat(normalizedQs);
         }
@@ -2307,14 +2311,15 @@ export default function App() {
     if (validQuestions && validQuestions.length > 0) {
       const normalizedQs = validQuestions.map((q: any, i: number) => ({
         id: q.id || i + 1,
-        question: q.question || q.qText || q.title || 'Question',
-        questionEn: q.questionEn || q.question_en || q.question || 'Question',
+        question: stripPyq(q.question || q.qText || q.title || 'Question'),
+        questionEn: stripPyq(q.questionEn || q.question_en || q.question || 'Question'),
+        pyq: pyqTagOf(q) || undefined,
         options: Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D'],
         optionsEn: Array.isArray(q.optionsEn) ? q.optionsEn : (Array.isArray(q.options) ? q.options : ['Option A', 'Option B', 'Option C', 'Option D']),
         correct: resolveCorrectIndex(q),
         category: q.section || q.subject || q.category || undefined,
-        explanation: q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।',
-        explanationEn: q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.'
+        explanation: stripPyq(q.explanation || q.exp || 'सही उत्तर चुनने हेतु बधाई।'),
+        explanationEn: stripPyq(q.explanationEn || q.explanation_en || q.explanation || 'Great job selecting the correct answer.')
       }));
 
       const title = resolveNodeTitle(btn, langHindi);
@@ -3028,7 +3033,7 @@ export default function App() {
 
           {/* Pure 100% Full Viewport Output without frames, margins or bottom bars */}
           <div
-            className="flex-1 min-h-0 w-full bg-white overflow-hidden relative"
+            className={`flex-1 min-h-0 w-full overflow-hidden relative ${isHtmlTool ? 'bg-white' : 'bg-[#f3f6fd]'}`}
             style={isHtmlTool ? { paddingBottom: 'env(safe-area-inset-bottom)' } : undefined}
           >
             {isHtmlTool ? (
@@ -3041,137 +3046,49 @@ export default function App() {
               />
             ) : (
               /* If folder or container, show child buttons cleanly in full screen with back button */
-              <div className="max-w-4xl mx-auto p-6 overflow-y-auto overscroll-contain h-full" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
-                <div className="mb-6 flex items-center gap-3">
-                  <span className="text-3xl">{featureIcon}</span>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-900">{featureTitle}</h2>
-                    {featureSubtitle && <p className="text-xs text-slate-500 mt-0.5">{featureSubtitle}</p>}
+              <div className="max-w-4xl mx-auto px-4 pt-5 sm:px-6 overflow-y-auto overscroll-contain h-full" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
+                <div className="mb-5 flex items-center gap-3.5">
+                  <div className="w-14 h-14 shrink-0 rounded-2xl bg-white border border-blue-100 shadow-[0_4px_14px_-6px_rgba(30,64,175,0.25)] flex items-center justify-center text-[28px]">
+                    {featureIcon}
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-[20px] font-extrabold text-slate-900 leading-tight truncate">{featureTitle}</h2>
+                    {featureSubtitle && <p className="text-[12px] text-slate-500 mt-0.5 leading-snug line-clamp-2">{featureSubtitle}</p>}
                   </div>
                 </div>
 
-                {Array.isArray(activeCustomNode.children) && activeCustomNode.children.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {activeCustomNode.children.map((child: any) => {
-                      const childTitle = resolveNodeTitle(child, langHindi);
-                      const childIcon = resolveNodeIcon(child);
-                      const childSubtitle = resolveNodeSubtitle(child, langHindi);
-                      const childTarget = String(child.view || child.target_view || child.type || child.id || '').toLowerCase();
-                      const childHasHtml = Boolean(
-                        child.htmlContent || child.html || child.code || child.rawHtml ||
-                        (typeof child.content === 'string' && (child.content.includes('<html') || child.content.includes('<!DOCTYPE') || child.content.includes('<script')))
-                      );
-
-                      const isChildSection = isSectionNode(child);
-                      const isChildFolder = isFolderNode(child);
-
-                      const handleChildClick = () => {
-                        handleNodeInteraction(child);
-                      };
-
-                      if (isChildSection) {
-                        return (
-                          <button
-                            key={child.id}
-                            onClick={handleChildClick}
-                            className="col-span-2 sm:col-span-2 md:col-span-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-white border border-blue-200/80 hover:border-blue-300 rounded-2xl p-4 flex items-center justify-between shadow-sm my-1 text-left w-full cursor-pointer transition active:scale-98"
-                          >
-                            <div className="flex items-center space-x-3 min-w-0">
-                              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl shrink-0 shadow-sm">
-                                {childIcon || '📑'}
-                              </div>
-                              <div className="min-w-0">
-                                <h3 className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight truncate">
-                                  {childTitle}
-                                </h3>
-                                {childSubtitle && (
-                                  <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                                    {childSubtitle}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <span className="px-2.5 py-1 bg-blue-100 text-blue-700 font-bold text-[10px] rounded-lg uppercase tracking-wider">
-                                Section
-                              </span>
-                              <ChevronRight className="w-4 h-4 text-blue-500" />
-                            </div>
-                          </button>
-                        );
-                      }
-
-                      const childCount = Array.isArray(child.children) ? child.children.length : 0;
-
-                      if (isChildFolder) {
-                        return (
-                          <button
-                            key={child.id}
-                            onClick={handleChildClick}
-                            className="col-span-2 sm:col-span-2 md:col-span-3 group relative bg-gradient-to-r from-amber-50 via-amber-50/90 to-amber-100/80 rounded-2xl p-4 shadow-sm border-2 border-amber-300/90 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer flex items-center justify-between text-left overflow-hidden my-1 w-full active:scale-98"
-                          >
-                            <div className="flex items-center space-x-3.5 min-w-0">
-                              <div className="w-11 h-11 rounded-xl bg-amber-200/90 group-hover:bg-amber-300 text-amber-900 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 group-hover:scale-105 transform duration-150">
-                                {childIcon || '📂'}
-                              </div>
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <h3 className="font-extrabold text-amber-950 group-hover:text-amber-900 transition-colors text-base sm:text-lg tracking-tight truncate">
-                                    {childTitle}
-                                  </h3>
-                                  <span className="px-2 py-0.5 bg-amber-200/90 text-amber-900 text-[10px] font-extrabold rounded-md uppercase tracking-wider shrink-0 border border-amber-300/80 shadow-2xs">
-                                    📁 {langHindi ? 'फोल्डर' : 'Folder'}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-amber-800/90 font-medium truncate mt-0.5">
-                                  {childSubtitle || (childCount > 0 ? (langHindi ? `${childCount} सामग्री मौजूद` : `${childCount} items inside`) : (langHindi ? 'फोल्डर खोलें' : 'Open Folder'))}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0 ml-2">
-                              <span className="px-2.5 py-1 bg-amber-200/80 text-amber-900 font-bold text-xs rounded-lg border border-amber-300/70 shadow-2xs hidden sm:inline-block">
-                                {childCount} {langHindi ? 'आइटम' : 'items'}
-                              </span>
-                              <ChevronRight className="w-5 h-5 text-amber-700 group-hover:translate-x-0.5 transition-transform" />
-                            </div>
-                          </button>
-                        );
-                      }
-
-                      return (
-                        <button
-                          key={child.id}
-                          onClick={handleChildClick}
-                          className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
-                        >
-                          <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
-                          </div>
-
-                          <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
-                            {childIcon || '⚡'}
-                          </div>
-
-                          <div className="w-full">
-                            <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors text-sm sm:text-base leading-snug line-clamp-1">
-                              {childTitle}
-                            </h3>
-                            <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
-                              {childSubtitle || (langHindi ? 'पेज खोलें' : 'Open Page')}
-                            </p>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                    <p className="text-sm text-slate-500">
-                      {langHindi ? 'इस फोल्डर में कोई सामग्री नहीं है' : 'No items found in this folder'}
-                    </p>
-                  </div>
-                )}
+                {(() => {
+                  // 3-level layout: level 1 = cube buttons, level 2+ = big folder cards, leaves = slim section rows
+                  const tileNode = folderStack[0] || activeCustomNode;
+                  const depth = folderStack.length;
+                  let levelItems: any[] = Array.isArray(activeCustomNode.children) ? activeCustomNode.children : [];
+                  if (depth === 1) {
+                    try {
+                      const src = pyqSourceFor(activeCustomNode, tileNode, adminNodes);
+                      const pyq = src ? buildPyqFolder(activeCustomNode, src, langHindi) : null;
+                      if (pyq) levelItems = [pyq, ...levelItems];
+                    } catch { /* never break the folder page */ }
+                  }
+                  return levelItems.length > 0 ? (
+                    <LevelList
+                      items={levelItems}
+                      depth={depth}
+                      langHindi={langHindi}
+                      onOpen={(child: any) => handleNodeInteraction(child)}
+                      titleOf={(n: any) => resolveNodeTitle(n, langHindi)}
+                      iconOf={(n: any) => resolveNodeIcon(n)}
+                      subtitleOf={(n: any) => resolveNodeSubtitle(n, langHindi)}
+                      isSection={isSectionNode}
+                      isFolder={isFolderNode}
+                    />
+                  ) : (
+                    <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
+                      <p className="text-sm text-slate-500">
+                        {langHindi ? 'इस फोल्डर में कोई सामग्री नहीं है' : 'No items found in this folder'}
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -3719,6 +3636,7 @@ export default function App() {
                         </div>
                       </div>
 
+                      <PyqBadge tag={(currentQ as any).pyq} />
                       <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-relaxed">
                         {langHindi ? currentQ.question : currentQ.questionEn}
                       </h2>
@@ -3993,6 +3911,7 @@ export default function App() {
                         ))}
                       </div>
 
+                      <PyqBadge tag={(currentMockQ as any).pyq} />
                       <h2 className="text-lg sm:text-xl font-bold text-slate-900 leading-relaxed">
                         {langHindi ? currentMockQ.question : currentMockQ.questionEn}
                       </h2>
