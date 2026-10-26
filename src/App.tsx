@@ -975,14 +975,15 @@ export default function App() {
       if (isMounted) setIsDbLoaded(true);
     });
 
-    // 2. Every 15 s while the tab is visible (and when it comes back): tiny version stamps only;
+    // 2. Every 30 s while the tab is visible (and when it comes back): tiny version stamps only, from the
+    //    CDN-cached /api/meta (20 s) → an admin save shows up within about a minute;
     //    only the tiles the admin changed are downloaded again.
     const syncIfChanged = () => {
       if (!isMounted) return;
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
       splitStore.poll().catch(() => {});
     };
-    const timer = setInterval(syncIfChanged, 15000);
+    const timer = setInterval(syncIfChanged, 30000);
     const onVisible = () => { if (document.visibilityState === 'visible') syncIfChanged(); };
     document.addEventListener('visibilitychange', onVisible);
 
