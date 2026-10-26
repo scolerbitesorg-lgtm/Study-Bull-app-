@@ -2929,7 +2929,7 @@ export default function App() {
 
     return (
       <SafeErrorBoundary fallbackView={() => { setActiveCustomNode(null); setCurrentView('home'); }}>
-        <div className="fixed inset-0 z-50 flex flex-col w-screen h-screen bg-slate-50 select-none overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col w-full h-dvh bg-slate-50 select-none overflow-hidden">
           {/* Top Bar - Clean header matching main home page header */}
           <div 
             className="h-14 px-4 flex items-center justify-between text-white shadow-sm shrink-0 z-20"
@@ -2999,7 +2999,10 @@ export default function App() {
           </div>
 
           {/* Pure 100% Full Viewport Output without frames, margins or bottom bars */}
-          <div className="flex-1 w-full bg-white overflow-hidden relative">
+          <div
+            className="flex-1 min-h-0 w-full bg-white overflow-hidden relative"
+            style={isHtmlTool ? { paddingBottom: 'env(safe-area-inset-bottom)' } : undefined}
+          >
             {isHtmlTool ? (
               <SandboxedHtmlView
                 key={`fs-feature-${activeCustomNode.id}-${htmlReloadKey}`}
@@ -3010,7 +3013,7 @@ export default function App() {
               />
             ) : (
               /* If folder or container, show child buttons cleanly in full screen with back button */
-              <div className="max-w-4xl mx-auto p-6 overflow-y-auto h-full">
+              <div className="max-w-4xl mx-auto p-6 overflow-y-auto overscroll-contain h-full" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
                 <div className="mb-6 flex items-center gap-3">
                   <span className="text-3xl">{featureIcon}</span>
                   <div>
@@ -3204,9 +3207,10 @@ export default function App() {
   return (
     <SafeErrorBoundary fallbackView={() => setCurrentView('home')}>
       <div 
-        className={`min-h-screen font-sans pb-16 selection:bg-blue-600 selection:text-white antialiased ${adminSettings?.darkMode ? 'dark bg-slate-950 text-white' : 'text-slate-900'}`}
+        className={`min-h-screen font-sans selection:bg-blue-600 selection:text-white antialiased ${adminSettings?.darkMode ? 'dark bg-slate-950 text-white' : 'text-slate-900'}`}
         style={{
-          backgroundColor: adminSettings?.darkMode ? '#0b1120' : (adminSettings?.appBgColor || '#f1f5ff')
+          backgroundColor: adminSettings?.darkMode ? '#0b1120' : (adminSettings?.appBgColor || '#f1f5ff'),
+          paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))'
         }}
       >
         {/* Top Header - Controlled live by Admin App */}
@@ -3802,7 +3806,7 @@ export default function App() {
                   </button>
 
                   {reviewExpanded && (
-                    <div className="mt-4 space-y-4 max-h-96 overflow-y-auto pr-1">
+                    <div className="mt-4 space-y-4">
                       {quizQuestions.map((q, idx) => {
                         const userAns = userQuizAnswers[idx];
                         const isCorrect = userAns === q.correct;
@@ -4085,7 +4089,7 @@ export default function App() {
                         </button>
 
                         {reviewExpanded && (
-                          <div className="mt-4 space-y-4 max-h-96 overflow-y-auto pr-1">
+                          <div className="mt-4 space-y-4">
                             {mockQuestions.map((q, idx) => {
                               const userAns = userMockAnswers[idx];
                               const isCorrect = userAns === q.correct;
@@ -4319,7 +4323,7 @@ export default function App() {
                       </div>
 
                       {/* PDF Document Page View */}
-                      <div className={`p-8 sm:p-16 rounded-b-xl border border-t-0 shadow-2xl transition-colors min-h-[600px] font-sans ${readerDarkMode ? 'bg-[#12141c] border-slate-800 text-white' : 'bg-white border-slate-300 text-black'}`}>
+                      <div className={`p-8 sm:p-16 rounded-b-xl border border-t-0 shadow-2xl transition-colors font-sans ${readerDarkMode ? 'bg-[#12141c] border-slate-800 text-white' : 'bg-white border-slate-300 text-black'}`}>
                         {/* Document Header */}
                         <div className={`border-b pb-6 mb-8 text-center sm:text-left ${readerDarkMode ? 'border-slate-800' : 'border-slate-300'}`}>
                           <div className="text-xs uppercase tracking-widest text-blue-600 dark:text-blue-400 font-bold mb-1">
@@ -4788,7 +4792,7 @@ export default function App() {
                   </button>
 
                   {reviewExpanded && (
-                    <div className="mt-4 space-y-4 max-h-96 overflow-y-auto pr-1">
+                    <div className="mt-4 space-y-4">
                       {calcQuestions.map((q, idx) => {
                         const userAns = calcUserAnswers[idx];
                         const isCorrect = userAns ? userAns.correct : false;

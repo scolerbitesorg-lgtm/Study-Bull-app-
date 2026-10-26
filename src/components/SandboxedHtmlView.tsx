@@ -34,8 +34,15 @@ export default function SandboxedHtmlView({
         typeof event.data.height === "number" &&
         event.data.height > 40
       ) {
-        const safeHeight = Math.max(280, Math.min(event.data.height + 24, 3500));
-        setContentHeight(safeHeight);
+        // No upper cap: a long notes page must grow to its full height so the
+        // page itself scrolls to the real end of the content (was capped at 3500 px).
+        const reported = event.data.height;
+        setContentHeight((prev) => {
+          // A document that merely fills the frame (height:100%/100vh) reports the
+          // frame's own height back; treat that as stable so it can't grow forever.
+          if (prev !== null && reported >= prev - 8 && reported <= prev + 4) return prev;
+          return Math.max(280, Math.min(reported + 8, 200000));
+        });
       }
     };
     window.addEventListener("message", handleMessage);
@@ -163,7 +170,9 @@ export default function SandboxedHtmlView({
 
   if (typeof ResizeObserver !== "undefined" && document.body) {
     try {
-      new ResizeObserver(function() { reportHeight(); }).observe(document.body);
+      var ro = new ResizeObserver(function() { reportHeight(); });
+      ro.observe(document.body);
+      if (document.documentElement) ro.observe(document.documentElement);
     } catch(e) {}
   }
   setInterval(reportHeight, 1000);
