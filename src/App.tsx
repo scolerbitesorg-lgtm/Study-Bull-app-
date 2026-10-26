@@ -14,7 +14,8 @@ import {
 } from './lib/supabase.ts';
 import { splitStore } from './lib/splitStore';
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
-import { LevelList, buildPyqFolder, pyqSourceFor, pyqTagOf, stripPyq, PyqBadge, soleQuizChild } from './components/LevelList';
+import { LevelList, pyqTagOf, stripPyq, PyqBadge, soleQuizChild } from './components/LevelList';
+import { refreshNav } from './lib/freshNav';
 
 // Code-defined screens load as separate chunks only when opened (smaller first download)
 const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
@@ -2543,6 +2544,25 @@ export default function App() {
     };
   }, []);
 
+  // Fresh data arrived (tile downloaded again / admin saved): the open folder page is a node object from the
+  // OLD data, so look it (and its parent trail) up again by id. Gone? → its nearest parent that still exists.
+  const adminNodesRef = useRef<any[]>(adminNodes);
+  adminNodesRef.current = adminNodes;
+  useEffect(() => {
+    if (currentView !== 'custom_node' || !activeCustomNode) return;
+    try {
+      const fix = refreshNav(adminNodes, activeCustomNode, folderStack);
+      if (!fix || !fix.changed) return;
+      setFolderStack(fix.folders);
+      setActiveCustomNode(fix.node);
+      // keep the history entry of this page in step too (back/forward from here)
+      const st = navStackRef.current;
+      const i = navIndexRef.current;
+      if (st[i] && st[i].view === 'custom_node') st[i] = { ...st[i], node: fix.node, folders: fix.folders };
+    } catch { /* never break the open page */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminNodes]);
+
   // Views that read across all tiles (old quiz/notes hubs, typing setup) need every tile's content
   useEffect(() => {
     if (['quiz_categories', 'notes_lib', 'typing_setup'].includes(currentView) && adminNodes.some((n: any) => n && n._splitPending)) {
@@ -2589,9 +2609,18 @@ export default function App() {
 
   const restoreNav = (snap: NavSnapshot) => {
     stopActivityTimers(liveNavRef.current.view, snap.view);
-    liveNavRef.current = { ...snap };
-    setFolderStack(Array.isArray(snap.folders) ? snap.folders : []);
-    setActiveCustomNode(snap.view === 'home' ? null : snap.node);
+    // the page we go back to may have been downloaded again meanwhile → its fresh copy by id
+    let snapNode = snap.node;
+    let snapFolders = Array.isArray(snap.folders) ? snap.folders : [];
+    if (snap.view !== 'home' && snapNode) {
+      try {
+        const fix = refreshNav(adminNodesRef.current, snapNode, snapFolders);
+        if (fix) { snapNode = fix.node; snapFolders = fix.folders; }
+      } catch { /* keep the snapshot */ }
+    }
+    liveNavRef.current = { ...snap, node: snapNode, folders: snapFolders };
+    setFolderStack(snapFolders);
+    setActiveCustomNode(snap.view === 'home' ? null : snapNode);
     if (snap.chapter !== undefined) setSelectedChapter(snap.chapter);
     setHtmlIsFullscreen(false);
     setCurrentView(snap.view);
@@ -3064,16 +3093,9 @@ export default function App() {
 
                 {(() => {
                   // 3-level layout: level 1 = cube buttons, level 2+ = big folder cards, leaves = slim section rows
-                  const tileNode = folderStack[0] || activeCustomNode;
                   const depth = folderStack.length;
-                  let levelItems: any[] = Array.isArray(activeCustomNode.children) ? activeCustomNode.children : [];
-                  if (depth === 1) {
-                    try {
-                      const src = pyqSourceFor(activeCustomNode, tileNode, adminNodes);
-                      const pyq = src ? buildPyqFolder(activeCustomNode, src, langHindi) : null;
-                      if (pyq) levelItems = [pyq, ...levelItems];
-                    } catch { /* never break the folder page */ }
-                  }
+                  // (Aarav 11:18 AM Oct 26: no virtual '<विषय> PYQ' mix folder in any subject — real PYQ folders only)
+                  const levelItems: any[] = Array.isArray(activeCustomNode.children) ? activeCustomNode.children : [];
                   return levelItems.length > 0 ? (
                     <LevelList
                       items={levelItems}

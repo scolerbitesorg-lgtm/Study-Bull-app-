@@ -324,17 +324,21 @@ export function LevelList(p: LevelListProps) {
   };
 
   const row = (n: any, idx: number) => {
-    const pill = leafPill(n, langHindi);
-    const sub = cleanSub(subtitleOf(n));
+    // Aarav 11:18 AM Oct 26: the left pill shows the row's serial number (1, 2, 3…); the question count
+    // lives in the subtitle only (added there when the subtitle doesn't already say it).
+    const kindHint = leafPill(n, langHindi);
+    const q = countQuestions(n);
+    let sub = cleanSub(subtitleOf(n));
+    if (q > 0 && !/प्रश्न|\bQs?\b|question|MCQ/i.test(sub)) sub = [`${q} ${langHindi ? 'प्रश्न' : 'Qs'}`, sub].filter(Boolean).join(' • ');
+    else if (!sub && q === 0 && kindHint.top !== '▶') sub = `${kindHint.top} ${kindHint.bottom}`;
     return (
       <button
-        key={n.id}
+        key={n.id ?? idx}
         onClick={() => onOpen(n)}
         className="sb-tap group w-full flex items-center gap-3 text-left bg-white rounded-2xl px-3 py-2.5 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(15,23,42,0.12)] hover:border-blue-200 transition-all cursor-pointer"
       >
-        <div className="w-[52px] shrink-0 rounded-xl bg-blue-50 border border-blue-100 py-1.5 flex flex-col items-center justify-center leading-none">
-          <span className="text-[14px] font-extrabold text-blue-700">{pill.top}</span>
-          <span className="text-[9.5px] font-bold text-blue-600/80 mt-0.5">{pill.bottom}</span>
+        <div className="w-10 h-10 shrink-0 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center leading-none">
+          <span className="text-[16px] font-extrabold text-blue-700 tabular-nums">{idx + 1}</span>
         </div>
         <div className="min-w-0 flex-1">
           <h4 className="font-bold text-slate-900 text-[14.5px] leading-snug truncate">

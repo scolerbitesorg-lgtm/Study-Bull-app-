@@ -278,6 +278,13 @@ class SplitStore {
         this.emit();
         await Promise.all(stale.map((id) => this.ensureTile(id, true)));
         this.afterIndex();
+      } else {
+        // Index unchanged, but a cached tile may still be an OLD copy whose refetch failed earlier
+        // (slow line / offline at boot): retry it on every check until it is confirmed fresh this session.
+        // (mode 'split' means the index came from the network this session, so `fresh` is trustworthy;
+        //  a tile fetched this session is always in `fresh`, so this never refetches in a loop)
+        const retry = Array.from(this.tiles.keys()).filter((id) => !this.fresh.has(id) && !this.inflight.has(id));
+        if (retry.length) await Promise.all(retry.map((id) => this.ensureTile(id, true)));
       }
     } finally {
       this.polling = false;
