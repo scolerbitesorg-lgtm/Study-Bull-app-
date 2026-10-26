@@ -18,11 +18,13 @@ import { SandboxedHtmlView } from './components/SandboxedHtmlView';
 import { LevelList, pyqTagOf, stripPyq, PyqBadge, soleQuizChild } from './components/LevelList';
 import { refreshNav } from './lib/freshNav';
 import { MockRules, buildMockInfo, type MockInfo } from './components/MockRules';
+import { MISTAKE_QUIZ_ID, addMistake, resolveMistake, toggleBookmark, isBookmarked, mistakeCount, onMistakesChange, recordMockMistakes, type MistakeQ } from './lib/mistakes';
 
 // Code-defined screens load as separate chunks only when opened (smaller first download)
 const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
 const EligibilityExam = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityExam })));
 const JobAlert = React.lazy(() => import('./components/JobAlert').then((m) => ({ default: m.JobAlert })));
+const MistakeBook = React.lazy(() => import('./components/MistakeBook').then((m) => ({ default: m.MistakeBook })));
 
 // Return visit: home + already-opened tiles straight from the per-tile cache (split data layout)
 const SPLIT_BOOT: { nodes: any[]; settings: any } | null = (() => {
@@ -125,7 +127,8 @@ type ViewState =
   | 'custom_node'
   | 'eligibility'
   | 'eligibility_exam'
-  | 'job_alert';
+  | 'job_alert'
+  | 'mistake_book';
 
 export interface QuizQuestion {
   id: number;
@@ -929,6 +932,37 @@ export default function App() {
   });
 
   const [eligibilityExamId, setEligibilityExamId] = useState<string | null>(null);
+  // 📕 गलती बुक (localStorage only) — re-render when it changes
+  const [mbVer, setMbVer] = useState(0);
+  useEffect(() => onMistakesChange(() => setMbVer((v) => v + 1)), []);
+  const mbCount = React.useMemo(() => mistakeCount(), [mbVer]);
+  const startMistakePractice = (qs: MistakeQ[]) => {
+    const list: QuizQuestion[] = qs.map((q, i) => ({
+      id: i + 1,
+      question: q.question,
+      questionEn: q.questionEn || q.question,
+      options: q.options,
+      optionsEn: Array.isArray(q.optionsEn) && q.optionsEn.length === q.options.length ? q.optionsEn : q.options,
+      correct: q.correct,
+      explanation: q.explanation || '',
+      explanationEn: q.explanationEn || q.explanation || '',
+      category: q.category,
+      pyq: q.pyq,
+    }));
+    if (!list.length) return;
+    setSelectedSubject({ id: MISTAKE_QUIZ_ID, title: '📕 गलती बुक अभ्यास', titleEn: 'Mistake Book Practice', subtitle: '', icon: '📕', questions: list });
+    setQuizQuestions(list);
+    setQuizIndex(0);
+    setUserQuizAnswers(new Array(list.length).fill(null));
+    setQuizScore(0);
+    setIsAnswerRevealed(false);
+    navigateTo('quiz_play');
+  };
+  useEffect(() => {
+    if (currentView !== 'mock_result') return;
+    const src = mockInfo ? [mockInfo.exam, mockInfo.title].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(' • ') : 'मॉक टेस्ट';
+    recordMockMistakes(mockQuestions, userMockAnswers, src);
+  }, [currentView]);
   const [isDbLoaded, setIsDbLoaded] = useState<boolean>(() => {
     if (SPLIT_BOOT && SPLIT_BOOT.nodes.length > 0) return true;
     try {
@@ -1048,7 +1082,7 @@ export default function App() {
 
   const PLAY_VIEWS: ViewState[] = ['quiz_play', 'mock_play', 'calc_practice', 'typing_practice'];
   const RESULT_VIEWS: ViewState[] = ['quiz_result', 'mock_result', 'calc_result', 'typing_result'];
-  const HUB_VIEWS: ViewState[] = ['home', 'quiz_categories', 'notes_lib', 'calc_setup', 'typing_setup'];
+  const HUB_VIEWS: ViewState[] = ['home', 'quiz_categories', 'notes_lib', 'calc_setup', 'typing_setup', 'mistake_book'];
 
   const stopActivityTimers = (from: ViewState, to: ViewState) => {
     if (from === to) return;
@@ -1417,6 +1451,8 @@ export default function App() {
         return langHindi ? 'पात्रता जाँच' : 'Eligibility Checker';
       case 'job_alert':
         return langHindi ? 'जॉब अलर्ट' : 'Job Alert';
+      case 'mistake_book':
+        return langHindi ? 'गलती बुक' : 'Mistake Book';
       default:
         return defaultAppName;
     }
@@ -1999,6 +2035,32 @@ export default function App() {
                       </button>
                     )}
                     </div>
+
+                    {/* 📕 गलती बुक — a slim code button BELOW the 9-tile grid (grid itself unchanged) */}
+                    {(isDbLoaded || adminNodes.length > 0) && (
+                      <button
+                        key="mistake-book-strip"
+                        type="button"
+                        onClick={() => navigateTo('mistake_book')}
+                        data-testid="mb-home"
+                        className="mt-3 w-full flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm border border-rose-200 hover:border-rose-400 hover:shadow-md transition-all text-left active:scale-[0.99] cursor-pointer"
+                      >
+                        <span className="w-11 h-11 rounded-2xl bg-rose-50 flex items-center justify-center text-2xl shadow-inner shrink-0">📕</span>
+                        <span className="flex-1 min-w-0">
+                          <span className="flex items-center gap-1.5">
+                            <span className="font-bold text-slate-900 text-sm sm:text-base leading-snug">{langHindi ? 'गलती बुक' : 'Mistake Book'}</span>
+                            <span className="px-1.5 py-0.5 bg-emerald-600 text-white text-[9px] font-extrabold rounded-md leading-none">NEW</span>
+                          </span>
+                          <span className="block text-xs text-slate-500 mt-0.5 font-medium truncate">
+                            {mbCount > 0
+                              ? (langHindi ? `${mbCount} गलत/सेव प्रश्न • दोबारा अभ्यास करें` : `${mbCount} questions to revise`)
+                              : (langHindi ? 'क्विज़ के गलत प्रश्न यहाँ अपने-आप जुड़ेंगे' : 'Wrong quiz answers are saved here')}
+                          </span>
+                        </span>
+                        {mbCount > 0 && <span className="shrink-0 min-w-[28px] h-7 px-2 rounded-full bg-rose-600 text-white text-xs font-black flex items-center justify-center">{mbCount}</span>}
+                        <ChevronRight className="w-5 h-5 text-slate-400 shrink-0" />
+                      </button>
+                    )}
                   </m.div>
               </>
             )}
@@ -2018,6 +2080,8 @@ export default function App() {
             {currentView === 'eligibility_exam' && <React.Suspense fallback={<ScreenLoader />}><EligibilityExam examId={eligibilityExamId} /></React.Suspense>}
 
             {currentView === 'job_alert' && <React.Suspense fallback={<ScreenLoader />}><JobAlert /></React.Suspense>}
+
+            {currentView === 'mistake_book' && <React.Suspense fallback={<ScreenLoader />}><MistakeBook onPractice={startMistakePractice} /></React.Suspense>}
 
             {currentView === 'quiz_categories' && (
               <m.div
@@ -2177,8 +2241,10 @@ export default function App() {
                                   if (idx === currentQ.correct) {
                                     playGentleSound('correct', soundMuted);
                                     setQuizScore(prev => prev + 1);
+                                    if (selectedSubject?.id === MISTAKE_QUIZ_ID) resolveMistake(currentQ);
                                   } else {
                                     playGentleSound('wrong', soundMuted);
+                                    addMistake(currentQ, selectedSubject?.id === MISTAKE_QUIZ_ID ? MISTAKE_QUIZ_ID : (selectedSubject?.title || ''), idx);
                                   }
                                 }
                               }}
@@ -2205,6 +2271,29 @@ export default function App() {
                           <p>{langHindi ? (currentQ.explanation || currentQ.explanationEn) : (currentQ.explanationEn || currentQ.explanation)}</p>
                         </div>
                       )}
+
+                      {isAnswerRevealed && (() => {
+                        const wrongNow = userQuizAnswers[quizIndex] !== currentQ.correct;
+                        const inBook = selectedSubject?.id === MISTAKE_QUIZ_ID;
+                        const bm = mbVer >= 0 && isBookmarked(currentQ);
+                        return (
+                          <div className="flex items-center justify-between gap-2 -mt-2" data-testid="mb-quiz-row">
+                            <span className={`text-[12px] font-bold leading-snug min-w-0 ${wrongNow ? 'text-rose-700' : 'text-emerald-700'}`}>
+                              {inBook
+                                ? (wrongNow ? '📕 गलती बुक में बना रहेगा' : '✅ सुधर गया — गलती बुक से हटा')
+                                : (wrongNow ? '📕 गलती बुक में सेव हुआ' : '')}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => toggleBookmark(currentQ, selectedSubject?.title || '')}
+                              data-testid="mb-bookmark"
+                              className={`shrink-0 px-3 py-1.5 rounded-xl border text-[12px] font-bold active:scale-95 cursor-pointer transition ${bm ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-blue-700 border-blue-200'}`}
+                            >
+                              {bm ? '🔖 सेव है' : '🔖 रिवीजन में सेव'}
+                            </button>
+                          </div>
+                        );
+                      })()}
 
                       {isAnswerRevealed && (
                         <div className="flex justify-end pt-2">
@@ -2328,12 +2417,21 @@ export default function App() {
                     <RotateCcw className="w-4 h-4" /> {langHindi ? 'पुनः अभ्यास' : 'Practice Again'}
                   </button>
                   <button
-                    onClick={() => navigateTo('quiz_categories')}
+                    onClick={() => navigateTo(selectedSubject?.id === MISTAKE_QUIZ_ID ? 'mistake_book' : 'quiz_categories')}
                     className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-bold transition active:scale-95 cursor-pointer"
                   >
-                    {langHindi ? 'विषय बदलें' : 'Change Subject'}
+                    {selectedSubject?.id === MISTAKE_QUIZ_ID ? (langHindi ? '📕 गलती बुक' : 'Mistake Book') : (langHindi ? 'विषय बदलें' : 'Change Subject')}
                   </button>
                 </div>
+                {selectedSubject?.id !== MISTAKE_QUIZ_ID && mbCount > 0 && (
+                  <button
+                    onClick={() => navigateTo('mistake_book')}
+                    data-testid="mb-open-result"
+                    className="w-full py-3 rounded-2xl border-2 border-rose-200 bg-rose-50 text-rose-800 font-extrabold text-sm active:scale-95 cursor-pointer"
+                  >
+                    📕 गलती बुक खोलें — {mbCount} प्रश्न रिवीजन के लिए
+                  </button>
+                )}
               </m.div>
             )}
 
@@ -2619,6 +2717,15 @@ export default function App() {
                     {langHindi ? 'होम स्क्रीन पर लौटें' : 'Return to Home'}
                   </button>
                 </div>
+                {mbCount > 0 && (
+                  <button
+                    onClick={() => navigateTo('mistake_book')}
+                    data-testid="mb-open-mock"
+                    className="w-full py-3 rounded-2xl border-2 border-rose-200 bg-rose-50 text-rose-800 font-extrabold text-sm active:scale-95 cursor-pointer"
+                  >
+                    📕 गलत प्रश्न गलती बुक में — {mbCount} प्रश्न रिवीजन के लिए
+                  </button>
+                )}
               </m.div>
             )}
 
