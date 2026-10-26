@@ -16,6 +16,7 @@ import { splitStore } from './lib/splitStore';
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
 import { LevelList, pyqTagOf, stripPyq, PyqBadge, soleQuizChild } from './components/LevelList';
 import { refreshNav } from './lib/freshNav';
+import { MockRules, buildMockInfo, type MockInfo } from './components/MockRules';
 
 // Code-defined screens load as separate chunks only when opened (smaller first download)
 const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
@@ -2055,6 +2056,9 @@ export default function App() {
   const [mockDurationSec, setMockDurationSec] = useState(3600);
   const [mockMarks, setMockMarks] = useState<{ pos: number; neg: number }>({ pos: 1, neg: 0 });
   const [mockTimerActive, setMockTimerActive] = useState(false);
+  // instructions screen before every mock; the timer starts only after "टेस्ट शुरू करें"
+  const [mockStarted, setMockStarted] = useState(true);
+  const [mockInfo, setMockInfo] = useState<MockInfo | null>(null);
 
   // Calculation Setup State
   const [calcCount, setCalcCount] = useState<number | 'Infinite'>(10);
@@ -2352,7 +2356,13 @@ export default function App() {
         setMockDurationSec(durSec);
         setMockMarks(resolveMockMarks(btn));
         setMockTimer(durSec);
-        setMockTimerActive(true);
+        setMockTimerActive(false);
+        {
+          const examNode = tapped !== btn ? tapped : (currentView === 'custom_node' ? activeCustomNode : null);
+          const examTitle = examNode ? resolveNodeTitle(examNode, langHindi) : (langHindi ? 'मॉक टेस्ट' : 'Mock Test');
+          setMockInfo(buildMockInfo(btn, examTitle, title, normalizedQs));
+        }
+        setMockStarted(false);
         navigateTo('mock_play');
       } else {
         navigateTo('quiz_play');
@@ -2423,7 +2433,9 @@ export default function App() {
         setUserMockAnswers(new Array(mockQs.length).fill(null));
         setMockDurationSec(durSec);
         setMockTimer(durSec);
-        setMockTimerActive(true);
+        setMockTimerActive(false);
+        setMockInfo(buildMockInfo(firstMock, langHindi ? 'मॉक टेस्ट' : 'Mock Test', firstMock ? resolveNodeTitle(firstMock, langHindi) : (langHindi ? 'मॉक टेस्ट' : 'Mock Test'), mockQs));
+        setMockStarted(false);
         navigateTo('mock_play');
       } else {
         navigateTo('mock_play');
@@ -3185,6 +3197,23 @@ export default function App() {
           paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))'
         }}
       >
+        {currentView === 'mock_play' && !mockStarted && mockInfo && mockQuestions.length > 0 && (
+          <MockRules
+            key={mockInfo.title + ':' + mockQuestions.length}
+            info={mockInfo}
+            langHindi={langHindi}
+            headerBg={`linear-gradient(to right, ${adminSettings?.primaryColor || '#1546b5'}, ${adminSettings?.secondaryColor || '#3d2db3'})`}
+            onBack={handleBack}
+            onStart={() => {
+              setMockIndex(0);
+              setUserMockAnswers(new Array(mockQuestions.length).fill(null));
+              setMockTimer(mockDurationSec);
+              setMockStarted(true);
+              setMockTimerActive(true);
+              window.scrollTo(0, 0);
+            }}
+          />
+        )}
         {/* Top Header - Controlled live by Admin App */}
         <header 
           className="sticky top-0 z-40 text-white shadow-md transition-all"
