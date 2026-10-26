@@ -2,9 +2,9 @@
 // The site's data rows are read from Supabase ONCE per version by these functions; Vercel's CDN keeps the
 // answer (Cache-Control s-maxage) and serves every other visitor without touching Supabase.
 // Files starting with "_" are not routes on Vercel.
-const SB_URL = (process.env.SUPABASE_URL || 'https://epsplspwdjjjjezxscer.supabase.co').replace(/\/+$/, '');
+export const SB_URL = (process.env.SUPABASE_URL || 'https://epsplspwdjjjjezxscer.supabase.co').replace(/\/+$/, '');
 // Public anon (publishable) key — the same one the browser app already ships with.
-const SB_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_X8IsGDLwK9fUliHih60dlg_vqyOiePl';
+export const SB_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_X8IsGDLwK9fUliHih60dlg_vqyOiePl';
 
 export async function sbRows(qs, timeoutMs = 25000) {
   const controller = new AbortController();

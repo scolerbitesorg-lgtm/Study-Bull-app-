@@ -22,6 +22,7 @@ import { MockRules, buildMockInfo, type MockInfo } from './components/MockRules'
 // Code-defined screens load as separate chunks only when opened (smaller first download)
 const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
 const EligibilityExam = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityExam })));
+import { trackTile } from './lib/views';
 const JobAlert = React.lazy(() => import('./components/JobAlert').then((m) => ({ default: m.JobAlert })));
 
 // Return visit: home + already-opened tiles straight from the per-tile cache (split data layout)
@@ -657,6 +658,8 @@ export default function App() {
   // Reusable universal handler for clicking ANY Admin node (MCQs, Notes, Folders, Pages)
   const handleNodeInteraction = (tapped: any) => {
     if (!tapped) return;
+    // 📊 Views: count home-button opens (title only)
+    if (tapped.id && adminNodes.some((n: any) => n && n.id === tapped.id)) trackTile(tapped.title || tapped.titleHi || tapped.titleEn);
     // a folder holding just one quiz (e.g. "📜 इतिहास — महत्वपूर्ण PYQ") opens that quiz directly (Aarav 26 Oct)
     let btn = tapped;
     if (!tapped._splitPending && !tapped.url) {
@@ -1952,7 +1955,7 @@ export default function App() {
                     {(isDbLoaded || adminNodes.length > 0) && (
                       <button
                         key="eligibility-checker-tile"
-                        onClick={() => navigateTo('eligibility')}
+                        onClick={() => { trackTile('पात्रता जाँच'); navigateTo('eligibility'); }}
                         className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                       >
                         <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
@@ -1977,7 +1980,7 @@ export default function App() {
                     {(isDbLoaded || adminNodes.length > 0) && (
                       <button
                         key="job-alert-tile"
-                        onClick={() => navigateTo('job_alert')}
+                        onClick={() => { trackTile('Job Alert'); navigateTo('job_alert'); }}
                         className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                       >
                         <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">

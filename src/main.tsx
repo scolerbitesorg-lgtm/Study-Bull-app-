@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import { Analytics } from '@vercel/analytics/react';
 import App from './App.tsx';
 import { MotionProvider } from './lib/motionLazy';
+import { trackOpen } from './lib/views';
 import './index.css';
 
 // Top-level safety net: an error while the app starts must never leave a blank page or an endless loader.
@@ -35,6 +36,9 @@ class RootBoundary extends React.Component<{ children: React.ReactNode }, { fail
 function Mounted() {
   React.useEffect(() => {
     (window as any).__sbMounted = true;
+    // 📊 Views counter for the admin panel: one tiny ping after the page has settled
+    const t = setTimeout(trackOpen, 2500);
+    return () => clearTimeout(t);
   }, []);
   return null;
 }
