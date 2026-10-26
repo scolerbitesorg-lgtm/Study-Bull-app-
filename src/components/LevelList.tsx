@@ -156,9 +156,45 @@ export function buildPyqFolder(subject: any, source: any, langHindi: boolean): a
   return node;
 }
 
+/** a folder whose only (visible) child is a single quiz/mock → that quiz (tap opens it directly) */
+export function soleQuizChild(n: any): any | null {
+  if (!n || n._pyq || n._virtual || !Array.isArray(n.children)) return null;
+  const kids = n.children.filter((k: any) => k && k.enabled !== false);
+  if (kids.length !== 1) return null;
+  const k = kids[0];
+  if (hasKids(k) || !Array.isArray(k.questions) || k.questions.length === 0) return null;
+  return k;
+}
+
+/**
+ * A REAL PYQ folder/quiz added by the admin (e.g. "📜 इतिहास — महत्वपूर्ण PYQ" with Aarav's 73 tagged PYQs):
+ * its title says PYQ, or most of its MCQs carry a [PYQ: …] tag. Not the virtual mix folder.
+ */
+const realPyqCache = new WeakMap<object, boolean>();
+export function isRealPyqNode(n: any): boolean {
+  if (!n || typeof n !== 'object' || n._pyq || n._virtual || n.enabled === false) return false;
+  if (nodeKind(n) === 'mock') return false;
+  const c = realPyqCache.get(n);
+  if (c !== undefined) return c;
+  let res = /\bPYQs?\b/i.test(`${n.title || ''} ${n.titleEn || ''}`);
+  if (!res) {
+    const qs: any[] = [];
+    collectMcqs(n, qs);
+    const tagged = qs.filter(q => pyqTagOf(q)).length;
+    res = tagged >= 5 && tagged * 2 >= qs.length;
+  }
+  realPyqCache.set(n, res);
+  return res;
+}
+/** a subject that already has a real PYQ child needs no virtual mix folder */
+export function hasRealPyq(subject: any): boolean {
+  return Array.isArray(subject?.children) && subject.children.some(isRealPyqNode);
+}
+
 /** should a subject page get a PYQ folder, and from which node */
 export function pyqSourceFor(subject: any, tile: any, allTiles: any[]): any | null {
   if (!subject || !tile || subject._virtual) return null;
+  if (hasRealPyq(subject)) return null;
   const tt = `${tile.title || ''} ${tile.titleEn || ''}`.toLowerCase();
   const isQuiz = /quiz|क्विज/.test(tt);
   const isNotes = /notes|नोट्स/.test(tt);
@@ -169,7 +205,9 @@ export function pyqSourceFor(subject: any, tile: any, allTiles: any[]): any | nu
   const quizTile = (allTiles || []).find(t => /quiz|क्विज/.test(`${t?.title || ''}`.toLowerCase()) && !t?._splitPending && Array.isArray(t?.children));
   if (!quizTile) return null;
   const want = shortSubject(subject.title).toLowerCase();
-  return quizTile.children.find((c: any) => shortSubject(c?.title).toLowerCase() === want && hasKids(c)) || null;
+  const src = quizTile.children.find((c: any) => shortSubject(c?.title).toLowerCase() === want && hasKids(c)) || null;
+  // the Quiz subject already has its real PYQs → no mix on the Notes side either
+  return src && !hasRealPyq(src) ? src : null;
 }
 
 function cleanSub(s: string) {
@@ -204,8 +242,14 @@ export function LevelList(p: LevelListProps) {
   for (const n of items) {
     if (!n || n.enabled === false) continue;
     if (isSection(n)) { headings.push(n); continue; }
+    // a real PYQ quiz/folder inside a subject is always the first big highlighted card
+    if (depth >= 1 && isRealPyqNode(n)) { containers.push(n); continue; }
     if (hasKids(n) || isFolder(n) || nodeKind(n) === 'mock') containers.push(n);
     else leaves.push(n);
+  }
+  if (depth >= 1) {
+    const rank = (n: any) => (isRealPyqNode(n) ? 0 : n?._pyq ? 1 : 2);
+    containers.sort((a, b) => rank(a) - rank(b)); // stable: the rest keep the admin's order
   }
 
   const cube = (n: any) => {
@@ -233,15 +277,21 @@ export function LevelList(p: LevelListProps) {
   };
 
   const folder = (n: any) => {
-    const isPyq = Boolean(n._pyq);
+    const isMix = Boolean(n._pyq);
+    const isReal = !isMix && isRealPyqNode(n);
+    const isPyq = isMix || isReal;
     const isMock = nodeKind(n) === 'mock';
     const q = countQuestions(n);
     const kids = Array.isArray(n.children) ? n.children.length : 0;
     const sub = cleanSub(subtitleOf(n));
     const meta = isMock
       ? (langHindi ? '▶ टेस्ट शुरू करें' : '▶ Start test')
-      : isPyq
+      : isMix
         ? (langHindi ? `🔀 ${kids} सेट` : `🔀 ${kids} sets`)
+        : isReal
+          ? (q ? (langHindi ? `📜 ${q} असली PYQ` : `📜 ${q} real PYQs`) : '')
+        : soleQuizChild(n)
+          ? (q ? `${q} ${langHindi ? 'प्रश्न' : 'Qs'}` : '')
         : [kids && !/टॉपिक|topic|lesson|आइटम/i.test(sub) ? `${kids} ${langHindi ? 'आइटम' : 'items'}` : '', q ? `${q} ${langHindi ? 'प्रश्न' : 'Qs'}` : ''].filter(Boolean).join(' • ');
     return (
       <button
@@ -256,12 +306,12 @@ export function LevelList(p: LevelListProps) {
         <div className={`w-16 h-16 shrink-0 rounded-2xl flex items-center justify-center text-[30px] shadow-inner border ${
           isPyq ? 'bg-gradient-to-br from-amber-100 to-orange-100 border-amber-200' : 'bg-gradient-to-br from-blue-50 to-indigo-100/80 border-blue-100'
         }`}>
-          {iconOf(n) || (isMock ? '📝' : '📂')}
+          {iconOf(n) || (isReal ? '📜' : isMock ? '📝' : '📂')}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 min-w-0">
             <h3 className={`font-extrabold text-[16.5px] leading-snug truncate ${isPyq ? 'text-amber-950' : 'text-slate-900'}`}>{titleOf(n)}</h3>
-            {isPyq && <span className="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500 text-white text-[9.5px] font-extrabold tracking-wide">{langHindi ? 'मिक्स' : 'MIX'}</span>}
+            {isPyq && <span className="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-500 text-white text-[9.5px] font-extrabold tracking-wide">{isMix ? (langHindi ? 'मिक्स' : 'MIX') : 'PYQ'}</span>}
           </div>
           {sub && <p className={`text-[12px] mt-0.5 leading-snug line-clamp-2 ${isPyq ? 'text-amber-900/80' : 'text-slate-500'}`}>{sub}</p>}
           {meta && <p className={`text-[11px] font-bold mt-1 ${isPyq ? 'text-amber-700' : 'text-blue-700'}`}>{meta}</p>}

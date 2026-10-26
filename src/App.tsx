@@ -14,7 +14,7 @@ import {
 } from './lib/supabase.ts';
 import { splitStore } from './lib/splitStore';
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
-import { LevelList, buildPyqFolder, pyqSourceFor, pyqTagOf, stripPyq, PyqBadge } from './components/LevelList';
+import { LevelList, buildPyqFolder, pyqSourceFor, pyqTagOf, stripPyq, PyqBadge, soleQuizChild } from './components/LevelList';
 
 // Code-defined screens load as separate chunks only when opened (smaller first download)
 const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
@@ -2213,8 +2213,13 @@ export default function App() {
   };
 
   // Reusable universal handler for clicking ANY Admin node (MCQs, Notes, Folders, Pages)
-  const handleNodeInteraction = (btn: any) => {
-    if (!btn) return;
+  const handleNodeInteraction = (tapped: any) => {
+    if (!tapped) return;
+    // a folder holding just one quiz (e.g. "📜 इतिहास — महत्वपूर्ण PYQ") opens that quiz directly (Aarav 26 Oct)
+    let btn = tapped;
+    if (!tapped._splitPending && !tapped.url) {
+      try { const only = soleQuizChild(tapped); if (only) btn = only; } catch { /* keep the folder */ }
+    }
 
     // Tile whose content isn't downloaded yet: small loader inside the tile, then open it
     if (btn._splitPending) {
