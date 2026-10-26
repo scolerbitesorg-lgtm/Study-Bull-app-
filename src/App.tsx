@@ -10,14 +10,33 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   loadStudyBullApp, 
-  subscribeToAdminUpdates, 
-  fetchStudyBullStamp,
-  recordUserAttempt,
-  syncExistingContentToSupabase
+  recordUserAttempt
 } from './lib/supabase.ts';
+import { splitStore } from './lib/splitStore';
 import { SandboxedHtmlView } from './components/SandboxedHtmlView';
-import { EligibilityList, EligibilityExam } from './components/EligibilityChecker';
-import { JobAlert } from './components/JobAlert';
+
+// Code-defined screens load as separate chunks only when opened (smaller first download)
+const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
+const EligibilityExam = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityExam })));
+const JobAlert = React.lazy(() => import('./components/JobAlert').then((m) => ({ default: m.JobAlert })));
+
+// Return visit: home + already-opened tiles straight from the per-tile cache (split data layout)
+const SPLIT_BOOT: { nodes: any[]; settings: any } | null = (() => {
+  try {
+    return typeof window !== 'undefined' ? splitStore.initFromCache() : null;
+  } catch {
+    return null;
+  }
+})();
+
+function ScreenLoader() {
+  return (
+    <div className="flex items-center justify-center py-16 text-sm font-semibold text-slate-500 gap-2">
+      <span className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      लोड हो रहा है…
+    </div>
+  );
+}
 import { playSound, initSound, type SoundType } from './lib/sound';
 
 // Error Boundary to prevent any blank or white screen crashes
@@ -2178,6 +2197,11 @@ export default function App() {
     return kind === 'section' || kind === 'divider' || kind === 'heading' || kind === 'header';
   };
 
+  const [loadingTileId, setLoadingTileId] = useState<string | null>(null);
+  const [tileLoadError, setTileLoadError] = useState<string | null>(null);
+  const pendingTileTapRef = useRef<string | null>(null);
+  const nodeInteractionRef = useRef<((btn: any) => void) | null>(null);
+
   const isFolderNode = (item: any) => {
     if (!item) return false;
     const kind = String(item?.kind || item?.type || '').toLowerCase();
@@ -2187,6 +2211,25 @@ export default function App() {
   // Reusable universal handler for clicking ANY Admin node (MCQs, Notes, Folders, Pages)
   const handleNodeInteraction = (btn: any) => {
     if (!btn) return;
+
+    // Tile whose content isn't downloaded yet: small loader inside the tile, then open it
+    if (btn._splitPending) {
+      const id = String(btn.id);
+      pendingTileTapRef.current = id;
+      setTileLoadError(null);
+      setLoadingTileId(id);
+      splitStore.ensureTile(id).then((full) => {
+        if (pendingTileTapRef.current !== id) return;
+        pendingTileTapRef.current = null;
+        setLoadingTileId(null);
+        if (full && !full._splitPending) {
+          if (liveNavRef.current.view === 'home') nodeInteractionRef.current?.(full);
+        } else {
+          setTileLoadError(id);
+        }
+      });
+      return;
+    }
 
     if (btn.url) {
       window.open(btn.url, '_blank');
@@ -2401,9 +2444,11 @@ export default function App() {
     setHtmlIsFullscreen(false);
     navigateTo('custom_node');
   };
+  nodeInteractionRef.current = handleNodeInteraction;
 
   // Supabase State & Instant Cache-First (eliminates all old default flickers)
   const [adminNodes, setAdminNodes] = useState<any[]>(() => {
+    if (SPLIT_BOOT && SPLIT_BOOT.nodes.length > 0) return SPLIT_BOOT.nodes;
     try {
       const cached = localStorage.getItem('studybull_user_cache') || localStorage.getItem('studybull_cached_nodes');
       if (cached) {
@@ -2415,6 +2460,7 @@ export default function App() {
   });
 
   const [adminSettings, setAdminSettings] = useState<any>(() => {
+    if (SPLIT_BOOT && SPLIT_BOOT.settings && Object.keys(SPLIT_BOOT.settings).length > 0) return SPLIT_BOOT.settings;
     try {
       const cached = localStorage.getItem('studybull_cached_settings');
       if (cached) return JSON.parse(cached);
@@ -2424,6 +2470,7 @@ export default function App() {
 
   const [eligibilityExamId, setEligibilityExamId] = useState<string | null>(null);
   const [isDbLoaded, setIsDbLoaded] = useState<boolean>(() => {
+    if (SPLIT_BOOT && SPLIT_BOOT.nodes.length > 0) return true;
     try {
       const cached = localStorage.getItem('studybull_user_cache') || localStorage.getItem('studybull_cached_nodes');
       if (cached) {
@@ -2438,11 +2485,8 @@ export default function App() {
 
   const applyLiveAdminData = (nodes: any[], settings: any) => {
     if (Array.isArray(nodes)) {
+      // Caching is done by splitStore (per tile) / loadStudyBullApp (old single row)
       setAdminNodes(nodes);
-      try {
-        localStorage.removeItem('studybull_cached_nodes');
-        localStorage.setItem('studybull_user_cache', JSON.stringify(nodes));
-      } catch {}
     }
     if (settings && Object.keys(settings).length > 0) {
       setAdminSettings(settings);
@@ -2459,46 +2503,24 @@ export default function App() {
   useEffect(() => {
     let isMounted = true;
 
-    // Last applied state version (row updated_at) — lets the background sync skip unchanged data
-    let lastStamp: string | null = null;
-
-    // 1. Initial background fetch & normalization from Supabase
-    loadStudyBullApp().then((appData) => {
+    // 1. Small index row first (home grid), tiles on demand — see src/lib/splitStore.ts.
+    //    Falls back to the old single row automatically when the index row is missing.
+    splitStore.setListener((nodes, settings) => {
       if (!isMounted) return;
-      if (appData.updatedAt) lastStamp = appData.updatedAt;
-      if (Array.isArray(appData.nodes) && (appData.nodes.length > 0 || !appData.error)) {
-        applyLiveAdminData(appData.nodes, appData.settings || {});
-      } else {
-        setIsDbLoaded(true);
-      }
-    }).catch((err) => {
+      if (Array.isArray(nodes) && nodes.length > 0) applyLiveAdminData(nodes, settings || {});
+    });
+    splitStore.start().catch((err) => {
       console.warn('Initial load error from Supabase:', err);
+    }).finally(() => {
       if (isMounted) setIsDbLoaded(true);
     });
 
-    // 2. Real-time subscription to admin panel updates
-    const unsubscribe = subscribeToAdminUpdates((data) => {
-      if (!isMounted) return;
-      applyLiveAdminData(data.nodes || [], data.settings || {});
-    });
-
-    // 3. Fallback sync: check only the tiny updated_at stamp (was: re-download the whole multi-MB
-    //    state every 4 s), and fetch the full state only when the admin actually saved something.
-    let syncing = false;
+    // 2. Every 15 s while the tab is visible (and when it comes back): tiny version stamps only;
+    //    only the tiles the admin changed are downloaded again.
     const syncIfChanged = () => {
-      if (!isMounted || syncing) return;
+      if (!isMounted) return;
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
-      syncing = true;
-      fetchStudyBullStamp().then((stamp) => {
-        if (!isMounted || !stamp || stamp === lastStamp) return;
-        return loadStudyBullApp().then((appData) => {
-          if (!isMounted) return;
-          if (appData && Array.isArray(appData.nodes) && (appData.nodes.length > 0 || !appData.error)) {
-            if (appData.updatedAt) lastStamp = appData.updatedAt;
-            applyLiveAdminData(appData.nodes, appData.settings || {});
-          }
-        });
-      }).catch(() => {}).finally(() => { syncing = false; });
+      splitStore.poll().catch(() => {});
     };
     const timer = setInterval(syncIfChanged, 15000);
     const onVisible = () => { if (document.visibilityState === 'visible') syncIfChanged(); };
@@ -2508,9 +2530,15 @@ export default function App() {
       isMounted = false;
       clearInterval(timer);
       document.removeEventListener('visibilitychange', onVisible);
-      if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, []);
+
+  // Views that read across all tiles (old quiz/notes hubs, typing setup) need every tile's content
+  useEffect(() => {
+    if (['quiz_categories', 'notes_lib', 'typing_setup'].includes(currentView) && adminNodes.some((n: any) => n && n._splitPending)) {
+      void splitStore.ensureAll();
+    }
+  }, [currentView, adminNodes]);
 
   // Sync Language and Mute with LocalStorage
   useEffect(() => {
@@ -3335,9 +3363,7 @@ export default function App() {
                         <button
                           onClick={() => {
                             setIsDbLoaded(false);
-                            loadStudyBullApp().then((d) => {
-                              if (Array.isArray(d.nodes)) applyLiveAdminData(d.nodes, d.settings || {});
-                            });
+                            splitStore.start().catch(() => {}).finally(() => setIsDbLoaded(true));
                           }}
                           className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1.5"
                         >
@@ -3408,7 +3434,7 @@ export default function App() {
                         }
 
                         // 2. UNIFORM BLOCK GRID CARD (Used for both Folders and regular buttons)
-                        const childCount = Array.isArray(btn.children) ? btn.children.length : 0;
+                        const childCount = btn._splitPending ? Number(btn._childCount || 0) : (Array.isArray(btn.children) ? btn.children.length : 0);
 
                         if (isFolder) {
                           return (
@@ -3417,6 +3443,20 @@ export default function App() {
                               onClick={handleNodeClick}
                               className="col-span-2 sm:col-span-2 md:col-span-3 group relative bg-gradient-to-r from-amber-50 via-amber-50/90 to-amber-100/80 rounded-2xl p-4 shadow-sm border-2 border-amber-300/90 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer flex items-center justify-between text-left overflow-hidden my-1 w-full active:scale-98"
                             >
+                              {(loadingTileId === String(btn.id) || tileLoadError === String(btn.id)) && (
+                              <div className="absolute inset-0 z-10 bg-white/80 flex items-center justify-center rounded-2xl">
+                                {loadingTileId === String(btn.id) ? (
+                                  <span className="flex items-center gap-2 text-xs font-bold text-blue-700">
+                                    <span className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                                    {langHindi ? 'लोड हो रहा है…' : 'Loading…'}
+                                  </span>
+                                ) : (
+                                  <span className="px-2 text-center text-xs font-bold text-red-600">
+                                    {langHindi ? 'नेटवर्क धीमा है — फिर से टैप करें' : 'Slow network — tap again'}
+                                  </span>
+                                )}
+                              </div>
+                            )}
                               <div className="flex items-center space-x-3.5 min-w-0">
                                 <div className="w-11 h-11 rounded-xl bg-amber-200/90 group-hover:bg-amber-300 text-amber-900 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 group-hover:scale-105 transform duration-150">
                                   {displayIcon || '📂'}
@@ -3455,6 +3495,20 @@ export default function App() {
                             <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
                               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
                             </div>
+                            {(loadingTileId === String(btn.id) || tileLoadError === String(btn.id)) && (
+                              <div className="absolute inset-0 z-10 bg-white/80 flex items-center justify-center rounded-2xl">
+                                {loadingTileId === String(btn.id) ? (
+                                  <span className="flex items-center gap-2 text-xs font-bold text-blue-700">
+                                    <span className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                                    {langHindi ? 'लोड हो रहा है…' : 'Loading…'}
+                                  </span>
+                                ) : (
+                                  <span className="px-2 text-center text-xs font-bold text-red-600">
+                                    {langHindi ? 'नेटवर्क धीमा है — फिर से टैप करें' : 'Slow network — tap again'}
+                                  </span>
+                                )}
+                              </div>
+                            )}
 
                             <div className="w-12 h-12 rounded-2xl bg-blue-50 group-hover:bg-blue-100 transition-colors flex items-center justify-center text-2xl shadow-inner flex-shrink-0 mb-2">
                               {displayIcon || '⚡'}
@@ -3529,17 +3583,19 @@ export default function App() {
 
             {/* 2. QUIZ SUBJECT CATEGORIES */}
             {currentView === 'eligibility' && (
+              <React.Suspense fallback={<ScreenLoader />}>
               <EligibilityList
                 onOpenExam={(id) => {
                   setEligibilityExamId(id);
                   navigateTo('eligibility_exam');
                 }}
               />
+              </React.Suspense>
             )}
 
-            {currentView === 'eligibility_exam' && <EligibilityExam examId={eligibilityExamId} />}
+            {currentView === 'eligibility_exam' && <React.Suspense fallback={<ScreenLoader />}><EligibilityExam examId={eligibilityExamId} /></React.Suspense>}
 
-            {currentView === 'job_alert' && <JobAlert />}
+            {currentView === 'job_alert' && <React.Suspense fallback={<ScreenLoader />}><JobAlert /></React.Suspense>}
 
             {currentView === 'quiz_categories' && (
               <motion.div

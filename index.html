@@ -17,6 +17,8 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://epsplspwdjjjjezxscer.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://epsplspwdjjjjezxscer.supabase.co" />
+    <!-- Home tiles (small "index" row) start downloading together with the JS; must match splitStore.ts restUrl() exactly -->
+    <link rel="preload" as="fetch" crossorigin="anonymous" href="https://epsplspwdjjjjezxscer.supabase.co/rest/v1/studybull_app_state?id=eq.index&amp;select=nodes,settings&amp;apikey=sb_publishable_X8IsGDLwK9fUliHih60dlg_vqyOiePl" />
     <meta property="og:site_name" content="StudyBull" />
     <meta property="og:title" content="StudyBull — SSC GD, Agniveer, Police, Railway की फ्री तैयारी (Hindi)" />
     <meta property="og:description" content="StudyBull: SSC GD, Agniveer, Police, Railway की फ्री तैयारी हिंदी में — Mock Test, Quiz, Notes, PYQ, करंट अफेयर्स, Typing Test, Speed Math, Job Alert." />

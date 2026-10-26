@@ -1,4 +1,5 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// The Supabase SDK is loaded on demand (only for rare paths); site data is read with plain fetch.
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 // Production Fallback Credentials (ensures app works on Vercel without manual env configuration)
 export const FALLBACK_SUPABASE_URL = "https://epsplspwdjjjjezxscer.supabase.co";
@@ -41,7 +42,7 @@ export function saveSupabaseCredentials(url: string, anonKey: string) {
     if (anonKey) localStorage.setItem('studybull_supabase_key', anonKey.trim());
     else localStorage.removeItem('studybull_supabase_key');
   }
-  _clientInstance = null; // Reset singleton on credential change
+  _clientPromise = null; // Reset singleton on credential change
 }
 
 // Check if credentials look valid (non-empty and not sample placeholders)
@@ -56,38 +57,37 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
-// Singleton client instance to prevent multiple client creations and connection churn
-let _clientInstance: SupabaseClient | null = null;
+// Lazily-created singleton client (the SDK is a separate chunk, downloaded only when a path needs it)
+let _clientPromise: Promise<SupabaseClient | null> | null = null;
 
-// Create client helper
-export function getSupabaseClient(): SupabaseClient | null {
-  if (_clientInstance) return _clientInstance;
+export function getSupabaseClient(): Promise<SupabaseClient | null> {
+  if (_clientPromise) return _clientPromise;
 
   const { url, anonKey } = getSupabaseCredentials();
   if (!url || !anonKey || !url.startsWith('https://')) {
-    return null;
+    return Promise.resolve(null);
   }
-  try {
-    _clientInstance = createClient(url, anonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-      realtime: {
-        params: {
-          eventsPerSecond: 10,
+  _clientPromise = import('@supabase/supabase-js')
+    .then(({ createClient }) =>
+      createClient(url, anonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
         },
-      },
+        realtime: {
+          params: {
+            eventsPerSecond: 10,
+          },
+        },
+      })
+    )
+    .catch((err) => {
+      console.warn('Failed to initialize Supabase client:', err);
+      _clientPromise = null;
+      return null;
     });
-    return _clientInstance;
-  } catch (err) {
-    console.warn('Failed to initialize Supabase client:', err);
-    return null;
-  }
+  return _clientPromise;
 }
-
-// Export default supabase instance
-export const supabase = getSupabaseClient();
 
 export interface StudyBullNode {
   id: string;
@@ -128,7 +128,7 @@ export function isNodeActive(n: any): boolean {
 
 // Helper: Migration/sync function to keep Supabase in sync without forcing dummy nodes
 export async function syncExistingContentToSupabase(): Promise<{ nodes: any[]; success: boolean; error?: string }> {
-  const client = getSupabaseClient();
+  const client = await getSupabaseClient();
   if (!client) {
     return { nodes: [], success: false, error: 'No client' };
   }
@@ -252,15 +252,11 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
     const controller = new AbortController();
     // The state row is several MB: a 6 s abort cut slow mobile downloads off and then re-downloaded it via the SDK
     const timer = setTimeout(() => controller.abort(), 30000);
-    const endpoint = `${url}/rest/v1/studybull_app_state?select=nodes,settings,updated_at&order=updated_at.desc&limit=1`;
+    // Always the old single row by id (other rows in the table are the split tiles/index, see splitStore.ts).
+    // Key in the query string and no custom headers = no CORS preflight round trip.
+    const endpoint = `${url}/rest/v1/studybull_app_state?id=eq.main&select=nodes,settings,updated_at&apikey=${anonKey}`;
     const response = await fetch(endpoint, {
       method: 'GET',
-      headers: {
-        'apikey': anonKey,
-        'Authorization': `Bearer ${anonKey}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
       signal: controller.signal,
     });
     clearTimeout(timer);
@@ -293,7 +289,7 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
   }
 
   // Strategy B: Supabase JS Client
-  const client = getSupabaseClient();
+  const client = await getSupabaseClient();
   if (!client) {
     return {
       nodes: getCachedNodes(),
@@ -303,33 +299,21 @@ export async function loadStudyBullApp(): Promise<{ nodes: any[]; settings: any;
   }
 
   try {
-    // Check latest row first (supports any custom ID or updated row)
-    const { data: rows, error: rowsErr } = await client
+    const { data: mainData, error: mainErr } = await client
       .from('studybull_app_state')
       .select('nodes, settings, updated_at')
-      .order('updated_at', { ascending: false })
-      .limit(1);
+      .eq('id', 'main')
+      .maybeSingle();
 
-    let row = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
-
-    if (!row || rowsErr) {
-      // Fallback by ID 'main'
-      const { data: mainData, error: mainErr } = await client
-        .from('studybull_app_state')
-        .select('nodes, settings, updated_at')
-        .eq('id', 'main')
-        .maybeSingle();
-
-      if (mainErr) {
-        console.warn('Supabase loadStudyBullApp query error:', mainErr.message);
-        return {
-          nodes: getCachedNodes(),
-          settings: getCachedSettings(),
-          error: mainErr.message,
-        };
-      }
-      row = mainData;
+    if (mainErr) {
+      console.warn('Supabase loadStudyBullApp query error:', mainErr.message);
+      return {
+        nodes: getCachedNodes(),
+        settings: getCachedSettings(),
+        error: mainErr.message,
+      };
     }
+    const row = mainData;
 
     if (row) {
       const rawNodes = Array.isArray(row.nodes) ? row.nodes : [];
@@ -392,8 +376,7 @@ export async function fetchStudyBullStamp(): Promise<string | null> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
-    const res = await fetch(`${url}/rest/v1/studybull_app_state?select=updated_at&order=updated_at.desc&limit=1`, {
-      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, Accept: 'application/json' },
+    const res = await fetch(`${url}/rest/v1/studybull_app_state?id=eq.main&select=updated_at&apikey=${anonKey}`, {
       signal: controller.signal,
     });
     clearTimeout(timer);
@@ -407,9 +390,11 @@ export async function fetchStudyBullStamp(): Promise<string | null> {
 
 // 2. Admin में बदलाव होते ही User App में तुरंत लाइव अपडेट करने के लिए:
 export function subscribeToAdminUpdates(onUpdate: (data: { nodes: any[]; settings: any }) => void) {
-  const client = getSupabaseClient();
-  if (!client) return () => {};
-
+  let cancelled = false;
+  let cleanup: () => void = () => {};
+  void (async () => {
+  const client = await getSupabaseClient();
+  if (!client || cancelled) return;
   try {
     const channel = client
       .channel('user-app-live-sync')
@@ -451,15 +436,19 @@ export function subscribeToAdminUpdates(onUpdate: (data: { nodes: any[]; setting
       )
       .subscribe();
 
-    return () => {
+    cleanup = () => {
       try {
         client.removeChannel(channel);
       } catch {}
     };
   } catch (err) {
     console.warn('Failed to subscribe to realtime updates:', err);
-    return () => {};
   }
+  })();
+  return () => {
+    cancelled = true;
+    cleanup();
+  };
 }
 
 // 3. लाइव डेटाबेस कनेक्शन टेस्ट और डायग्नोस्टिक्स:
@@ -483,7 +472,7 @@ export async function checkSupabaseConnection(): Promise<ConnectionTestResult> {
     };
   }
 
-  const client = getSupabaseClient();
+  const client = await getSupabaseClient();
   if (!client) {
     return {
       status: 'error',
@@ -561,7 +550,7 @@ export async function checkSupabaseConnection(): Promise<ConnectionTestResult> {
 
 // User attempt tracking
 export async function recordUserAttempt(type: 'quiz' | 'mock' | 'calc' | 'typing', payload: Record<string, any>) {
-  const client = getSupabaseClient();
+  const client = await getSupabaseClient();
   if (!client) return null;
   try {
     const { data, error } = await client
@@ -580,7 +569,7 @@ export async function recordUserAttempt(type: 'quiz' | 'mock' | 'calc' | 'typing
 
 // 4. App Snippets / Button Previews Realtime Sync (Admin Code Editor to User App Preview)
 export async function upsertAppSnippet(buttonId: string, htmlContent: string): Promise<{ success: boolean; error?: string }> {
-  const client = getSupabaseClient();
+  const client = await getSupabaseClient();
   if (!client) {
     // Fallback to localStorage if Supabase client not initialized
     try {
@@ -631,7 +620,7 @@ export async function fetchAppSnippet(buttonId: string): Promise<string | null> 
     }
   } catch {}
 
-  const client = getSupabaseClient();
+  const client = await getSupabaseClient();
   if (!client) {
     try {
       return localStorage.getItem(`snippet_${buttonId}`) || null;
@@ -663,9 +652,11 @@ export async function fetchAppSnippet(buttonId: string): Promise<string | null> 
 }
 
 export function subscribeToSnippetUpdates(buttonId: string, onUpdate: (htmlContent: string) => void) {
-  const client = getSupabaseClient();
-  if (!client) return () => {};
-
+  let cancelled = false;
+  let cleanup: () => void = () => {};
+  void (async () => {
+  const client = await getSupabaseClient();
+  if (!client || cancelled) return;
   try {
     const channelName = `snippet-realtime-${buttonId}-${Math.random().toString(36).substring(2, 7)}`;
     const channel = client
@@ -690,13 +681,17 @@ export function subscribeToSnippetUpdates(buttonId: string, onUpdate: (htmlConte
       )
       .subscribe();
 
-    return () => {
+    cleanup = () => {
       try {
         client.removeChannel(channel);
       } catch {}
     };
   } catch (err) {
     console.warn('Failed to subscribe to snippet updates:', err);
-    return () => {};
   }
+  })();
+  return () => {
+    cancelled = true;
+    cleanup();
+  };
 }
