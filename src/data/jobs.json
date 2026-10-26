@@ -1,6 +1,6 @@
 {
- "updatedAt": "25 अक्टूबर 2026, शाम 7:45 बजे",
- "updatedAtIso": "2026-10-25T19:45+05:30",
+ "updatedAt": "26 अक्टूबर 2026, सुबह 8:15 बजे",
+ "updatedAtIso": "2026-10-26T08:15+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -287,26 +287,29 @@
    "status": "open",
    "name_hi": "MP पुलिस कांस्टेबल (ड्राइवर) भर्ती 2026",
    "name_en": "MP Police Constable (Driver) 2026 — MPESB",
-   "posts": "1000",
-   "qualification": "नोटिफिकेशन देखें (ड्राइविंग लाइसेंस ज़रूरी)",
-   "age": "नोटिफिकेशन देखें",
-   "fee": "नोटिफिकेशन देखें",
+   "posts": "1000 (कांस्टेबल ड्राइवर 800 + SAF ड्राइवर 200; केवल पुरुष)",
+   "qualification": "10वीं पास (ST: 8वीं), हैवी व्हीकल ड्राइविंग लाइसेंस; ऊँचाई 168 सेमी",
+   "age": "18–33 वर्ष (पुरुष)",
+   "fee": "₹760 (सामान्य/अन्य राज्य), ₹410 (EWS/OBC/SC/ST) — पोर्टल शुल्क सहित",
    "start": "2026-10-15",
    "last": "2026-10-29",
-   "exam": "बाद में घोषित",
+   "exam": "04-01-2027 से",
    "link": "https://esb.mp.gov.in/",
-   "source": "https://education.sakshi.com/en/jobs/education-news/madhya-pradesh-1000-constable-driver-posts-apply",
-   "source_note": "Official ESB site did not load from here; posts/dates from secondary pages (Sakshi, others agree)",
+   "source": "https://esb.mp.gov.in/Rulebooks/RB_2026/PCRT_Driver_2026_rulebook_07102026.pdf + https://www.sarkariresult.com/2026/mpesb-mpp-constable-driver-oct26/",
+   "source_note": "Official ESB rulebook link did not load from here on 26 Oct; details from secondary pages (Sarkari Result, Sakshi agree on 15–29 Oct)",
    "unconfirmed": [
     "posts",
     "qualification",
-    "start",
-    "last"
+    "age",
+    "fee",
+    "last",
+    "exam"
    ],
-   "checked_at": "2026-10-24T23:00+05:30",
+   "checked_at": "2026-10-26T08:15+05:30",
    "link_display": "esb.mp.gov.in",
    "category": "Police",
-   "state": "Madhya Pradesh"
+   "state": "Madhya Pradesh",
+   "last_note": "सुधार (correction) की अंतिम तिथि 03-11-2026"
   },
   {
    "id": "gsssb-work-assistant",
@@ -521,7 +524,7 @@
    "source": "https://www.rrbapply.gov.in/ + CEN 06/2026 official PDF",
    "source_note": "Dates on rrbapply.gov.in; posts/age/fee from the official CEN PDF",
    "unconfirmed": [],
-   "checked_at": "2026-10-25T19:45+05:30",
+   "checked_at": "2026-10-26T08:15+05:30",
    "link_display": "rrbapply.gov.in",
    "category": "Railway",
    "state": "All India"
@@ -623,6 +626,28 @@
    "state": "Odisha"
   },
   {
+   "id": "dsssb-05-2026-sweeper-chowkidar",
+   "status": "open",
+   "name_hi": "DSSSB दिल्ली जिला न्यायालय सफ़ाई कर्मचारी व चौकीदार भर्ती 2026 (25 पद)",
+   "name_en": "DSSSB Sweeper/Safai Karamchari & Chowkidar, District & Sessions Courts (Advt. No. 05/2026)",
+   "posts": "25 (सफ़ाई कर्मचारी 10 + चौकीदार 15)",
+   "qualification": "10वीं (मैट्रिक) पास",
+   "age": "18–27 वर्ष (01.06.2026 को); आरक्षित वर्ग को नियमानुसार छूट",
+   "fee": "₹100 (महिला/SC/ST/PwBD/भूतपूर्व सैनिक को छूट)",
+   "start": "2026-10-13",
+   "last": "2026-11-11",
+   "last_note": null,
+   "exam": "बाद में घोषित",
+   "link": "https://dsssbonline.nic.in/",
+   "link_display": "dsssbonline.nic.in",
+   "source": "https://dsssb.delhi.gov.in/sites/default/files/DSSSB/circulars-orders/final_advt_05_2026_1.pdf",
+   "source_note": "आधिकारिक अधिसूचना (09.10.2026)",
+   "unconfirmed": [],
+   "checked_at": "2026-10-26T08:15+05:30",
+   "category": "State",
+   "state": "Delhi"
+  },
+  {
    "id": "jkssb-class-iv",
    "status": "open",
    "name_hi": "जेकेएसएसबी चतुर्थ श्रेणी (MTS/सफाई कर्मचारी) भर्ती 2026",
@@ -691,7 +716,7 @@
     "posts",
     "age"
    ],
-   "checked_at": "2026-10-25T19:45+05:30",
+   "checked_at": "2026-10-26T08:15+05:30",
    "link_display": "rrbapply.gov.in",
    "category": "Railway",
    "state": "All India"
@@ -774,6 +799,31 @@
    "state": "Uttar Pradesh"
   },
   {
+   "id": "uppsc-ro-aro-2026",
+   "status": "open",
+   "name_hi": "UPPSC समीक्षा अधिकारी / सहायक समीक्षा अधिकारी (RO/ARO) भर्ती 2026 (501 पद)",
+   "name_en": "UPPSC Samiksha Adhikari / Sahayak Samiksha Adhikari (RO/ARO) Exam 2026 — 501 Posts",
+   "posts": "501",
+   "qualification": "स्नातक (किसी भी विषय में); सहायक समीक्षा अधिकारी (सचिवालय) हेतु 'O' लेवल + हिंदी टाइपिंग 25 शब्द/मिनट भी",
+   "age": "21–40 वर्ष (01.07.2026 को); आरक्षित वर्ग को नियमानुसार छूट",
+   "fee": "₹125 (सामान्य/OBC/EWS), ₹65 (SC/ST), ₹25 (दिव्यांग)",
+   "start": "2026-10-26",
+   "last": "2026-11-26",
+   "last_note": "आवेदन में संशोधन की अंतिम तिथि 03-12-2026",
+   "exam": "प्रारंभिक परीक्षा — तिथि बाद में घोषित",
+   "link": "https://uppsc.up.nic.in/",
+   "link_display": "uppsc.up.nic.in",
+   "source": "https://doc.sarkariresults.org.in/uppscroaro2026.pdf + https://www.sarkariresult.com/2026/uppsc-ro-aro-jun26/",
+   "source_note": "Abridged advt (copy of the UPPSC notice) shows 501 posts, 26.10–26.11.2026, age 21–40 on 01.07.2026; not yet in uppsc.up.nic.in 'What's New' at 8 AM 26 Oct; qualification/fee from secondary page",
+   "unconfirmed": [
+    "qualification",
+    "fee"
+   ],
+   "checked_at": "2026-10-26T08:15+05:30",
+   "category": "State",
+   "state": "Uttar Pradesh"
+  },
+  {
    "id": "sci-junior-court-attendant-2026",
    "status": "upcoming",
    "name_hi": "सुप्रीम कोर्ट जूनियर कोर्ट अटेंडेंट भर्ती 2026",
@@ -809,7 +859,7 @@
    "posts": "1250",
    "qualification": "ग्रेजुएशन (किसी भी विषय में)",
    "age": "विस्तृत CEN के अनुसार (आयु 01.01.2027 को गिनी जाएगी)",
-   "fee": "विस्तृत CEN में घोषित होगी",
+   "fee": "₹500 (सामान्य/OBC/EWS; CBT देने पर ₹400 वापस), ₹250 (SC/ST/दिव्यांग; CBT देने पर वापस)",
    "start": "2026-10-27",
    "last": "2026-11-25",
    "last_note": "संक्षिप्त सूचना की तारीखें — विस्तृत CEN आने पर पक्की होंगी",
@@ -817,14 +867,15 @@
    "link": "https://www.rrbapply.gov.in/",
    "link_display": "rrbapply.gov.in",
    "source": "https://www.freejobalert.com/articles/rrb-station-master-recruitment-2026-3074679",
-   "source_note": "Short notice reported 22 Oct; not yet listed on rrbapply.gov.in 'Latest Updates' at 7:30 PM 25 Oct — posts/dates from secondary page",
+   "source_note": "Short notice reported 22 Oct; still not on rrbapply.gov.in 'Latest Updates' at 8 AM 26 Oct — posts/dates/fee from secondary pages (Sarkari Result, FreeJobAlert agree: 27 Oct–25 Nov)",
    "unconfirmed": [
     "posts",
     "qualification",
+    "fee",
     "start",
     "last"
    ],
-   "checked_at": "2026-10-25T19:45+05:30",
+   "checked_at": "2026-10-26T08:15+05:30",
    "category": "Railway",
    "state": "All India"
   },
