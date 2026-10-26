@@ -242,7 +242,7 @@ export function LevelList(p: LevelListProps) {
       ? (langHindi ? '▶ टेस्ट शुरू करें' : '▶ Start test')
       : isPyq
         ? (langHindi ? `🔀 ${kids} सेट` : `🔀 ${kids} sets`)
-        : [kids && !/टॉपिक|topic/i.test(sub) ? `${kids} ${langHindi ? 'टॉपिक' : 'topics'}` : '', q ? `${q} ${langHindi ? 'प्रश्न' : 'Qs'}` : ''].filter(Boolean).join(' • ');
+        : [kids && !/टॉपिक|topic|lesson|आइटम/i.test(sub) ? `${kids} ${langHindi ? 'आइटम' : 'items'}` : '', q ? `${q} ${langHindi ? 'प्रश्न' : 'Qs'}` : ''].filter(Boolean).join(' • ');
     return (
       <button
         key={n.id}
