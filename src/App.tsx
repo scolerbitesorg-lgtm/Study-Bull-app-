@@ -1622,11 +1622,8 @@ export default function App() {
 
             <button
               onClick={() => {
-                loadStudyBullApp().then(appData => {
-                  if (appData?.settings) {
-                    setAdminSettings(appData.settings);
-                  }
-                });
+                // via the CDN index (settings arrive through the splitStore listener) — never the big old row
+                splitStore.start().catch(() => {});
               }}
               className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-bold text-sm shadow-md active:scale-95 transition cursor-pointer flex items-center justify-center gap-2"
             >

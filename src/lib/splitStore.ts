@@ -3,6 +3,10 @@
 //    settings = app settings (no passcodes) + settings._split = { mainAt, v, tiles: { <tileId>: <version> } }
 //  - row id "tile:<tileId>": nodes = [{ id, children[, passages] }] = that tile's whole content, settings = { _v }
 //  - row id "main": the old single row, still written by the admin for compatibility (fallback only).
+// CDN (Oct 26 2026, Supabase egress quota): every read goes through this site's own /api routes first
+// (/api/index, /api/meta, /api/tile?id&v — see api/*.js), which Vercel's CDN caches, so Supabase is read
+// about once per data version instead of once per visitor. Direct Supabase REST is only the fallback when
+// a route errors (or in local dev, where /api does not exist).
 // Home renders from the small index; a tile's row is fetched only when it is opened (Quiz/Mock prefetched
 // quietly after idle) and cached per tile in localStorage. The 15 s check reads only tiny version stamps.
 import { getSupabaseCredentials, normalizeNode, isNodeActive, loadStudyBullApp } from './supabase';
@@ -17,11 +21,36 @@ const LS_TILE = 'sb_split_tile_v1:';
 const LS_LEGACY = 'studybull_user_cache';
 const LEGACY_SLACK_MS = 2000;
 
-// Plain GET with the key in the query string: no custom headers = no CORS preflight (saves a round trip on 4G).
-// The index URL must stay byte-identical to the <link rel="preload"> in index.html.
+// Direct Supabase (fallback only). Plain GET with the key in the query string: no custom headers = no CORS preflight.
 function restUrl(qs: string): string {
   const { url, anonKey } = getSupabaseCredentials();
   return `${url}/rest/v1/studybull_app_state?${qs}&apikey=${anonKey}`;
+}
+
+// Same-origin CDN route (cached by Vercel). The /api/index URL must stay byte-identical to the
+// <link rel="preload"> in index.html. Returns null on any error → caller falls back to direct Supabase.
+async function apiRows(path: string, timeoutMs = 30000): Promise<any[] | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(path, { signal: controller.signal });
+    if (!res.ok) return null;
+    const ct = res.headers.get('content-type') || '';
+    if (ct.indexOf('json') < 0) return null; // e.g. local dev: the SPA page instead of the route
+    const rows = await res.json();
+    return Array.isArray(rows) ? rows : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// CDN route first, direct Supabase only if the route failed.
+async function rowsVia(path: string, qs: string, timeoutMs = 30000): Promise<any[] | null> {
+  const viaCdn = await apiRows(path, timeoutMs);
+  if (viaCdn) return viaCdn;
+  return getRows(qs, timeoutMs);
 }
 
 async function getRows(qs: string, timeoutMs = 30000): Promise<any[] | null> {
@@ -158,9 +187,19 @@ class SplitStore {
   }
 
   async start(): Promise<void> {
-    const stampP = getRows('id=eq.main&select=updated_at', 15000);
-    const rows = await getRows('id=eq.index&select=nodes,settings', 30000);
-    const row = rows && rows[0];
+    // One CDN call carries the index row AND the old row's timestamp (no content). Never the 'main' content.
+    let stampP: Promise<any[] | null>;
+    let row: any = null;
+    const cdn = await apiRows('/api/index', 30000);
+    if (cdn) {
+      row = cdn.find((r: any) => r && r.id === 'index') || null;
+      const m = cdn.find((r: any) => r && r.id === 'main');
+      stampP = Promise.resolve(m ? [m] : []);
+    } else {
+      stampP = getRows('id=eq.main&select=updated_at', 15000);
+      const rows = await getRows('id=eq.index&select=nodes,settings', 30000);
+      row = rows && rows[0];
+    }
     if (!validIndexRow(row)) {
       await this.switchToLegacy();
       return;
@@ -219,7 +258,13 @@ class SplitStore {
     let p = this.inflight.get(key);
     if (!p) {
       p = (async () => {
-        const rows = await getRows(`id=eq.${encodeURIComponent('tile:' + key)}&select=nodes,settings`, 90000);
+        // Version in the URL → the CDN answer for it is immutable; a new admin save = a new URL.
+        const want = String(this.index?.split?.tiles?.[key] || '');
+        const rows = await rowsVia(
+          `/api/tile?id=${encodeURIComponent(key)}&v=${encodeURIComponent(want)}`,
+          `id=eq.${encodeURIComponent('tile:' + key)}&select=nodes,settings`,
+          90000,
+        );
         const r = rows && rows[0];
         const n0 = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
         if (!n0) return false;
@@ -258,12 +303,12 @@ class SplitStore {
     }
   }
 
-  // Every 15 s while visible: ~200 bytes of version stamps; refetch only what changed.
+  // Every 15 s while visible: ~200 bytes of version stamps from /api/meta (CDN, 20 s); refetch only what changed.
   async poll(): Promise<void> {
     if (this.polling) return;
     this.polling = true;
     try {
-      const rows = await getRows('id=in.(index,main)&select=id,updated_at,sp:settings->_split', 10000);
+      const rows = await rowsVia('/api/meta', 'id=in.(index,main)&select=id,updated_at,sp:settings->_split', 10000);
       if (!rows) return;
       const mainRow = rows.find((r: any) => r.id === 'main');
       const idxRow = rows.find((r: any) => r.id === 'index');
@@ -275,8 +320,8 @@ class SplitStore {
         return;
       }
       if (this.mode !== 'split' || !this.index || sp.v !== this.index.split?.v) {
-        const ir = await getRows('id=eq.index&select=nodes,settings', 30000);
-        const row = ir && ir[0];
+        const ir = await rowsVia(`/api/index?v=${encodeURIComponent(String(sp.v || ''))}`, 'id=eq.index&select=nodes,settings', 30000);
+        const row = ir && (ir.find((r: any) => r && r.id === 'index') || ir[0]);
         if (!validIndexRow(row)) return;
         this.mode = 'split';
         this.applyIndexRow(row);
