@@ -242,7 +242,7 @@ export function LevelList(p: LevelListProps) {
   for (const n of items) {
     if (!n || n.enabled === false) continue;
     if (isSection(n)) { headings.push(n); continue; }
-    // a real PYQ quiz/folder inside a subject is always the first big highlighted card
+    // a real PYQ quiz/folder inside a subject is always the first big card (normal style)
     if (depth >= 1 && isRealPyqNode(n)) { containers.push(n); continue; }
     if (hasKids(n) || isFolder(n) || nodeKind(n) === 'mock') containers.push(n);
     else leaves.push(n);
@@ -278,8 +278,10 @@ export function LevelList(p: LevelListProps) {
 
   const folder = (n: any) => {
     const isMix = Boolean(n._pyq);
-    const isReal = !isMix && isRealPyqNode(n);
-    const isPyq = isMix || isReal;
+    // Aarav 12:02 PM Oct 26: the real PYQ card is NOT highlighted any more — it renders like every
+    // other normal folder card (white card, blue icon box, normal count line). It still sorts first.
+    const isReal = false;
+    const isPyq = isMix;
     const isMock = nodeKind(n) === 'mock';
     const q = countQuestions(n);
     const kids = Array.isArray(n.children) ? n.children.length : 0;
