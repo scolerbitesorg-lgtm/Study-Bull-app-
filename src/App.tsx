@@ -1108,8 +1108,8 @@ export default function App() {
   useEffect(() => {
     const title = adminSettings?.appName?.trim() || 'Study Bull';
     // SEO: keep the full keyword title (same as index.html) so Google's rendered title stays descriptive.
-    const brand = title.replace(/\s+/g, '').toLowerCase() === 'studybull' ? 'StudyBull' : `${title} | StudyBull`;
-    document.title = `${brand} — SSC GD, Agniveer, Police, Railway Free Mock Test, Notes, PYQ & Current Affairs (Hindi)`;
+    const brand = title.replace(/\s+/g, '').toLowerCase() === 'studybull' ? 'Study Bull (StudyBull)' : `${title} | Study Bull (StudyBull)`;
+    document.title = `${brand} — Free Mock Test, PYQ, Notes: SSC GD, Agniveer, Police, Railway (Hindi)`;
   }, [adminSettings?.appName]);
 
   // ---- Navigation stack synced with browser history ----
