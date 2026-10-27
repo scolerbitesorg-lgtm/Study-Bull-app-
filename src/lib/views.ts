@@ -6,7 +6,10 @@ function istDay(): string {
   return new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
 }
 
-function readState(): { d?: string; f?: string; t?: Record<string, number> } {
+// d = day of the per-button (tile) memory, s = last day the SITE open was counted, f = first-ever day.
+// (s was added Oct 27 2026: a home button tapped in the first 2.5 s set d before the site open ran,
+//  so that open went out as "not a new visitor today" — new devices were counted as new but not as visitors.)
+function readState(): { d?: string; s?: string; f?: string; t?: Record<string, number> } {
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || '{}');
     return s && typeof s === 'object' ? s : {};
@@ -41,8 +44,10 @@ export function trackOpen() {
   const st = readState();
   const d = istDay();
   const first = !st.f;
-  const newToday = st.d !== d;
-  if (newToday) {
+  const siteDay = st.s ?? (st.f ? st.d : undefined); // older copies had no s; d was the site day then
+  const newToday = siteDay !== d;
+  st.s = d;
+  if (st.d !== d) {
     st.d = d;
     st.t = {};
   }
