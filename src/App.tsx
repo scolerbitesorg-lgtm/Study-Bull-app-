@@ -22,7 +22,7 @@ import { MockRules, buildMockInfo, type MockInfo } from './components/MockRules'
 // Code-defined screens load as separate chunks only when opened (smaller first download)
 const EligibilityList = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityList })));
 const EligibilityExam = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityExam })));
-import { trackTile } from './lib/views';
+import { trackTile, trackResult } from './lib/views';
 const JobAlert = React.lazy(() => import('./components/JobAlert').then((m) => ({ default: m.JobAlert })));
 
 // Return visit: home + already-opened tiles straight from the per-tile cache (split data layout)
@@ -1087,6 +1087,53 @@ export default function App() {
     } catch { /* never break the open page */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminNodes]);
+
+  // 👥 Users history (Oct 27 2026): one small event when a quiz / mock / typing test / speed-math round finishes
+  // (only when the result screen is reached from its play screen — going back/forward to it sends nothing).
+  const prevViewForResult = useRef<ViewState>(currentView);
+  useEffect(() => {
+    const from = prevViewForResult.current;
+    prevViewForResult.current = currentView;
+    try {
+      if (currentView === 'quiz_play' && from !== 'quiz_play' && from !== 'quiz_result') {
+        trackResult('quiz_start', selectedSubject?.title, { n: quizQuestions.length });
+      } else if (currentView === 'notes_reader' && from !== 'notes_reader') {
+        trackResult('notes', selectedChapter?.title);
+      } else if (currentView === 'quiz_result' && from === 'quiz_play') {
+        const a = userQuizAnswers.filter((x: any) => x !== null && x !== undefined).length;
+        trackResult('quiz', selectedSubject?.title, { c: quizScore, n: quizQuestions.length, a });
+      } else if (currentView === 'mock_result' && from === 'mock_play') {
+        let c = 0, w = 0;
+        mockQuestions.forEach((q: any, i: number) => {
+          const ans = userMockAnswers[i];
+          if (ans === null || ans === undefined) return;
+          if (ans === q.correct) c++; else w++;
+        });
+        const title = mockInfo ? [mockInfo.exam, mockInfo.title].filter(Boolean).join(' • ') : 'Mock Test';
+        trackResult('mock', title, { c, w, n: mockQuestions.length, a: c + w, marks: c * mockMarks.pos - w * mockMarks.neg, max: mockQuestions.length * mockMarks.pos, secs: Math.max(0, mockDurationSec - mockTimer) });
+      } else if (currentView === 'typing_result' && from === 'typing_practice') {
+        const typed = typedInputRef.current || '';
+        let ok = 0;
+        for (let i = 0; i < typed.length; i++) if (typed[i] === passageText[i]) ok++;
+        const words = typed.trim().split(/\s+/).filter(Boolean).length;
+        const total = typeof typingDuration === 'number' ? typingDuration * 60 : 120;
+        const secs = Math.max(1, total - typingTimeLeft);
+        trackResult('typing', activeTypingTitle || 'Typing', { wpm: Math.round((words / secs) * 60), acc: typed.length ? Math.round((ok / typed.length) * 100) : 0, secs });
+      } else if (currentView === 'calc_result' && from === 'calc_practice') {
+        trackResult('calc', calcTopic, { c: calcCorrectCount, w: calcWrongCount, n: calcCorrectCount + calcWrongCount, secs: calcTimer });
+      }
+    } catch { /* never break the result screen */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentView]);
+
+  // a mock counts as started when its timer starts (after the instructions screen)
+  useEffect(() => {
+    if (!mockStarted || currentView !== 'mock_play') return;
+    try {
+      trackResult('mock_start', mockInfo ? [mockInfo.exam, mockInfo.title].filter(Boolean).join(' • ') : 'Mock Test', { n: mockQuestions.length });
+    } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mockStarted]);
 
   // Views that read across all tiles (old quiz/notes hubs, typing setup) need every tile's content
   useEffect(() => {
