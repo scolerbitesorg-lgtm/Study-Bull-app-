@@ -1,6 +1,6 @@
 {
- "updatedAt": "27 अक्टूबर 2026, सुबह 8 बजे",
- "updatedAtIso": "2026-10-27T08:50+05:30",
+ "updatedAt": "27 अक्टूबर 2026, शाम 7 बजे",
+ "updatedAtIso": "2026-10-27T19:20+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -355,6 +355,33 @@
    "state": "All India"
   },
   {
+   "id": "bpsc-tre-40",
+   "status": "open",
+   "name_hi": "बिहार BPSC शिक्षक भर्ती (TRE 4.0)",
+   "name_en": "BPSC TRE-4.0 School Teacher Recruitment 2026 (Advt No. 14/2026)",
+   "posts": "32,388",
+   "qualification": "स्कूल स्तरानुसार NCTE/RCI मान्यता प्राप्त योग्यता; CTET/BTET/STET अनिवार्य",
+   "age": "18–42 वर्ष (न्यूनतम 01.08.2026, अधिकतम 01.08.2024 के अनुसार)",
+   "fee": "₹100 (सभी वर्ग)",
+   "start": "2026-09-25",
+   "last": "2026-11-03",
+   "last_note": "26 अक्टूबर से बढ़ाकर 3 नवंबर 2026 (फीस भुगतान 2 नवंबर तक)",
+   "exam": "बाद में घोषित",
+   "link": "https://bpsconline.bihar.gov.in/",
+   "link_display": "bpsconline.bihar.gov.in",
+   "source": "https://timesofindia.indiatimes.com/education/news/bpsc-tre-4-0-recruitment-2026-application-deadline-extended-for-33320-vacancies-candidates-can-apply-till-november-3/articleshow/135213254.cms",
+   "source_note": "मूल अधिसूचना: bpsc.bihar.gov.in (Advt 14/2026); तारीख बढ़ने की खबर TOI/News18 से — BPSC का नोटिस यहाँ से नहीं खुला",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee",
+    "last"
+   ],
+   "checked_at": "2026-10-27T19:20+05:30",
+   "category": "Teaching",
+   "state": "Bihar"
+  },
+  {
    "id": "dsssb-delhi-district",
    "status": "open",
    "name_hi": "DSSSB दिल्ली जिला न्यायालय संयुक्त भर्ती परीक्षा 2026 (641 पद)",
@@ -700,6 +727,31 @@
    "state": "Odisha"
   },
   {
+   "id": "isro-ursc-04-2026",
+   "status": "open",
+   "name_hi": "ISRO URSC टेक्नीशियन-B व ड्राइवर भर्ती 2026 (URSC:04:2026)",
+   "name_en": "ISRO URSC Technician-B / Heavy, Light & Staff Car Driver-A Recruitment (Advt URSC:04:2026)",
+   "posts": "61",
+   "qualification": "टेक्नीशियन-B: 10वीं + संबंधित ट्रेड में ITI/NTC/NAC; ड्राइवर: 10वीं + ड्राइविंग लाइसेंस + अनुभव",
+   "age": "18–35 वर्ष (13.11.2026 को); आरक्षित वर्ग को छूट",
+   "fee": "₹500 (परीक्षा में बैठने पर ₹400 वापस; SC/ST/PwBD/महिला/पूर्व सैनिक को पूरी वापसी)",
+   "start": "2026-10-24",
+   "last": "2026-11-13",
+   "last_note": null,
+   "exam": "लिखित परीक्षा + स्किल टेस्ट (बेंगलुरु; तारीख बाद में)",
+   "link": "https://www.isro.gov.in/URSCRecruitment13.html",
+   "link_display": "isro.gov.in",
+   "source": "https://www.isro.gov.in/media_isro/pdf/recruitmentNotice/2026/Oct/URSClAdvt2410_24102026.pdf",
+   "source_note": "आधिकारिक ISRO पेज: विज्ञापन 24.10.2026, अंतिम तिथि 13.11.2026, स्थिति Open; पदों की कुल संख्या/आयु द्वितीयक स्रोत से",
+   "unconfirmed": [
+    "posts",
+    "age"
+   ],
+   "checked_at": "2026-10-27T19:20+05:30",
+   "category": "Other",
+   "state": "All India"
+  },
+  {
    "id": "cwc-am-je-2026",
    "status": "open",
    "name_hi": "केंद्रीय भंडारण निगम (CWC) असिस्टेंट मैनेजर व जूनियर एग्ज़िक्यूटिव भर्ती 2026",
@@ -895,6 +947,34 @@
    "checked_at": "2026-10-26T08:15+05:30",
    "category": "State",
    "state": "Uttar Pradesh"
+  },
+  {
+   "id": "aees-teachers-2026",
+   "status": "upcoming",
+   "name_hi": "AEES शिक्षक भर्ती 2026 (PGT, TGT, PRT आदि) — परमाणु ऊर्जा शिक्षा सोसायटी",
+   "name_en": "AEES Teacher Recruitment 2026 (PGT/TGT/PRT & others), Notification 01/2026",
+   "posts": "254",
+   "qualification": "PRT: 12वीं (50%) + D.El.Ed/B.El.Ed + CTET-I; TGT: स्नातक + B.Ed + CTET-II; PGT: परास्नातक + B.Ed",
+   "age": "पद अनुसार (नोटिफिकेशन देखें)",
+   "fee": "नोटिफिकेशन देखें",
+   "start": "2026-10-29",
+   "last": "2026-11-18",
+   "last_note": "स्रोतों में 18 या 22 नवंबर — आधिकारिक PDF आने पर पक्का होगा",
+   "exam": "CBT + स्किल टेस्ट (तारीख बाद में)",
+   "link": "https://www.aees.gov.in/recruitment.html",
+   "link_display": "aees.gov.in",
+   "source": "https://testbook.com/news/aees-tgt-pgt-prt-recruitment-2026-out/",
+   "source_note": "27 अक्टूबर को जारी (द्वितीयक स्रोत); aees.gov.in भर्ती पेज पर अभी केवल पाठ्यक्रम (26.10) दिखा, नई विज्ञापन PDF नहीं",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "start",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-10-27T19:20+05:30",
+   "category": "Teaching",
+   "state": "All India"
   },
   {
    "id": "sci-junior-court-attendant-2026",
@@ -1132,32 +1212,6 @@
    "checked_at": "2026-10-25T19:45+05:30",
    "category": "Defence",
    "state": "All India"
-  },
-  {
-   "id": "bpsc-tre-40",
-   "status": "closed",
-   "name_hi": "बिहार BPSC शिक्षक भर्ती (TRE 4.0)",
-   "name_en": "BPSC TRE-4.0 School Teacher Recruitment 2026 (Advt No. 14/2026)",
-   "posts": "32,388",
-   "qualification": "स्कूल स्तरानुसार NCTE/RCI मान्यता प्राप्त योग्यता; CTET/BTET/STET अनिवार्य",
-   "age": "18–42 वर्ष (न्यूनतम 01.08.2026, अधिकतम 01.08.2024 के अनुसार)",
-   "fee": "₹100 (सभी वर्ग)",
-   "start": "2026-09-25",
-   "last": "2026-10-26",
-   "last_note": null,
-   "exam": "बाद में घोषित",
-   "link": "https://bpsconline.bihar.gov.in/",
-   "link_display": "bpsconline.bihar.gov.in",
-   "source": "https://bpsc.bihar.gov.in/wp-content/uploads/BPSC_content/Notices/Advertisement-142026-TRE-4.0_BPSC-20260818-jwk5si.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [
-    "qualification",
-    "age",
-    "fee"
-   ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "Teaching",
-   "state": "Bihar"
   },
   {
    "id": "cg-vyapam-lecturer",
