@@ -160,6 +160,20 @@ function resolveCorrectIndex(q: any): number {
   return 0;
 }
 
+// Typing passage time in minutes: its own "duration" (minutes; a value over 60 is read as seconds), else from its
+// length at the passage's target speed (or 30 WPM English / 25 WPM Hindi), rounded up, 2–15 min.
+function typingPassageMinutes(p: any, text: string): number {
+  const raw = Number(p?.duration ?? p?.durationMinutes ?? p?.minutes ?? p?.time);
+  if (Number.isFinite(raw) && raw > 0) {
+    const mins = raw > 60 ? Math.round(raw / 60) : raw;
+    return Math.max(1, Math.min(60, Math.round(mins)));
+  }
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean).length;
+  const hindi = String(p?.lang || '').toLowerCase().startsWith('hi') || /[\u0900-\u097F]/.test(String(text || '').slice(0, 200));
+  const wpm = Number(p?.targetWpm) > 0 ? Number(p.targetWpm) : (hindi ? 25 : 30);
+  return Math.max(2, Math.min(15, Math.ceil(words / wpm)));
+}
+
 // Mock duration as set in the admin panel (durationMinutes, default 60 min), in seconds.
 function resolveMockDurationSec(node: any): number {
   const m = Number(node?.durationMinutes);
@@ -535,6 +549,9 @@ export default function App() {
 
   // Typing Test State
   const [typingDuration, setTypingDuration] = useState<number | 'Infinite'>(2);
+  // Until the user taps a duration chip, each passage runs on its own time (its "duration" field in minutes,
+  // else an estimate from its length) — Oct 27 2026: the timer was 2 min even for 5–10 min passages.
+  const [typingDurationPicked, setTypingDurationPicked] = useState(false);
   const [activeTypingPassage, setActiveTypingPassage] = useState<string>('');
   const [activeTypingTitle, setActiveTypingTitle] = useState<string>('');
   const passageText = activeTypingPassage || '';
@@ -681,6 +698,30 @@ export default function App() {
         } else {
           setTileLoadError(id);
         }
+      });
+      return;
+    }
+
+    // Big tiles load as an outline first (Speed fix, Oct 27 2026): a quiz / notes page / mock that isn't
+    // downloaded yet is a stub — fetch just that node (a few KB), with a loader on its card, then open it.
+    const stubNode = splitStore.isStub(btn) ? btn : null;
+    if (stubNode) {
+      const sid = String(stubNode.id);
+      const tappedId = String(tapped.id);
+      const viewAt = liveNavRef.current.view;
+      const pageAt = String(liveNavRef.current.node?.id ?? '');
+      pendingTileTapRef.current = sid;
+      setTileLoadError(null);
+      setLoadingTileId(sid);
+      splitStore.ensureNode(sid).then((ok) => {
+        if (pendingTileTapRef.current !== sid) return;
+        pendingTileTapRef.current = null;
+        setLoadingTileId(null);
+        const loadedNode = ok ? splitStore.findNode(sid) : null;
+        const fresh = ok ? splitStore.findNode(tappedId) : null;
+        const samePage = liveNavRef.current.view === viewAt && String(liveNavRef.current.node?.id ?? '') === pageAt;
+        if (loadedNode && !splitStore.isStub(loadedNode) && fresh) { if (samePage) nodeInteractionRef.current?.(fresh); }
+        else setTileLoadError(sid);
       });
       return;
     }
@@ -1569,6 +1610,8 @@ export default function App() {
                       depth={depth}
                       langHindi={langHindi}
                       onOpen={(child: any) => handleNodeInteraction(child)}
+                      loadingId={loadingTileId}
+                      errorId={tileLoadError}
                       titleOf={(n: any) => resolveNodeTitle(n, langHindi)}
                       iconOf={(n: any) => resolveNodeIcon(n)}
                       subtitleOf={(n: any) => resolveNodeSubtitle(n, langHindi)}
@@ -3339,12 +3382,13 @@ export default function App() {
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">{langHindi ? 'समय अवधि चुनें (Duration):' : 'Select Time Duration:'}</h3>
+                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{langHindi ? 'समय अवधि चुनें (Duration):' : 'Select Time Duration:'}</h3>
+                  <p className="text-[11px] text-slate-500 mb-3">{typingDurationPicked ? (langHindi ? 'हर पैसेज पर आपका चुना समय लगेगा' : 'Your chosen time applies to every passage') : (langHindi ? 'अभी हर पैसेज अपने समय (⏱) पर चलेगा — बदलना हो तो ऊपर चुनें' : 'Each passage runs on its own time (⏱) — pick one to override')}</p>
                   <div className="grid grid-cols-5 gap-2">
                     {[1, 2, 5, 10, 'Infinite'].map((dur) => (
                       <button
                         key={String(dur)}
-                        onClick={() => setTypingDuration(dur as number | 'Infinite')}
+                        onClick={() => { setTypingDuration(dur as number | 'Infinite'); setTypingDurationPicked(true); }}
                         className={"py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition active:scale-95 cursor-pointer " + (typingDuration === dur ? 'bg-blue-600 border-blue-500 text-white shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200')}
                       >
                         {dur === 'Infinite' ? (langHindi ? '∞ नि:शुल्क' : '∞ Free') : `${dur} ${langHindi ? 'मि' : 'm'}`}
@@ -3395,6 +3439,7 @@ export default function App() {
                       const title = testItem.title || testItem.name || `टाइपिंग टेस्ट सेट #${idx + 1}`;
                       const sub = testItem.subtitle || testItem.sub || 'SSC & State Exams Typing';
                       const text = testItem.passage || testItem.text || testItem.typingPassage || testItem.content || testItem.html || '';
+                      const passageMins = typingPassageMinutes(testItem, text);
 
                       return (
                         <button
@@ -3404,7 +3449,12 @@ export default function App() {
                             setActiveTypingTitle(title);
                             setTypedInput('');
                             setTypingStarted(false);
-                            setTypingTimeLeft(typeof typingDuration === 'number' ? typingDuration * 60 : 120);
+                            if (!typingDurationPicked) {
+                              setTypingDuration(passageMins);
+                              setTypingTimeLeft(passageMins * 60);
+                            } else {
+                              setTypingTimeLeft(typeof typingDuration === 'number' ? typingDuration * 60 : 120);
+                            }
                             navigateTo('typing_practice');
                           }}
                           className="w-full bg-white rounded-2xl p-4 shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md cursor-pointer flex items-center justify-between text-left transition active:scale-98 group"
@@ -3420,6 +3470,7 @@ export default function App() {
                               <p className="text-xs text-slate-500 mt-0.5 truncate">{sub}</p>
                               <p className="text-[10px] text-slate-400 mt-0.5 font-mono">
                                 {langHindi ? `${text.trim().split(/\s+/).filter(Boolean).length} शब्द • ${text.length} अक्षर` : `${text.trim().split(/\s+/).filter(Boolean).length} words • ${text.length} chars`}
+                                {` • ⏱ ${!typingDurationPicked ? passageMins : (typingDuration === 'Infinite' ? '∞' : typingDuration)} ${langHindi ? 'मि' : 'min'}`}
                               </p>
                             </div>
                           </div>

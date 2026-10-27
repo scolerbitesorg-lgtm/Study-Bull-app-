@@ -23,6 +23,8 @@ export interface LevelListProps {
   subtitleOf: Fn<string>;
   isSection: Fn<boolean>;
   isFolder: Fn<boolean>;
+  loadingId?: string | null; // a stub node being downloaded (Speed fix Oct 27 2026) → loader on its card
+  errorId?: string | null;
 }
 
 const GENERIC_SUBS = ['स्टडी बुल इंटरएक्टिव फीचर', 'Study Bull Interactive Feature', 'पेज खोलें', 'Open Page'];
@@ -36,7 +38,8 @@ export function countQuestions(n: any): number {
   if (!n || typeof n !== 'object') return 0;
   const c = qCache.get(n);
   if (c !== undefined) return c;
-  let total = Array.isArray(n.questions) ? n.questions.length : 0;
+  // a not-yet-downloaded node (outline stub) carries its question count in _qn
+  let total = Array.isArray(n.questions) && n.questions.length ? n.questions.length : Number(n._qn || 0);
   if (Array.isArray(n.children)) for (const k of n.children) total += countQuestions(k);
   qCache.set(n, total);
   return total;
@@ -58,6 +61,14 @@ function collectMcqs(n: any, out: any[]) {
     }
   }
   if (Array.isArray(n.children)) for (const k of n.children) collectMcqs(k, out);
+}
+
+// question / PYQ-tag counts of outline stubs under a node (their questions aren't downloaded yet)
+function stubCounts(n: any, acc = { n: 0, p: 0 }): { n: number; p: number } {
+  if (!n || nodeKind(n) === 'mock') return acc;
+  if (n._stub && !(Array.isArray(n.questions) && n.questions.length)) { acc.n += Number(n._qn || 0); acc.p += Number(n._pq || 0); }
+  if (Array.isArray(n.children)) for (const k of n.children) stubCounts(k, acc);
+  return acc;
 }
 
 function seededShuffle<T>(arr: T[], seedStr: string): T[] {
@@ -162,7 +173,7 @@ export function soleQuizChild(n: any): any | null {
   const kids = n.children.filter((k: any) => k && k.enabled !== false);
   if (kids.length !== 1) return null;
   const k = kids[0];
-  if (hasKids(k) || !Array.isArray(k.questions) || k.questions.length === 0) return null;
+  if (hasKids(k) || ((!Array.isArray(k.questions) || k.questions.length === 0) && !(k._stub && k._qn > 0))) return null;
   return k;
 }
 
@@ -180,8 +191,9 @@ export function isRealPyqNode(n: any): boolean {
   if (!res) {
     const qs: any[] = [];
     collectMcqs(n, qs);
-    const tagged = qs.filter(q => pyqTagOf(q)).length;
-    res = tagged >= 5 && tagged * 2 >= qs.length;
+    const st = stubCounts(n);
+    const tagged = qs.filter(q => pyqTagOf(q)).length + st.p;
+    res = tagged >= 5 && tagged * 2 >= qs.length + st.n;
   }
   realPyqCache.set(n, res);
   return res;
@@ -219,8 +231,9 @@ function leafPill(n: any, langHindi: boolean): { top: string; bottom: string } {
   const k = nodeKind(n);
   const q = countQuestions(n);
   if (q > 0) return { top: String(q), bottom: langHindi ? 'प्रश्न' : 'Qs' };
-  if (k === 'notes' || k === 'note' || k === 'pdf' || n?.notesContent) return { top: '📖', bottom: langHindi ? 'नोट्स' : 'Notes' };
-  if (k === 'html' || n?.htmlContent) return { top: '📄', bottom: langHindi ? 'नोट्स' : 'Page' };
+  const sk: string[] = Array.isArray(n?._k) ? n._k : [];
+  if (k === 'notes' || k === 'note' || k === 'pdf' || n?.notesContent || sk.includes('notesContent')) return { top: '📖', bottom: langHindi ? 'नोट्स' : 'Notes' };
+  if (k === 'html' || n?.htmlContent || sk.includes('htmlContent')) return { top: '📄', bottom: langHindi ? 'नोट्स' : 'Page' };
   return { top: '▶', bottom: langHindi ? 'खोलें' : 'Open' };
 }
 
@@ -236,6 +249,23 @@ export function PyqBadge({ tag }: { tag?: string }) {
 
 export function LevelList(p: LevelListProps) {
   const { items, depth, langHindi, onOpen, titleOf, iconOf, subtitleOf, isSection, isFolder } = p;
+  // loader / error veil on the card whose quiz or notes is being downloaded
+  const veil = (n: any) => {
+    const id = String(n?.id ?? '');
+    if (!id || (p.loadingId !== id && p.errorId !== id)) return null;
+    return (
+      <span className="absolute inset-0 z-10 flex items-center justify-center rounded-[inherit] bg-white/80">
+        {p.loadingId === id ? (
+          <span className="flex items-center gap-2 text-xs font-bold text-blue-700">
+            <span className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            {langHindi ? 'लोड हो रहा है…' : 'Loading…'}
+          </span>
+        ) : (
+          <span className="px-2 text-center text-xs font-bold text-red-600">{langHindi ? 'नेटवर्क धीमा है — फिर से टैप करें' : 'Slow network — tap again'}</span>
+        )}
+      </span>
+    );
+  };
   const containers: any[] = [];
   const leaves: any[] = [];
   const headings: any[] = [];
@@ -262,6 +292,7 @@ export function LevelList(p: LevelListProps) {
         onClick={() => onOpen(n)}
         className="sb-tap group relative flex flex-col items-start text-left bg-white rounded-[22px] p-4 min-h-[156px] border border-slate-100 shadow-[0_4px_18px_-6px_rgba(30,64,175,0.18)] hover:shadow-[0_8px_26px_-8px_rgba(30,64,175,0.30)] hover:border-blue-200 transition-all cursor-pointer overflow-hidden"
       >
+        {veil(n)}
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100/80 border border-blue-100 flex items-center justify-center text-[28px] shadow-inner mb-3 group-hover:scale-105 transition-transform">
           {iconOf(n) || '📘'}
         </div>
@@ -299,12 +330,13 @@ export function LevelList(p: LevelListProps) {
       <button
         key={n.id}
         onClick={() => onOpen(n)}
-        className={`sb-tap group w-full flex items-center gap-3.5 text-left rounded-[22px] p-3.5 pr-3 border transition-all cursor-pointer overflow-hidden ${
+        className={`sb-tap group relative w-full flex items-center gap-3.5 text-left rounded-[22px] p-3.5 pr-3 border transition-all cursor-pointer overflow-hidden ${
           isPyq
             ? 'bg-gradient-to-r from-amber-50 via-orange-50 to-white border-amber-200 shadow-[0_6px_22px_-8px_rgba(217,119,6,0.35)]'
             : 'bg-white border-slate-100 shadow-[0_4px_20px_-6px_rgba(30,64,175,0.18)] hover:border-blue-200'
         }`}
       >
+        {veil(n)}
         <div className={`w-16 h-16 shrink-0 rounded-2xl flex items-center justify-center text-[30px] shadow-inner border ${
           isPyq ? 'bg-gradient-to-br from-amber-100 to-orange-100 border-amber-200' : 'bg-gradient-to-br from-blue-50 to-indigo-100/80 border-blue-100'
         }`}>
@@ -337,8 +369,9 @@ export function LevelList(p: LevelListProps) {
       <button
         key={n.id ?? idx}
         onClick={() => onOpen(n)}
-        className="sb-tap group w-full flex items-center gap-3 text-left bg-white rounded-2xl px-3 py-2.5 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(15,23,42,0.12)] hover:border-blue-200 transition-all cursor-pointer"
+        className="sb-tap group relative w-full flex items-center gap-3 text-left bg-white rounded-2xl px-3 py-2.5 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(15,23,42,0.12)] hover:border-blue-200 transition-all cursor-pointer"
       >
+        {veil(n)}
         <div className="w-10 h-10 shrink-0 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center leading-none">
           <span className="text-[16px] font-extrabold text-blue-700 tabular-nums">{idx + 1}</span>
         </div>

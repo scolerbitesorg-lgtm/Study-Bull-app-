@@ -13,7 +13,67 @@ import { getSupabaseCredentials, normalizeNode, isNodeActive, loadStudyBullApp }
 
 type SplitMeta = { format?: number; mainAt?: string; v?: string; tiles?: Record<string, string> };
 type IndexData = { nodes: any[]; settings: any; split: SplitMeta };
-type TileEntry = { v: string; heavy: Record<string, any> };
+// A tile is either FULL ({ v, heavy } = its whole content, small tiles + old caches) or PARTIAL (big tiles, Speed fix
+// Oct 27 2026): { v, part: true, outline, loaded } — outline = the structure from /api/tile?part=outline (heavy fields
+// left out, those nodes marked _stub with a hash _h), loaded = { nodeId: { h, f: heavy fields, pin } } = the quizzes /
+// notes pages downloaded one by one (/api/tile?node=…) when tapped. A loaded node is used while its hash matches the
+// outline's (or while the outline is the version it was loaded at = pin), so a new admin save only re-downloads
+// what actually changed.
+type Loaded = Record<string, { h: string; f: Record<string, any>; pin?: string }>;
+type TileEntry = { v: string; heavy?: Record<string, any>; part?: boolean; outline?: any; loaded?: Loaded; rev?: number };
+
+const HEAVY_KEYS = ['questions', 'mcqs', 'quiz', 'notesContent', 'htmlContent', 'html', 'code', 'rawHtml', 'content', 'text', 'notes', 'body', 'chapters', 'description', 'pdf'];
+// tiles at least this big (index _sb.b, raw bytes) load as outline + nodes on demand; smaller ones load whole
+const OUTLINE_MIN_BYTES = 150000;
+
+function findById(list: any, id: string): any {
+  if (!Array.isArray(list)) return null;
+  for (const c of list) {
+    if (!c || typeof c !== 'object') continue;
+    if (String(c.id) === id) return c;
+    const d = findById(c.children, id);
+    if (d) return d;
+  }
+  return null;
+}
+
+function mergeLoaded(n: any, loaded: Loaded, v: string): any {
+  if (!n || typeof n !== 'object') return n;
+  let out = n;
+  if (n._stub) {
+    const L = loaded[String(n.id)];
+    if (L && ((L.h && L.h === n._h) || (L.pin && L.pin === v))) {
+      const { _stub, _k, _qn, _pq, _h, ...rest } = n;
+      out = { ...rest, ...L.f };
+    }
+  }
+  if (Array.isArray(n.children) && n.children.length) {
+    out = { ...out, children: n.children.map((c: any) => mergeLoaded(c, loaded, v)) };
+  }
+  return out;
+}
+
+// keep only downloaded nodes that the new outline still has with the same content hash
+function pruneLoaded(loaded: Loaded | undefined, outline: any): Loaded {
+  const out: Loaded = {};
+  if (!loaded) return out;
+  const walk = (list: any) => {
+    if (!Array.isArray(list)) return;
+    for (const n of list) {
+      if (!n || typeof n !== 'object') continue;
+      const L = n._stub ? loaded[String(n.id)] : null;
+      if (L && L.h && L.h === n._h) out[String(n.id)] = { h: L.h, f: L.f };
+      walk(n.children);
+    }
+  };
+  walk(outline?.children);
+  return out;
+}
+
+function tileContent(t: TileEntry): Record<string, any> {
+  if (!t.part) return t.heavy || {};
+  return mergeLoaded(t.outline || {}, t.loaded || {}, t.v);
+}
 type Listener = (nodes: any[], settings: any) => void;
 
 const LS_INDEX = 'sb_split_index_v1';
@@ -29,6 +89,9 @@ function restUrl(qs: string): string {
 
 // Same-origin CDN route (cached by Vercel). The /api/index URL must stay byte-identical to the
 // <link rel="preload"> in index.html. Returns null on any error → caller falls back to direct Supabase.
+// true once a route answered with something that is not JSON (local dev without /api): then the outline/node
+// requests fall back to the whole tile; a plain network failure does NOT (no 2 MB download on a weak line).
+let apiMissing = false;
 async function apiRows(path: string, timeoutMs = 30000): Promise<any[] | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -36,7 +99,7 @@ async function apiRows(path: string, timeoutMs = 30000): Promise<any[] | null> {
     const res = await fetch(path, { signal: controller.signal });
     if (!res.ok) return null;
     const ct = res.headers.get('content-type') || '';
-    if (ct.indexOf('json') < 0) return null; // e.g. local dev: the SPA page instead of the route
+    if (ct.indexOf('json') < 0) { apiMissing = true; return null; } // e.g. local dev: the SPA page instead of the route
     const rows = await res.json();
     return Array.isArray(rows) ? rows : null;
   } catch {
@@ -129,7 +192,7 @@ class SplitStore {
     for (const l of idx.nodes) {
       const id = String(l?.id);
       const t = lsGet(LS_TILE + id);
-      if (t && t.heavy && typeof t.v === 'string') this.tiles.set(id, t);
+      if (t && typeof t.v === 'string' && (t.part ? t.outline && Array.isArray(t.outline.children) : t.heavy)) this.tiles.set(id, t);
     }
     this.recomputeFresh();
     return { nodes: this.buildNodes(), settings: idx.settings || {} };
@@ -154,12 +217,12 @@ class SplitStore {
       const id = String(light.id);
       const t = this.tiles.get(id);
       if (t) {
-        const key = `${t.v}|${JSON.stringify(light)}`;
+        const key = `${t.v}|${t.rev || 0}|${JSON.stringify(light)}`;
         const m = this.memo.get(id);
         if (m && m.key === key) {
           out.push(m.node);
         } else {
-          const node = normalizeNode({ ...light, ...t.heavy });
+          const node = normalizeNode({ ...light, ...tileContent(t) });
           this.memo.set(id, { key, node });
           out.push(node);
         }
@@ -232,24 +295,85 @@ class SplitStore {
     }
   }
 
-  // Quietly fetch Quiz + Mock Test (the most opened tiles) one after the other once the page is idle.
+  // Once the page is idle: the small outlines of the big tiles (Quiz, Mock Test, Notes… ~5 KB each), then the
+  // small tiles that are still missing (Current Affairs), one after the other — so a tile tap needs no network.
+  // (Before Oct 27 2026 this downloaded the WHOLE Quiz + Mock rows, ~0.9 MB, which also slowed the first tap.)
   private async prefetchBig() {
-    try {
-      const conn = (navigator as any).connection;
-      // Slow line (2G/3G) or data saver: don't spend the user's bandwidth on tiles they may not open.
-      if (conn && (conn.saveData || /(^|-)[23]g$/.test(String(conn.effectiveType || '')))) return;
-    } catch {}
     if (this.mode !== 'split' || !this.index) return;
     const nodes = this.index.nodes || [];
-    const pick = (re: RegExp) => nodes.find((n: any) => re.test(String(n?.title || '')));
-    const targets = [pick(/quiz|क्विज़/i), pick(/mock|मॉक/i)].filter(Boolean).map((n: any) => String(n.id));
-    for (const id of targets) {
+    const ids = nodes.map((n: any) => String(n?.id)).filter((id: string) => id && id !== 'undefined');
+    const big = ids.filter((id: string) => this.isBig(id));
+    const small = ids.filter((id: string) => !this.isBig(id));
+    let slow = false;
+    try {
+      const conn = (navigator as any).connection;
+      slow = Boolean(conn && (conn.saveData || /(^|-)[23]g$/.test(String(conn.effectiveType || ''))));
+    } catch {}
+    for (const id of big.concat(slow ? [] : small)) {
       if (this.mode !== 'split') return;
       if (!this.tiles.has(id)) await this.ensureTile(id);
     }
   }
 
-  // Load one tile's content. Resolves with the full (normalized) tile node, or null on failure.
+  private sizeOf(id: string): number {
+    const l = (this.index?.nodes || []).find((n: any) => String(n?.id) === id);
+    return Number(l?._sb?.b || 0);
+  }
+
+  private isBig(id: string): boolean {
+    return this.sizeOf(id) >= OUTLINE_MIN_BYTES;
+  }
+
+  private store(key: string, entry: TileEntry) {
+    this.tiles.set(key, entry);
+    this.fresh.add(key);
+    if (!lsSet(LS_TILE + key, entry)) {
+      try {
+        localStorage.removeItem(LS_TILE + key);
+      } catch {}
+    }
+    if (this.mode === 'split') this.emit();
+  }
+
+  // Whole tile row (small tiles, and the old cross-tile views via ensureAll).
+  private async fetchFull(key: string): Promise<boolean> {
+    // Version in the URL → the CDN answer for it is immutable; a new admin save = a new URL.
+    const want = String(this.index?.split?.tiles?.[key] || '');
+    const rows = await rowsVia(
+      `/api/tile?id=${encodeURIComponent(key)}&v=${encodeURIComponent(want)}`,
+      `id=eq.${encodeURIComponent('tile:' + key)}&select=nodes,settings`,
+      90000,
+    );
+    const r = rows && rows[0];
+    const n0 = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
+    if (!n0) return false;
+    const { id: _ignored, ...heavy } = n0;
+    const old = this.tiles.get(key);
+    this.store(key, { v: String(r.settings?._v || ''), heavy, rev: (old?.rev || 0) + 1 });
+    return true;
+  }
+
+  // Structure only (big tiles). Falls back to the whole row when the route is not there (local dev).
+  private async fetchOutline(key: string): Promise<boolean> {
+    const want = String(this.index?.split?.tiles?.[key] || '');
+    const rows = await apiRows(`/api/tile?id=${encodeURIComponent(key)}&v=${encodeURIComponent(want)}&part=outline`, 30000);
+    const r = rows && rows[0];
+    const n0 = r && r.settings && r.settings._outline && Array.isArray(r.nodes) ? r.nodes[0] : null;
+    if (!n0 || !Array.isArray(n0.children)) return apiMissing || (rows && !n0) ? this.fetchFull(key) : false;
+    const { id: _ignored, ...outline } = n0;
+    const old = this.tiles.get(key);
+    this.store(key, {
+      v: String(r.settings._v || ''),
+      part: true,
+      outline,
+      loaded: old && old.part ? pruneLoaded(old.loaded, outline) : {},
+      rev: (old?.rev || 0) + 1,
+    });
+    return true;
+  }
+
+  // Load one tile. Big tiles: just the outline (the screen can open at once); their quizzes/notes come with
+  // ensureNode() when tapped. Resolves with the (normalized) tile node, or null on failure.
   ensureTile(id: string, force = false): Promise<any | null> {
     const key = String(id);
     const find = () => this.buildNodes().find((n: any) => String(n.id) === key && !n._splitPending) || null;
@@ -257,39 +381,101 @@ class SplitStore {
     if (!force && this.tiles.has(key)) return Promise.resolve(find());
     let p = this.inflight.get(key);
     if (!p) {
-      p = (async () => {
-        // Version in the URL → the CDN answer for it is immutable; a new admin save = a new URL.
-        const want = String(this.index?.split?.tiles?.[key] || '');
-        const rows = await rowsVia(
-          `/api/tile?id=${encodeURIComponent(key)}&v=${encodeURIComponent(want)}`,
-          `id=eq.${encodeURIComponent('tile:' + key)}&select=nodes,settings`,
-          90000,
-        );
-        const r = rows && rows[0];
-        const n0 = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
-        if (!n0) return false;
-        const { id: _ignored, ...heavy } = n0;
-        const v = String(r.settings?._v || '');
-        const entry = { v, heavy };
-        this.tiles.set(key, entry);
-        this.fresh.add(key);
-        if (!lsSet(LS_TILE + key, entry)) {
-          try {
-            localStorage.removeItem(LS_TILE + key);
-          } catch {}
-        }
-        if (this.mode === 'split') this.emit();
-        return true;
-      })().finally(() => this.inflight.delete(key));
+      p = (this.isBig(key) ? this.fetchOutline(key) : this.fetchFull(key)).catch(() => false).finally(() => this.inflight.delete(key));
       this.inflight.set(key, p);
     }
     return p.then((ok) => (ok ? find() : null));
   }
 
+  // Whole tile content (old cross-tile views: quiz/notes hubs, typing setup).
+  ensureFull(id: string): Promise<boolean> {
+    const key = String(id);
+    const t = this.tiles.get(key);
+    if (this.mode !== 'split' || (t && !t.part && this.fresh.has(key))) return Promise.resolve(true);
+    const k = 'full:' + key;
+    let p = this.inflight.get(k);
+    if (!p) {
+      p = this.fetchFull(key).catch(() => false).finally(() => this.inflight.delete(k));
+      this.inflight.set(k, p);
+    }
+    return p;
+  }
+
   async ensureAll(): Promise<void> {
     if (this.mode !== 'split' || !this.index) return;
-    const ids = this.index.nodes.map((l: any) => String(l?.id)).filter((id: string) => !this.tiles.has(id));
-    await Promise.all(ids.map((id: string) => this.ensureTile(id)));
+    const ids = this.index.nodes.map((l: any) => String(l?.id)).filter((id: string) => {
+      const t = this.tiles.get(id);
+      return !t || t.part;
+    });
+    await Promise.all(ids.map((id: string) => this.ensureFull(id)));
+  }
+
+  // The tile (partial) whose outline holds this node as a not-yet-downloaded stub.
+  private stubTileOf(nodeId: string): string | null {
+    for (const [tid, t] of this.tiles) {
+      if (!t.part) continue;
+      const n = findById(t.outline?.children, nodeId);
+      if (!n) continue;
+      if (!n._stub) return null;
+      const L = t.loaded?.[nodeId];
+      if (L && ((L.h && L.h === n._h) || (L.pin && L.pin === t.v))) return null; // already here
+      return tid;
+    }
+    return null;
+  }
+
+  // Download one quiz / notes page / mock (with anything under it) of a partial tile. Resolves true when it is
+  // in the tree (or was never missing).
+  ensureNode(nodeId: string): Promise<boolean> {
+    const id = String(nodeId);
+    const tid = this.stubTileOf(id);
+    if (!tid) return Promise.resolve(true);
+    const k = 'node:' + id;
+    let p = this.inflight.get(k);
+    if (!p) {
+      p = (async () => {
+        const t0 = this.tiles.get(tid);
+        if (!t0) return false;
+        const asked = t0.v;
+        const rows = await apiRows(`/api/tile?id=${encodeURIComponent(tid)}&v=${encodeURIComponent(asked)}&node=${encodeURIComponent(id)}`, 45000);
+        const r = rows && rows[0];
+        const n = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
+        if (!n) {
+          // route missing (local dev) → whole tile the old way; network failure → caller shows "tap again"
+          return apiMissing ? this.fetchFull(tid) : false;
+        }
+        const cur = this.tiles.get(tid);
+        if (!cur || !cur.part) return true;
+        const hs: Record<string, string> = (r && r.hs) || {};
+        const loaded: Loaded = { ...(cur.loaded || {}) };
+        const walk = (x: any) => {
+          if (!x || typeof x !== 'object') return;
+          const f: Record<string, any> = {};
+          let any = false;
+          for (const key of HEAVY_KEYS) if (x[key] !== undefined) { f[key] = x[key]; any = true; }
+          if (any && x.id != null) loaded[String(x.id)] = { h: hs[String(x.id)] || '', f, pin: cur.v };
+          if (Array.isArray(x.children)) x.children.forEach(walk);
+        };
+        walk(n);
+        this.store(tid, { ...cur, loaded, rev: (cur.rev || 0) + 1 });
+        // the server already has a newer version than our outline → refresh the outline quietly
+        const got = String(r.settings?._v || '');
+        if (got && got !== asked) void this.ensureTile(tid, true);
+        return true;
+      })().catch(() => false).finally(() => this.inflight.delete(k));
+      this.inflight.set(k, p);
+    }
+    return p;
+  }
+
+  // Is this node a not-yet-downloaded part of a big tile?
+  isStub(node: any): boolean {
+    return Boolean(node && node._stub && this.mode === 'split');
+  }
+
+  // The current (normalized) node with this id anywhere in the tree.
+  findNode(id: string): any {
+    return findById(this.buildNodes(), String(id));
   }
 
   private async switchToLegacy() {
