@@ -1,11 +1,11 @@
 // GET /api/index[?v=<index version>]  →  [{ id:"index", nodes, settings }, { id:"main", updated_at }]
 // The small home/index row (no passcodes in it) + the old row's timestamp (no content).
 // With v matching the row's version: the answer never changes → cached by the CDN for good.
-// Without v (first load of every visitor; the <link rel=preload> in index.html): CDN-cached 20 s (+60 s
-// stale-while-revalidate). Each revalidation reads only the ~600-byte version stamps from Supabase and takes
+// Without v (first load of every visitor; the <link rel=preload> in index.html): CDN-cached 5 s (+10 s
+// stale-while-revalidate; was 20+60 before the Oct 27 instant-update change). Each revalidation reads only the ~600-byte version stamps from Supabase and takes
 // the row itself from this route's own versioned (immutable, CDN-cached) URL — so Supabase sends the ~35 KB
 // index row about once per admin save, not once every 20 s.
-import { sbRows, send, fail, SHORT, IMMUTABLE } from './_sb.js';
+import { sbRows, send, fail, INDEX_SHORT as SHORT, IMMUTABLE } from './_sb.js';
 
 async function readDirect() {
   const [idx, main] = await Promise.all([

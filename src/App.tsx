@@ -1019,22 +1019,47 @@ export default function App() {
       if (isMounted) setIsDbLoaded(true);
     });
 
-    // 2. Every 30 s while the tab is visible (and when it comes back): tiny version stamps only, from the
-    //    CDN-cached /api/meta (20 s) → an admin save shows up within about a minute;
-    //    only the tiles the admin changed are downloaded again.
-    const syncIfChanged = () => {
+    // 2. INSTANT UPDATES (Aarav, Oct 27 2026): tiny version stamps from /api/meta (CDN 4 s) every 8 s while the
+    //    site is in use (touched in the last 3 min), every 30 s when it just sits open, never in a hidden tab, and
+    //    at once when the tab comes back / gets focus / the phone is back online → an admin save shows up in a few
+    //    seconds without a refresh. Only changed tiles/pages are downloaded again, in the background; an open
+    //    quiz/mock/notes page keeps its own copy (the new version is used the next time it is opened).
+    let lastPoll = 0;
+    let lastActive = Date.now();
+    const syncIfChanged = (force?: boolean) => {
       if (!isMounted) return;
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+      const now = Date.now();
+      if (!force && now - lastPoll < (now - lastActive < 180000 ? 7500 : 29000)) return;
+      if (now - lastPoll < 1500) return;
+      lastPoll = now;
       splitStore.poll().catch(() => {});
     };
-    const timer = setInterval(syncIfChanged, 30000);
-    const onVisible = () => { if (document.visibilityState === 'visible') syncIfChanged(); };
+    const timer = setInterval(() => syncIfChanged(), 2000);
+    const first = setTimeout(() => syncIfChanged(true), 3000);
+    const onVisible = () => { if (document.visibilityState === 'visible') { lastActive = Date.now(); syncIfChanged(true); } };
+    const onNow = () => { lastActive = Date.now(); syncIfChanged(true); };
+    const onUse = () => { lastActive = Date.now(); };
     document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onNow);
+    window.addEventListener('online', onNow);
+    window.addEventListener('pageshow', onNow);
+    window.addEventListener('pointerdown', onUse, { passive: true });
+    window.addEventListener('keydown', onUse, { passive: true });
+    window.addEventListener('scroll', onUse, { passive: true, capture: true });
 
     return () => {
       isMounted = false;
       clearInterval(timer);
+      clearTimeout(first);
       document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onNow);
+      window.removeEventListener('online', onNow);
+      window.removeEventListener('pageshow', onNow);
+      window.removeEventListener('pointerdown', onUse);
+      window.removeEventListener('keydown', onUse);
+      window.removeEventListener('scroll', onUse, { capture: true } as any);
     };
   }, []);
 
@@ -1047,6 +1072,12 @@ export default function App() {
     try {
       const fix = refreshNav(adminNodes, activeCustomNode, folderStack);
       if (!fix || !fix.changed) return;
+      // the open page's content changed on the server (admin save) → keep showing the old copy, fetch the new
+      // one in the background; this effect runs again once it has arrived (no blank page, no spinner)
+      if (splitStore.isStub(fix.node) && !splitStore.isStub(activeCustomNode) && fix.node && fix.node.id != null) {
+        void splitStore.ensureNode(String(fix.node.id));
+        return;
+      }
       setFolderStack(fix.folders);
       setActiveCustomNode(fix.node);
       // keep the history entry of this page in step too (back/forward from here)

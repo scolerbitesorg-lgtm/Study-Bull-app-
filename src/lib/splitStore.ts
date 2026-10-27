@@ -92,11 +92,11 @@ function restUrl(qs: string): string {
 // true once a route answered with something that is not JSON (local dev without /api): then the outline/node
 // requests fall back to the whole tile; a plain network failure does NOT (no 2 MB download on a weak line).
 let apiMissing = false;
-async function apiRows(path: string, timeoutMs = 30000): Promise<any[] | null> {
+async function apiRows(path: string, timeoutMs = 30000, noStore = false): Promise<any[] | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(path, { signal: controller.signal });
+    const res = await fetch(path, noStore ? { signal: controller.signal, cache: 'no-store' } : { signal: controller.signal });
     if (!res.ok) return null;
     const ct = res.headers.get('content-type') || '';
     if (ct.indexOf('json') < 0) { apiMissing = true; return null; } // e.g. local dev: the SPA page instead of the route
@@ -110,8 +110,8 @@ async function apiRows(path: string, timeoutMs = 30000): Promise<any[] | null> {
 }
 
 // CDN route first, direct Supabase only if the route failed.
-async function rowsVia(path: string, qs: string, timeoutMs = 30000): Promise<any[] | null> {
-  const viaCdn = await apiRows(path, timeoutMs);
+async function rowsVia(path: string, qs: string, timeoutMs = 30000, noStore = false): Promise<any[] | null> {
+  const viaCdn = await apiRows(path, timeoutMs, noStore);
   if (viaCdn) return viaCdn;
   return getRows(qs, timeoutMs);
 }
@@ -160,6 +160,13 @@ function isNewer(a?: string | null, b?: string | null, slack = LEGACY_SLACK_MS):
   const tb = b ? Date.parse(b) : 0;
   if (Number.isNaN(ta)) return false;
   return ta > (Number.isNaN(tb) ? 0 : tb) + slack;
+}
+
+// Versions look like "2026-10-27T06:20:24.584Z~hacnm" (save time + random tail).
+function isOlderVersion(a: any, b: any): boolean {
+  const ta = Date.parse(String(a || '').split('~')[0]);
+  const tb = Date.parse(String(b || '').split('~')[0]);
+  return !Number.isNaN(ta) && !Number.isNaN(tb) && ta < tb;
 }
 
 function validIndexRow(row: any): row is { nodes: any[]; settings: any } {
@@ -268,7 +275,9 @@ class SplitStore {
       return;
     }
     this.mode = 'split';
-    this.applyIndexRow(row);
+    // the CDN copy of /api/index can be a few seconds older than the copy this phone already cached → keep the newer
+    if (!(this.index && isOlderVersion(row.settings._split.v, this.index.split?.v))) this.applyIndexRow(row);
+    else this.recomputeFresh();
     this.emit();
     this.afterIndex();
     // Old admin wrote only the old row after the last split save? Then the old row is the truth.
@@ -489,12 +498,14 @@ class SplitStore {
     }
   }
 
-  // Every 15 s while visible: ~200 bytes of version stamps from /api/meta (CDN, 20 s); refetch only what changed.
+  // Instant updates (Oct 27 2026): every ~8 s while the site is in use, and at once on focus / tab visible /
+  // back online: ~500 bytes of version stamps from /api/meta (CDN, 4 s); only what changed is fetched again,
+  // in the background (old data stays on screen until the new copy has arrived — no spinner, no reload).
   async poll(): Promise<void> {
     if (this.polling) return;
     this.polling = true;
     try {
-      const rows = await rowsVia('/api/meta', 'id=in.(index,main)&select=id,updated_at,sp:settings->_split', 10000);
+      const rows = await rowsVia('/api/meta', 'id=in.(index,main)&select=id,updated_at,sp:settings->_split', 10000, true);
       if (!rows) return;
       const mainRow = rows.find((r: any) => r.id === 'main');
       const idxRow = rows.find((r: any) => r.id === 'index');
@@ -505,6 +516,8 @@ class SplitStore {
         if (this.mode !== 'legacy' || (mainAt && mainAt !== this.legacyStamp)) await this.switchToLegacy();
         return;
       }
+      // an edge that still holds an OLDER stamp (a few seconds after a save) must not roll the app back
+      if (this.mode === 'split' && this.index && isOlderVersion(sp.v, this.index.split?.v)) return;
       if (this.mode !== 'split' || !this.index || sp.v !== this.index.split?.v) {
         const ir = await rowsVia(`/api/index?v=${encodeURIComponent(String(sp.v || ''))}`, 'id=eq.index&select=nodes,settings', 30000);
         const row = ir && (ir.find((r: any) => r && r.id === 'index') || ir[0]);

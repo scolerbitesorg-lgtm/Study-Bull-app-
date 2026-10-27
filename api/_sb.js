@@ -37,4 +37,10 @@ export function fail(res, err) {
 }
 
 export const SHORT = 'public, max-age=0, s-maxage=20, stale-while-revalidate=60';
+// Instant updates (Oct 27 2026, Aarav: admin changes must show in the app within seconds, no refresh):
+// the version stamps (~500 bytes) are shared by every visitor through the CDN for only 4 s, so a new admin
+// save is visible to the next poll after at most ~4 s. Worst case ≈ 1 Supabase read of 500 B per 4 s per region.
+export const LIVE = 'public, max-age=0, must-revalidate, s-maxage=4';
+// First load of the index row (no version in the URL): short CDN life, the app's first poll corrects it.
+export const INDEX_SHORT = 'public, max-age=0, s-maxage=5, stale-while-revalidate=10';
 export const IMMUTABLE = 'public, max-age=31536000, s-maxage=31536000, immutable';
