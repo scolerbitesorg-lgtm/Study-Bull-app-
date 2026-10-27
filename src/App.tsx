@@ -24,6 +24,18 @@ const EligibilityList = React.lazy(() => import('./components/EligibilityChecker
 const EligibilityExam = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityExam })));
 import { trackTile, trackResult } from './lib/views';
 const JobAlert = React.lazy(() => import('./components/JobAlert').then((m) => ({ default: m.JobAlert })));
+// 📤 score-card share sheet (Oct 27 2026) — its own chunk, loaded only when "स्कोर कार्ड शेयर करें" is tapped
+const ShareScore = React.lazy(() => import('./components/ShareScore').then((m) => ({ default: m.ShareScore })));
+import type { ShareData } from './components/ShareScore';
+const ShareScoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    data-sb-share="open"
+    className="w-full py-3 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-black shadow-sm active:scale-95 transition flex items-center justify-center gap-2 cursor-pointer"
+  >
+    📤 स्कोर कार्ड बनाकर दोस्तों को भेजें
+  </button>
+);
 
 // Return visit: home + already-opened tiles straight from the per-tile cache (split data layout)
 const SPLIT_BOOT: { nodes: any[]; settings: any } | null = (() => {
@@ -581,6 +593,9 @@ export default function App() {
 
   // Review accordions state for Results
   const [reviewExpanded, setReviewExpanded] = useState(false);
+  // 📤 score card share sheet: open data (null = closed); any screen change closes it
+  const [shareData, setShareData] = useState<ShareData | null>(null);
+  useEffect(() => { setShareData(null); }, [currentView]);
   const [activeCustomNode, setActiveCustomNode] = useState<any>(null);
   const [folderStack, setFolderStack] = useState<any[]>([]);
   const [htmlReloadKey, setHtmlReloadKey] = useState<number>(0);
@@ -2398,6 +2413,25 @@ export default function App() {
                   </div>
                 </div>
 
+                <ShareScoreButton
+                  onClick={() => {
+                    const n = quizQuestions.length;
+                    const acc = Math.round((quizScore / (n || 1)) * 100);
+                    setShareData({
+                      heading: 'क्विज़ स्कोरकार्ड',
+                      title: String(selectedSubject?.title || 'क्विज़'),
+                      big: `${quizScore}/${n}`,
+                      bigLabel: 'सही उत्तर',
+                      pct: acc,
+                      stats: [
+                        { label: 'सही', value: String(quizScore), color: '#059669' },
+                        { label: 'गलत', value: String(n - quizScore), color: '#e11d48' },
+                        { label: 'सटीकता', value: `${acc}%`, color: '#7c3aed' },
+                      ],
+                    });
+                  }}
+                />
+
                 {/* Question Review Section */}
                 <div className="text-left border-t border-slate-100 pt-4">
                   <button
@@ -2662,6 +2696,23 @@ export default function App() {
                           <p className="text-2xl font-bold text-slate-800 mt-1">{unattempted}</p>
                         </div>
                       </div>
+
+                      <ShareScoreButton
+                        onClick={() =>
+                          setShareData({
+                            heading: 'मॉक टेस्ट स्कोरकार्ड',
+                            title: !mockInfo ? 'Mock Test' : mockInfo.exam && !String(mockInfo.title || '').includes(mockInfo.exam) ? `${mockInfo.exam} • ${mockInfo.title}` : String(mockInfo.title || mockInfo.exam || 'Mock Test'),
+                            big: `${fmtMarks(marksScore)}/${fmtMarks(marksTotal)}`,
+                            bigLabel: 'अंक',
+                            pct: marksTotal > 0 ? Math.max(0, (marksScore / marksTotal) * 100) : 0,
+                            stats: [
+                              { label: 'सही', value: String(correct), color: '#059669' },
+                              { label: 'गलत', value: String(wrong), color: '#e11d48' },
+                              { label: 'छोड़े', value: String(unattempted), color: '#475569' },
+                            ],
+                          })
+                        }
+                      />
 
                       {showSections && (
                         <div className="text-left border border-slate-200 rounded-2xl overflow-hidden text-xs">
@@ -3711,6 +3762,7 @@ export default function App() {
                   const wpm = Math.round((words / timeTakenSec) * 60);
 
                   return (
+                    <>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
                         <p className="text-xs text-slate-500 font-bold">{langHindi ? 'स्पीड (Speed)' : 'Speed'}</p>
@@ -3729,6 +3781,25 @@ export default function App() {
                         <p className="text-xl font-bold text-purple-600 mt-1">{typedInput.length}</p>
                       </div>
                     </div>
+                    <ShareScoreButton
+                      onClick={() =>
+                        setShareData({
+                          heading: 'टाइपिंग टेस्ट स्कोरकार्ड',
+                          title: String(activeTypingTitle || 'टाइपिंग टेस्ट'),
+                          big: String(wpm),
+                          bigLabel: 'WPM',
+                          pct: accuracy,
+                          cheerPct: Math.min(accuracy, Math.round((wpm / 35) * 100)), // 35 WPM = SSC English typing standard
+                          pctLabel: 'सटीकता',
+                          stats: [
+                            { label: 'स्पीड', value: `${wpm} WPM`, color: '#2563eb' },
+                            { label: 'सटीकता', value: `${accuracy}%`, color: '#059669' },
+                            { label: 'शब्द', value: String(words), color: '#475569' },
+                          ],
+                        })
+                      }
+                    />
+                    </>
                   );
                 })()}
 
@@ -3754,6 +3825,11 @@ export default function App() {
               </m.div>
             )}
           </AnimatePresence>
+          {shareData && (
+            <React.Suspense fallback={null}>
+              <ShareScore data={shareData} onClose={() => setShareData(null)} />
+            </React.Suspense>
+          )}
         </main>
       </div>
     </SafeErrorBoundary>

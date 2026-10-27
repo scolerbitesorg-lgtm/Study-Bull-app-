@@ -80,7 +80,10 @@ function post(body: object) {
   try {
     if (typeof navigator === 'undefined' || (navigator as any).webdriver || noTrack()) return;
     const u = uid();
-    const s = JSON.stringify(u ? (OLD_F ? { ...body, u, f: OLD_F } : { ...body, u }) : body);
+    // f only when that first visit is BEFORE today (Oct 27 2026 fix: a device first seen earlier today was sent f = today
+    // and the database marked a brand-new visitor as 'पुराना')
+    const f = OLD_F && OLD_F < istDay() ? OLD_F : undefined;
+    const s = JSON.stringify(u ? (f ? { ...body, u, f } : { ...body, u }) : body);
     if (navigator.sendBeacon && navigator.sendBeacon('/api/hit', s)) return;
     fetch('/api/hit', { method: 'POST', body: s, keepalive: true }).catch(() => {});
   } catch {
