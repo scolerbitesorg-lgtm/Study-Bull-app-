@@ -81,7 +81,8 @@ export default async function handler(req, res) {
   } else if (b && typeof b === 'object' && Buffer.isBuffer(b)) {
     try { b = JSON.parse(b.toString('utf8')); } catch { b = null; }
   }
-  if (!b || typeof b !== 'object') b = {};
+  // no readable body = nothing to count (a real beacon always carries one; Oct 27: an empty test POST counted a site open)
+  if (!b || typeof b !== 'object') return send(res, 200, { ok: false, why: 'no body' }, 'no-store');
   const clean = (x) => String(x || '').replace(/[\u0000-\u001f\u007f]/g, '').trim();
   if (b.p === 'ev') {
     const users = await trackUser(req, ua, b, clean(b.t).slice(0, 100));
