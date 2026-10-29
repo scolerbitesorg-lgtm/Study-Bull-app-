@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* One-tap fix (Aarav Oct 29 2026): no double-tap-zoom wait, no text selection or callout on buttons, so every tap clicks first time */
+html, body { touch-action: manipulation; }
+button, a, [role="button"], .sb-tap, .cursor-pointer, label {
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+
 /* 3-level layout cards: soft tap feedback (Oct 26 2026) */
 .sb-tap { -webkit-tap-highlight-color: transparent; transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease; }
 .sb-tap:active { transform: scale(0.975); }
