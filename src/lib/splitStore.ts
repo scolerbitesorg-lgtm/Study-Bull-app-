@@ -2,6 +2,8 @@
 //  - row id "index": nodes = the home tiles WITHOUT their content (title/icon/subtitle/order + _sb marker),
 //    settings = app settings (no passcodes) + settings._split = { mainAt, v, tiles: { <tileId>: <version> } }
 //  - row id "tile:<tileId>": nodes = [{ id, children[, passages] }] = that tile's whole content, settings = { _v }
+//    (Oct 29 2026: big tiles — Quiz/Notes/Mock — are stored as one row per top-level folder, "tile:<tileId>:<childId>",
+//    + a manifest row "tile:<tileId>:_parts"; /api/tile reassembles them, so this file sees the same tile shape.)
 //  - row id "main": the old single row, still written by the admin for compatibility (fallback only).
 // CDN (Oct 26 2026, Supabase egress quota): every read goes through this site's own /api routes first
 // (/api/index, /api/meta, /api/tile?id&v — see api/*.js), which Vercel's CDN caches, so Supabase is read
@@ -129,6 +131,37 @@ async function getRows(qs: string, timeoutMs = 30000): Promise<any[] | null> {
   } finally {
     clearTimeout(timer);
   }
+}
+
+// Direct Supabase read of one tile (only when the /api route failed). STORAGE SPLIT v2 (Oct 29 2026): a big tile may
+// live as rows "tile:<id>:<childId>" (one per top-level folder) + manifest "tile:<id>:_parts" (settings.parts =
+// [[childId, partVersion, bytes]…], settings._v = tile version); the classic row "tile:<id>" stays as a backup.
+// The row whose _v equals the index version wins (manifest first), else the newer version — same rule as api/tile.js.
+const vTime = (s: any) => {
+  const t = Date.parse(String(s || '').split('~')[0]);
+  return Number.isNaN(t) ? 0 : t;
+};
+const inList = (ids: string[]) => encodeURIComponent('in.(' + ids.map((x) => '"' + x.replace(/"/g, '') + '"').join(',') + ')');
+async function directTile(key: string, want: string): Promise<any[] | null> {
+  const st = await getRows(`id=${inList(['tile:' + key, 'tile:' + key + ':_parts'])}&select=id,settings`, 20000);
+  const m = st && st.find((r: any) => r.id === 'tile:' + key + ':_parts');
+  const o = st && st.find((r: any) => r.id === 'tile:' + key);
+  const ms = m && m.settings && m.settings.fmt === 2 && Array.isArray(m.settings.parts) ? m.settings : null;
+  const os = o ? o.settings || {} : null;
+  const useParts = Boolean(ms && ((want && String(ms._v) === want) || !(os && want && String(os._v || '') === want) && (!os || vTime(ms._v) >= vTime(os._v))));
+  if (!useParts) return getRows(`id=eq.${encodeURIComponent('tile:' + key)}&select=nodes,settings`, 90000);
+  const ids = ms.parts.map((p: any) => 'tile:' + key + ':' + p[0]);
+  const prs = await getRows(`id=${inList(ids)}&select=id,nodes,settings`, 90000);
+  if (!prs) return null;
+  const byId = new Map(prs.map((r: any) => [r.id, r]));
+  const children: any[] = [];
+  for (const id of ids) {
+    const r: any = byId.get(id);
+    const n = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
+    if (!n) return null;
+    children.push(n);
+  }
+  return [{ nodes: [{ id: ms.tile != null ? ms.tile : key, ...(ms.top || {}), children }], settings: { _v: String(ms._v), tile: ms.tile } }];
 }
 
 function lsGet(key: string): any {
@@ -348,11 +381,7 @@ class SplitStore {
   private async fetchFull(key: string): Promise<boolean> {
     // Version in the URL → the CDN answer for it is immutable; a new admin save = a new URL.
     const want = String(this.index?.split?.tiles?.[key] || '');
-    const rows = await rowsVia(
-      `/api/tile?id=${encodeURIComponent(key)}&v=${encodeURIComponent(want)}`,
-      `id=eq.${encodeURIComponent('tile:' + key)}&select=nodes,settings`,
-      90000,
-    );
+    const rows = (await apiRows(`/api/tile?id=${encodeURIComponent(key)}&v=${encodeURIComponent(want)}`, 90000)) || (await directTile(key, want));
     const r = rows && rows[0];
     const n0 = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
     if (!n0) return false;

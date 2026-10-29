@@ -1,4 +1,6 @@
 // GET /api/tile?id=<tileId>&v=<version>                →  [{ nodes, settings }] of row "tile:<id>" (whole tile, same shape as Supabase REST)
+//      — or, for a tile stored as split rows (Oct 29 2026, see STORAGE SPLIT v2 below), the same answer assembled from them.
+// GET /api/tile?id=<tileId>:<childId>&v=<partVersion>   →  one split row "tile:<tileId>:<childId>" (used by this route itself)
 // GET /api/tile?id=<tileId>&v=<version>&part=outline   →  same shape, but only the tile's STRUCTURE: every folder/quiz/notes
 //      node with its title/icon/subtitle/kind, and the heavy fields (questions, notesContent, htmlContent…) left out.
 //      A node whose heavy fields were left out carries _stub:1, _k:[left-out keys], _qn (question count), _pq (PYQ-tagged
@@ -50,12 +52,71 @@ async function wholeRow(req, id, v) {
   const key = `${id}|${v}`;
   if (v && mem.has(key)) return mem.get(key);
   let row = await viaVersionedUrl(req, id, v);
-  if (!row) {
-    const rows = await sbRows(`id=eq.${encodeURIComponent('tile:' + id)}&select=nodes,settings`, 50000);
-    row = rows[0] || null;
-  }
+  if (!row) row = await currentRow(req, id, v);
   if (row && v && verOf(row) === v) remember(key, row);
   return row;
+}
+
+// ---------- STORAGE SPLIT v2 (Oct 29 2026: Quiz/Notes/Mock rows hit the 2.5 MB guard) ----------
+// A big tile may now live as one row per top-level child folder instead of one row:
+//   row "tile:<id>:<childId>"  nodes = [childNode] (the whole subject/exam folder), settings = { _v: partVersion, tile, part }
+//   row "tile:<id>:_parts"     nodes = [], settings = { _v: tileVersion, tile, fmt: 2, parts: [[childId, partVersion, bytes], …], top }
+// The classic row "tile:<id>" is left as it was (backup, and the truth again if an old admin tab saves it).
+// Rule: the row whose settings._v equals the asked version is the truth (manifest first); without a match the newer
+// version wins. Answers keep the classic shape [{ nodes: [{ id, children… }], settings: { _v } }], so the app is unchanged.
+const PARTS = '_parts';
+const vTime = (s) => {
+  const t = Date.parse(String(s || '').split('~')[0]);
+  return Number.isNaN(t) ? 0 : t;
+};
+const inList = (ids) => 'in.(' + ids.map((x) => '"' + String(x).replace(/"/g, '') + '"').join(',') + ')';
+
+async function tileSource(id, v) {
+  const rows = await sbRows(`id=${encodeURIComponent(inList(['tile:' + id, 'tile:' + id + ':' + PARTS]))}&select=id,settings`, 20000);
+  const m = rows.find((r) => r.id === 'tile:' + id + ':' + PARTS);
+  const o = rows.find((r) => r.id === 'tile:' + id);
+  const ms = m && m.settings && m.settings.fmt === 2 && Array.isArray(m.settings.parts) ? m.settings : null;
+  const os = o ? o.settings || {} : null;
+  if (ms && v && String(ms._v) === v) return { kind: 'parts', m: ms };
+  if (os && v && String(os._v || '') === v) return { kind: 'row' };
+  if (ms && (!os || vTime(ms._v) >= vTime(os._v))) return { kind: 'parts', m: ms };
+  return { kind: os ? 'row' : 'none' };
+}
+
+async function assembleParts(req, id, m) {
+  const parts = m.parts.filter((p) => Array.isArray(p) && p[0] != null);
+  const got = await Promise.all(parts.map((p) => viaVersionedUrl(req, `${id}:${p[0]}`, String(p[1] || ''))));
+  const missing = parts.filter((p, i) => !got[i]).map((p) => 'tile:' + id + ':' + p[0]);
+  let direct = new Map();
+  if (missing.length) {
+    const rows = await sbRows(`id=${encodeURIComponent(inList(missing))}&select=id,nodes,settings`, 50000);
+    direct = new Map(rows.map((r) => [r.id, r]));
+  }
+  let exact = true;
+  const children = [];
+  parts.forEach((p, i) => {
+    const r = got[i] || direct.get('tile:' + id + ':' + p[0]);
+    const n = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
+    if (!n) { exact = false; return; }
+    if (verOf(r) !== String(p[1] || '')) exact = false;
+    children.push(n);
+  });
+  const top = { id: m.tile != null ? m.tile : id, ...(m.top && typeof m.top === 'object' ? m.top : {}), children };
+  // a part that moved on since the manifest was written → not this version: short cache, and the app re-asks
+  return { nodes: [top], settings: { _v: exact ? String(m._v) : String(m._v) + '!mixed', tile: m.tile, _src: 'parts' } };
+}
+
+// The tile's current content, from the split rows or the classic row.
+async function currentRow(req, id, v) {
+  if (id.includes(':')) {
+    const rows = await sbRows(`id=eq.${encodeURIComponent('tile:' + id)}&select=nodes,settings`, 50000);
+    return rows[0] || null;
+  }
+  const s = await tileSource(id, v);
+  if (s.kind === 'parts') return assembleParts(req, id, s.m);
+  if (s.kind === 'none') return null;
+  const rows = await sbRows(`id=eq.${encodeURIComponent('tile:' + id)}&select=nodes,settings`, 50000);
+  return rows[0] || null;
 }
 
 function qStats(qs) {
@@ -167,13 +228,13 @@ export default async function handler(req, res) {
       }
       return send(res, 200, [{ nodes: [outlineOf(top)], settings: { _v: have, _outline: 1 } }], cc, { 'X-SB-Version': have });
     }
-    const rows = await sbRows(`id=eq.${encodeURIComponent('tile:' + id)}&select=nodes,settings`, 50000);
-    if (!rows.length) return send(res, 404, [], 'public, max-age=0, s-maxage=10');
-    const have = verOf(rows[0]);
+    const row = await currentRow(req, id, v);
+    if (!row) return send(res, 404, [], 'public, max-age=0, s-maxage=10');
+    const have = verOf(row);
     // Only a version-matched answer is cached for good; anything else (no v asked, or the row moved on
     // since the index was read) gets a short cache so nobody is ever pinned to old content.
     const cc = v && have === v ? IMMUTABLE : SHORT_TILE;
-    send(res, 200, rows, cc, { 'X-SB-Version': have });
+    send(res, 200, [row], cc, { 'X-SB-Version': have, 'X-SB-Src': (row.settings && row.settings._src) || 'row' });
   } catch (e) {
     fail(res, e);
   }
