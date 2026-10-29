@@ -515,6 +515,11 @@ export default function App() {
   const [mockTimerActive, setMockTimerActive] = useState(false);
   // instructions screen before every mock; the timer starts only after "टेस्ट शुरू करें"
   const [mockStarted, setMockStarted] = useState(true);
+  // Leave-test confirm (Aarav Oct 29): back/home during a running quiz or mock asks first
+  const [leaveAsk, setLeaveAsk] = useState<null | (() => void)>(null);
+  const leaveOkRef = useRef(false);
+  const leaveAskOpenRef = useRef(false);
+  const testRunningRef = useRef(false);
   const [mockInfo, setMockInfo] = useState<MockInfo | null>(null);
 
   // Calculation Setup State
@@ -1224,7 +1229,7 @@ export default function App() {
     }
     // Safety net: if the browser did not move (popstate never came), restore in-app anyway
     window.setTimeout(() => {
-      if (navIndexRef.current === before) {
+      if (navIndexRef.current === before && !leaveAskOpenRef.current) {
         const stack = navStackRef.current;
         stack[before] = { ...liveNavRef.current };
         navIndexRef.current = i;
@@ -1249,6 +1254,18 @@ export default function App() {
       const target = Math.max(0, Math.min(raw, stack.length - 1));
       const cur = navIndexRef.current;
       if (target === cur) return;
+      if (target < cur && testRunningRef.current && !leaveOkRef.current) {
+        // put the page back and ask first
+        try { window.history.pushState({ sbNav: cur }, ''); } catch { /* ignore */ }
+        leaveAskOpenRef.current = true;
+        setLeaveAsk(() => () => {
+          leaveOkRef.current = true;
+          window.setTimeout(() => { leaveOkRef.current = false; }, 1500);
+          goToNavIndex(target);
+        });
+        return;
+      }
+      leaveOkRef.current = false;
       if (cur < stack.length) stack[cur] = { ...liveNavRef.current };
       navIndexRef.current = target;
       restoreNav(stack[target]);
@@ -1405,9 +1422,33 @@ export default function App() {
     }
   }, [typedInput]);
 
+  testRunningRef.current =
+    (currentView === 'quiz_play' && userQuizAnswers.some(x => x !== null && x !== undefined)) ||
+    (currentView === 'mock_play' && mockStarted && userMockAnswers.some(x => x !== null && x !== undefined));
+
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!testRunningRef.current) return;
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, []);
+
   // Rock-Solid Safe Back Button Handler
   // Never unmounts unexpectedly and always maps to a stable parent view
   const handleBack = () => {
+    if (testRunningRef.current && !leaveOkRef.current) {
+      leaveAskOpenRef.current = true;
+      setLeaveAsk(() => () => {
+        leaveOkRef.current = true;
+        window.setTimeout(() => { leaveOkRef.current = false; }, 1500);
+        handleBack();
+      });
+      return;
+    }
     // One level up through the shared navigation stack / browser history
     if (navIndexRef.current > 0) {
       goToNavIndex(navIndexRef.current - 1);
@@ -1785,6 +1826,29 @@ export default function App() {
           paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))'
         }}
       >
+        {leaveAsk && (
+          <div className="fixed inset-0 z-[80] bg-black/50 flex items-center justify-center p-5" role="dialog" aria-modal="true">
+            <div className="bg-white rounded-3xl shadow-xl max-w-sm w-full p-6 text-center space-y-3">
+              <div className="text-4xl">⚠️</div>
+              <h3 className="text-lg font-bold text-slate-900">टेस्ट बीच में छोड़ें?</h3>
+              <p className="text-sm text-slate-600">अभी बाहर गए तो इस टेस्ट की प्रगति (जवाब) नहीं बचेगी।</p>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => { leaveAskOpenRef.current = false; setLeaveAsk(null); }}
+                  className="flex-1 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold active:scale-95 cursor-pointer"
+                >
+                  नहीं, जारी रखें
+                </button>
+                <button
+                  onClick={() => { const go = leaveAsk; leaveAskOpenRef.current = false; setLeaveAsk(null); go && go(); }}
+                  className="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-rose-700 font-bold active:scale-95 cursor-pointer"
+                >
+                  हाँ, छोड़ें
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {currentView === 'mock_play' && !mockStarted && mockInfo && mockQuestions.length > 0 && (
           <MockRules
             key={mockInfo.title + ':' + mockQuestions.length}
@@ -2346,7 +2410,7 @@ export default function App() {
                       )}
 
                       {isAnswerRevealed && (
-                        <div className="flex justify-end pt-2">
+                        <div className="sticky bottom-0 z-20 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 px-6 sm:px-8 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] bg-white/95 backdrop-blur border-t border-slate-100 rounded-b-3xl flex justify-end">
                           <button
                             onClick={() => {
                               if (quizIndex + 1 < quizQuestions.length) {
@@ -2602,7 +2666,7 @@ export default function App() {
                         })}
                       </div>
 
-                      <div className="flex justify-between pt-4 border-t border-slate-100">
+                      <div className="sticky bottom-0 z-20 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 px-6 sm:px-8 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] bg-white/95 backdrop-blur border-t border-slate-100 rounded-b-3xl flex justify-between">
                         <button
                           onClick={() => setMockIndex(prev => Math.max(0, prev - 1))}
                           disabled={mockIndex === 0}
