@@ -24,6 +24,10 @@ const EligibilityList = React.lazy(() => import('./components/EligibilityChecker
 const EligibilityExam = React.lazy(() => import('./components/EligibilityChecker').then((m) => ({ default: m.EligibilityExam })));
 import { trackTile, trackResult } from './lib/views';
 const JobAlert = React.lazy(() => import('./components/JobAlert').then((m) => ({ default: m.JobAlert })));
+// 🔥 पढ़ाई स्ट्रीक + रोज़ का लक्ष्य (Oct 30 2026): slim home card + result nudge (eager, tiny); full screen lazy
+import { StreakStrip, StreakNudge } from './components/StreakStrip';
+import { recordTest } from './lib/streak';
+const StudyStreak = React.lazy(() => import('./components/StudyStreak').then((m) => ({ default: m.StudyStreak })));
 // 📤 score-card share sheet (Oct 27 2026) — its own chunk, loaded only when "स्कोर कार्ड शेयर करें" is tapped
 const ShareScore = React.lazy(() => import('./components/ShareScore').then((m) => ({ default: m.ShareScore })));
 import type { ShareData } from './components/ShareScore';
@@ -138,7 +142,8 @@ type ViewState =
   | 'custom_node'
   | 'eligibility'
   | 'eligibility_exam'
-  | 'job_alert';
+  | 'job_alert'
+  | 'streak';
 
 export interface QuizQuestion {
   id: number;
@@ -1122,6 +1127,7 @@ export default function App() {
       } else if (currentView === 'quiz_result' && from === 'quiz_play') {
         const a = userQuizAnswers.filter((x: any) => x !== null && x !== undefined).length;
         trackResult('quiz', selectedSubject?.title, { c: quizScore, n: quizQuestions.length, a });
+        if (a > 0) recordTest('q', a, quizScore);
       } else if (currentView === 'mock_result' && from === 'mock_play') {
         let c = 0, w = 0;
         mockQuestions.forEach((q: any, i: number) => {
@@ -1131,6 +1137,7 @@ export default function App() {
         });
         const title = mockInfo ? [mockInfo.exam, mockInfo.title].filter(Boolean).join(' • ') : 'Mock Test';
         trackResult('mock', title, { c, w, n: mockQuestions.length, a: c + w, marks: c * mockMarks.pos - w * mockMarks.neg, max: mockQuestions.length * mockMarks.pos, secs: Math.max(0, mockDurationSec - mockTimer) });
+        if (c + w > 0) recordTest('m', c + w, c);
       } else if (currentView === 'typing_result' && from === 'typing_practice') {
         const typed = typedInputRef.current || '';
         let ok = 0;
@@ -1139,8 +1146,10 @@ export default function App() {
         const total = typeof typingDuration === 'number' ? typingDuration * 60 : 120;
         const secs = Math.max(1, total - typingTimeLeft);
         trackResult('typing', activeTypingTitle || 'Typing', { wpm: Math.round((words / secs) * 60), acc: typed.length ? Math.round((ok / typed.length) * 100) : 0, secs });
+        if (words >= 5) recordTest('t');
       } else if (currentView === 'calc_result' && from === 'calc_practice') {
         trackResult('calc', calcTopic, { c: calcCorrectCount, w: calcWrongCount, n: calcCorrectCount + calcWrongCount, secs: calcTimer });
+        if (calcCorrectCount + calcWrongCount > 0) recordTest('c', calcCorrectCount + calcWrongCount, calcCorrectCount);
       }
     } catch { /* never break the result screen */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1595,6 +1604,8 @@ export default function App() {
         return langHindi ? 'पात्रता जाँच' : 'Eligibility Checker';
       case 'job_alert':
         return langHindi ? 'जॉब अलर्ट' : 'Job Alert';
+      case 'streak':
+        return langHindi ? 'मेरी पढ़ाई 🔥' : 'My Study Streak';
       default:
         return defaultAppName;
     }
@@ -1955,6 +1966,9 @@ export default function App() {
                   transition={{ duration: 0.16 }}
                   className="space-y-4"
                 >
+                  {(isDbLoaded || adminNodes.length > 0) && (
+                    <StreakStrip onOpen={() => { trackTile('पढ़ाई स्ट्रीक'); navigateTo('streak'); }} />
+                  )}
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {/* Loading skeleton while fetching live buttons from database */}
                     {!isDbLoaded && adminNodes.length === 0 && (
@@ -2222,6 +2236,20 @@ export default function App() {
 
             {currentView === 'job_alert' && <React.Suspense fallback={<ScreenLoader />}><JobAlert /></React.Suspense>}
 
+            {currentView === 'streak' && (() => {
+              const findTile = (re: RegExp) => adminNodes.find((n: any) => n && re.test(`${n.title || ''} ${n.titleHi || ''} ${n.titleEn || ''}`));
+              const quizTile = findTile(/quiz|क्विज/i);
+              const mockTile = findTile(/mock|मॉक/i);
+              return (
+                <React.Suspense fallback={<ScreenLoader />}>
+                  <StudyStreak
+                    onQuiz={quizTile ? () => handleNodeInteraction(quizTile) : undefined}
+                    onMock={mockTile ? () => handleNodeInteraction(mockTile) : undefined}
+                  />
+                </React.Suspense>
+              );
+            })()}
+
             {currentView === 'quiz_categories' && (
               <m.div
                 key="quiz-categories"
@@ -2477,6 +2505,7 @@ export default function App() {
                   </div>
                 </div>
 
+                <StreakNudge onOpen={() => navigateTo('streak')} />
                 <ShareScoreButton
                   onClick={() => {
                     const n = quizQuestions.length;
@@ -2761,6 +2790,7 @@ export default function App() {
                         </div>
                       </div>
 
+                      <StreakNudge onOpen={() => navigateTo('streak')} />
                       <ShareScoreButton
                         onClick={() =>
                           setShareData({
@@ -3845,6 +3875,7 @@ export default function App() {
                         <p className="text-xl font-bold text-purple-600 mt-1">{typedInput.length}</p>
                       </div>
                     </div>
+                    <StreakNudge onOpen={() => navigateTo('streak')} />
                     <ShareScoreButton
                       onClick={() =>
                         setShareData({
