@@ -1945,6 +1945,13 @@ export default function App() {
             {/* 1. HOME SCREEN: ONLY CLEAN PURE BUTTON CARDS (NO EXPLORE/START AT BOTTOM) */}
             {currentView === 'home' && (
               <>
+                {/* First visit (no cached settings yet): keep the welcome heading's space so the grid doesn't jump down when settings arrive (CLS fix, 31 Oct 2026) */}
+                {!adminSettings?.welcomeHeading && !isDbLoaded && (
+                  <div className="mb-4" aria-hidden="true">
+                    <h2 className="text-lg sm:text-xl font-black invisible">&nbsp;</h2>
+                    <p className="text-xs mt-0.5 invisible">&nbsp;</p>
+                  </div>
+                )}
                 {/* Admin Welcome Heading if configured */}
                 {adminSettings?.welcomeHeading && (
                   <div className="mb-4">
@@ -1966,9 +1973,8 @@ export default function App() {
                   transition={{ duration: 0.16 }}
                   className="space-y-4"
                 >
-                  {(isDbLoaded || adminNodes.length > 0) && (
-                    <StreakStrip onOpen={() => { trackTile('पढ़ाई स्ट्रीक'); navigateTo('streak'); }} />
-                  )}
+                  {/* Always rendered (device-only data) so the tiles don't jump down when it appears (CLS fix, 31 Oct 2026) */}
+                  <StreakStrip onOpen={() => { trackTile('पढ़ाई स्ट्रीक'); navigateTo('streak'); }} />
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {/* Loading skeleton while fetching live buttons from database */}
                     {!isDbLoaded && adminNodes.length === 0 && (
