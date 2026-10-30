@@ -61,6 +61,7 @@ async function wholeRow(req, id, v) {
 // A big tile may now live as one row per top-level child folder instead of one row:
 //   row "tile:<id>:<childId>"  nodes = [childNode] (the whole subject/exam folder), settings = { _v: partVersion, tile, part }
 //   row "tile:<id>:_parts"     nodes = [], settings = { _v: tileVersion, tile, fmt: 2, parts: [[childId, partVersion, bytes], …], top }
+//   (nested split, Oct 30 2026: an entry [subId, subVersion, bytes, parentId] is a sub-folder row of that folder — see inflateSubs)
 // The classic row "tile:<id>" is left as it was (backup, and the truth again if an old admin tab saves it).
 // Rule: the row whose settings._v equals the asked version is the truth (manifest first); without a match the newer
 // version wins. Answers keep the classic shape [{ nodes: [{ id, children… }], settings: { _v } }], so the app is unchanged.
@@ -94,16 +95,39 @@ async function assembleParts(req, id, m) {
   }
   let exact = true;
   const children = [];
+  const subs = new Map();
   parts.forEach((p, i) => {
     const r = got[i] || direct.get('tile:' + id + ':' + p[0]);
     const n = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
     if (!n) { exact = false; return; }
     if (verOf(r) !== String(p[1] || '')) exact = false;
-    children.push(n);
+    if (p[3] != null) subs.set(String(p[0]), n);
+    else children.push(n);
   });
-  const top = { id: m.tile != null ? m.tile : id, ...(m.top && typeof m.top === 'object' ? m.top : {}), children };
+  const top = { id: m.tile != null ? m.tile : id, ...(m.top && typeof m.top === 'object' ? m.top : {}), children: inflateSubs(children, subs) };
+  if (subs.missing) exact = false;
   // a part that moved on since the manifest was written → not this version: short cache, and the app re-asks
   return { nodes: [top], settings: { _v: exact ? String(m._v) : String(m._v) + '!mixed', tile: m.tile, _src: 'parts' } };
+}
+
+// NESTED SPLIT (Oct 30 2026: Quiz → इतिहास reached ~0.95 MB). A top-level folder row may itself be split one level
+// deeper: its big sub-folders live in their own rows "tile:<id>:<subId>" and are listed in the manifest as
+// [subId, subVersion, bytes, parentId]; inside the parent's row each of them is a placeholder { id, _sbPart: 1 }.
+// The placeholders are replaced here, so every answer keeps the classic tile shape.
+function inflateSubs(children, subs) {
+  if (!subs.size) return children;
+  return children.map((c) => {
+    if (!c || typeof c !== 'object' || !Array.isArray(c.children) || !c.children.some((g) => g && g._sbPart)) return c;
+    return {
+      ...c,
+      children: c.children.map((g) => {
+        if (!g || !g._sbPart) return g;
+        const n = subs.get(String(g.id));
+        if (!n) { subs.missing = true; return g; }
+        return n;
+      }),
+    };
+  });
 }
 
 // The tile's current content, from the split rows or the classic row.

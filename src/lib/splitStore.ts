@@ -155,11 +155,26 @@ async function directTile(key: string, want: string): Promise<any[] | null> {
   if (!prs) return null;
   const byId = new Map(prs.map((r: any) => [r.id, r]));
   const children: any[] = [];
-  for (const id of ids) {
-    const r: any = byId.get(id);
+  const subs = new Map<string, any>();
+  for (let i = 0; i < ids.length; i++) {
+    const r: any = byId.get(ids[i]);
     const n = r && Array.isArray(r.nodes) ? r.nodes[0] : null;
     if (!n) return null;
-    children.push(n);
+    if (ms.parts[i] && ms.parts[i][3] != null) subs.set(String(ms.parts[i][0]), n);
+    else children.push(n);
+  }
+  // nested split (Oct 30 2026): entries [subId, v, bytes, parentId] are sub-folder rows; the parent row holds { id, _sbPart: 1 }
+  for (let i = 0; subs.size && i < children.length; i++) {
+    const c = children[i];
+    if (!c || !Array.isArray(c.children) || !c.children.some((g: any) => g && g._sbPart)) continue;
+    const kids: any[] = [];
+    for (const g of c.children) {
+      if (!g || !g._sbPart) { kids.push(g); continue; }
+      const n = subs.get(String(g.id));
+      if (!n) return null;
+      kids.push(n);
+    }
+    children[i] = { ...c, children: kids };
   }
   return [{ nodes: [{ id: ms.tile != null ? ms.tile : key, ...(ms.top || {}), children }], settings: { _v: String(ms._v), tile: ms.tile } }];
 }
