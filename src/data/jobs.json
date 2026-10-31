@@ -1,6 +1,6 @@
 {
- "updatedAt": "30 अक्टूबर 2026, शाम 7 बजे",
- "updatedAtIso": "2026-10-30T19:20+05:30",
+ "updatedAt": "31 अक्टूबर 2026, सुबह 8 बजे",
+ "updatedAtIso": "2026-10-31T08:40+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -14,32 +14,6 @@
   "Other"
  ],
  "jobs": [
-  {
-   "id": "karnataka-forest-department",
-   "status": "open",
-   "name_hi": "कर्नाटक वन विभाग (KFD) फॉरेस्ट ऑब्जर्वर भर्ती 2026",
-   "name_en": "Karnataka Forest Department (KFD) Forest Observer Recruitment 2026 (No. KFD/HOFF/B9(RCT)/5/2026-PnR)",
-   "posts": "750 (700 Non-HK + 50 HK)",
-   "qualification": "SSLC (10वीं) या समकक्ष परीक्षा उत्तीर्ण",
-   "age": "नोटिफिकेशन देखें",
-   "fee": "नोटिफिकेशन देखें",
-   "start": "2026-08-01",
-   "last": "2026-10-30",
-   "last_note": "आवेदन की अंतिम तिथि कई बार बढ़ाई गई (31.08.2026 → 07.09.2026 → 30.09.2026 → अब 30.10.2026)",
-   "exam": "बाद में घोषित",
-   "link": "https://aranya.gov.in/",
-   "link_display": "aranya.gov.in",
-   "source": "https://aranya.gov.in/aranyacms/(S(nqof132jmwemfgjlulecervc))/downloads/latestNews/Forest%20watchers%20extension%20for%20all%20circles%202026-27_30-09-2026_05.23.38.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [
-    "qualification",
-    "age",
-    "fee"
-   ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "State",
-   "state": "Karnataka"
-  },
   {
    "id": "dlrs-assam",
    "status": "open",
@@ -651,23 +625,20 @@
    "name_en": "GSSSB Surveyor, Class-3 Recruitment 2026 — Forest & Environment Dept (Advt No. 467/202627)",
    "posts": "78",
    "qualification": "सिविल इंजीनियरिंग डिप्लोमा या ITI सर्वेयर प्रमाणपत्र (B.E. सिविल वाले पात्र नहीं); शारीरिक मानक लागू",
-   "age": "18–33 वर्ष; आरक्षित वर्ग/महिला को छूट",
+   "age": "18–33 वर्ष (20.11.2026 को); आरक्षित वर्ग/महिला/पूर्व सैनिक को नियमानुसार छूट",
    "fee": "नोटिफिकेशन देखें",
    "start": "2026-10-30",
    "last": "2026-11-20",
-   "last_note": "आवेदन 30.10.2026 दोपहर 2 बजे से; फीस 23.11.2026 तक",
+   "last_note": "आवेदन 30.10.2026 दोपहर 2 बजे से 20.11.2026 रात 11:59 तक (OJAS); फीस 23.11.2026 तक",
    "exam": "प्रतियोगी परीक्षा — तारीख बाद में",
-   "link": "https://ojas.gujarat.gov.in/",
+   "link": "https://ojas.gujarat.gov.in",
    "link_display": "ojas.gujarat.gov.in",
    "source": "https://gsssb.gujarat.gov.in/Notification",
-   "source_note": "आधिकारिक GSSSB सूची में विज्ञापन 467/202627 'सर्वेयर' (30.10.2026) दिखा; पद/तिथियाँ/योग्यता द्वितीयक स्रोत (FreeJobAlert) से — PDF यहाँ से नहीं खुली",
+   "source_note": "आधिकारिक GSSSB विस्तृत विज्ञापन 467/202627 (30.10.2026, gsssb.gujarat.gov.in → जाहेरात) — कुल 78 पद, आयु 18–33, तिथियाँ पुष्ट",
    "unconfirmed": [
-    "posts",
-    "qualification",
-    "age",
-    "last"
+    "qualification"
    ],
-   "checked_at": "2026-10-30T19:20+05:30"
+   "checked_at": "2026-10-31T08:40+05:30"
   },
   {
    "id": "rrc-nwr-apprentice-04-2026",
@@ -752,7 +723,7 @@
    "link": "https://cetonline.karnataka.gov.in/kea/",
    "link_display": "cetonline.karnataka.gov.in/kea",
    "source": "https://cetonline.karnataka.gov.in/kea/",
-   "source_note": "KEA पोर्टल पर 'Karnataka Examinations Authority (FDA & SDA) Recruitment - 2026' लिंक दिखा (30.10.2026); पद/तिथियाँ/परीक्षा द्वितीयक स्रोतों (FreeJobAlert, Testbook, Adda247 — तीनों एकमत) से",
+   "source_note": "KEA पोर्टल पर 'Karnataka Examinations Authority (FDA & SDA) Recruitment - 2026' लिंक दिखा, पर 31.10.2026 सुबह तक वह KREIS पेज पर खुलता है — आधिकारिक अधिसूचना अभी नहीं मिली; पद/तिथियाँ/परीक्षा द्वितीयक स्रोतों (FreeJobAlert, Testbook, Adda247 — तीनों एकमत) से",
    "unconfirmed": [
     "posts",
     "age",
@@ -760,7 +731,7 @@
     "last",
     "exam"
    ],
-   "checked_at": "2026-10-30T19:20+05:30"
+   "checked_at": "2026-10-31T08:40+05:30"
   },
   {
    "id": "uppsc-ro-aro-2026",
@@ -788,6 +759,50 @@
    "state": "Uttar Pradesh"
   },
   {
+   "id": "nagaland-police-constable",
+   "status": "open",
+   "name_hi": "नागालैंड पुलिस कांस्टेबल (GD) भर्ती 2026",
+   "name_en": "Nagaland Police Constable (GD) Recruitment 2026 (PHQ(B-II)/RECT/CONSTABLES(GD)/WP(C)/2026)",
+   "posts": "1,137",
+   "qualification": "कक्षा 6 पास (पिछड़ी जनजाति) / कक्षा 8 पास या उच्च योग्यता (अन्य नागा जनजाति)",
+   "age": "18–37 वर्ष (14.10.2026 विज्ञापन तिथि को); सरकारी कर्मचारियों को अधिकतम 5 वर्ष छूट",
+   "fee": "₹300 (अप्रतिदेय)",
+   "start": "2026-10-31",
+   "last": "2026-11-30",
+   "last_note": null,
+   "exam": "बाद में घोषित",
+   "link": "https://nagalandpolicerecruitment.in",
+   "link_display": "nagalandpolicerecruitment.in",
+   "source": "https://police.nagaland.gov.in/wp-content/uploads/2026/10/advertisement-2026.pdf",
+   "source_note": "आधिकारिक अधिसूचना",
+   "unconfirmed": [],
+   "checked_at": "2026-10-25T08:10+05:30",
+   "category": "Police",
+   "state": "Nagaland"
+  },
+  {
+   "id": "ser-sports-quota-2026-27",
+   "status": "open",
+   "name_hi": "दक्षिण पूर्व रेलवे (SER) स्पोर्ट्स कोटा भर्ती 2026-27 — ग्रुप C व D",
+   "name_en": "South Eastern Railway Sports Quota Recruitment 2026-27 (Group C & D)",
+   "posts": "54 (लेवल-4/5: 5, लेवल-2/3: 16, लेवल-1: 33)",
+   "qualification": "लेवल-1: 10वीं या ITI/NAC; लेवल-2/3: 12वीं (या 10वीं + ITI/एक्ट अप्रेंटिस); लेवल-4/5: ग्रेजुएशन — साथ में खेल उपलब्धि ज़रूरी",
+   "age": "18–25 वर्ष (01.01.2027 को), कोई छूट नहीं",
+   "fee": "₹500 (SC/ST/पूर्व सैनिक/दिव्यांग/महिला/अल्पसंख्यक/EBC: ₹250)",
+   "start": "2026-10-31",
+   "last": "2026-11-30",
+   "last_note": "ऑनलाइन आवेदन 31.10.2026 से 30.11.2026 (रात 11:59) तक, rrcser.co.in",
+   "exam": "खेल ट्रायल + दस्तावेज़ जाँच (तारीख वेबसाइट पर बाद में)",
+   "link": "https://rrcser.co.in/",
+   "link_display": "rrcser.co.in",
+   "source": "https://rrcser.co.in/pdf/Notification%20Sports%20Quota%20OA%202026-27%20SER.pdf",
+   "source_note": "RRC दक्षिण पूर्व रेलवे की आधिकारिक अधिसूचना PDF (26.10.2026, पढ़ी 27 Oct सुबह)",
+   "unconfirmed": [],
+   "checked_at": "2026-10-27T08:50+05:30",
+   "category": "Railway",
+   "state": "All India"
+  },
+  {
    "id": "aees-teachers-2026",
    "status": "upcoming",
    "name_hi": "AEES शिक्षक भर्ती 2026 (PGT, TGT, PRT आदि) — परमाणु ऊर्जा शिक्षा सोसायटी",
@@ -803,13 +818,13 @@
    "link": "https://aees.onlineregistrationforms.com/",
    "link_display": "aees.onlineregistrationforms.com",
    "source": "https://www.freejobalert.com/articles/aees-teaching-recruitment-2026-3075950",
-   "source_note": "विस्तृत अधिसूचना 01/2026 की तिथियाँ/फीस द्वितीयक स्रोत (FreeJobAlert, 30.10.2026) से; aees.gov.in होमपेज पर अभी नई विज्ञापन सूचना नहीं दिखी",
+   "source_note": "विस्तृत अधिसूचना 01/2026 की तिथियाँ/फीस द्वितीयक स्रोत (FreeJobAlert, 30.10.2026) से; aees.gov.in भर्ती पेज (31.10.2026 सुबह) पर अब भी यह विज्ञापन नहीं दिखा, आवेदन पोर्टल खुला नहीं",
    "unconfirmed": [
     "start",
     "last",
     "fee"
    ],
-   "checked_at": "2026-10-30T19:20+05:30",
+   "checked_at": "2026-10-31T08:40+05:30",
    "category": "Teaching",
    "state": "All India"
   },
@@ -896,50 +911,6 @@
    "state": "Andhra Pradesh"
   },
   {
-   "id": "nagaland-police-constable",
-   "status": "upcoming",
-   "name_hi": "नागालैंड पुलिस कांस्टेबल (GD) भर्ती 2026",
-   "name_en": "Nagaland Police Constable (GD) Recruitment 2026 (PHQ(B-II)/RECT/CONSTABLES(GD)/WP(C)/2026)",
-   "posts": "1,137",
-   "qualification": "कक्षा 6 पास (पिछड़ी जनजाति) / कक्षा 8 पास या उच्च योग्यता (अन्य नागा जनजाति)",
-   "age": "18–37 वर्ष (14.10.2026 विज्ञापन तिथि को); सरकारी कर्मचारियों को अधिकतम 5 वर्ष छूट",
-   "fee": "₹300 (अप्रतिदेय)",
-   "start": "2026-10-31",
-   "last": "2026-11-30",
-   "last_note": null,
-   "exam": "बाद में घोषित",
-   "link": "https://nagalandpolicerecruitment.in",
-   "link_display": "nagalandpolicerecruitment.in",
-   "source": "https://police.nagaland.gov.in/wp-content/uploads/2026/10/advertisement-2026.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "Police",
-   "state": "Nagaland"
-  },
-  {
-   "id": "ser-sports-quota-2026-27",
-   "status": "upcoming",
-   "name_hi": "दक्षिण पूर्व रेलवे (SER) स्पोर्ट्स कोटा भर्ती 2026-27 — ग्रुप C व D",
-   "name_en": "South Eastern Railway Sports Quota Recruitment 2026-27 (Group C & D)",
-   "posts": "54 (लेवल-4/5: 5, लेवल-2/3: 16, लेवल-1: 33)",
-   "qualification": "लेवल-1: 10वीं या ITI/NAC; लेवल-2/3: 12वीं (या 10वीं + ITI/एक्ट अप्रेंटिस); लेवल-4/5: ग्रेजुएशन — साथ में खेल उपलब्धि ज़रूरी",
-   "age": "18–25 वर्ष (01.01.2027 को), कोई छूट नहीं",
-   "fee": "₹500 (SC/ST/पूर्व सैनिक/दिव्यांग/महिला/अल्पसंख्यक/EBC: ₹250)",
-   "start": "2026-10-31",
-   "last": "2026-11-30",
-   "last_note": "ऑनलाइन आवेदन 31.10.2026 से 30.11.2026 (रात 11:59) तक, rrcser.co.in",
-   "exam": "खेल ट्रायल + दस्तावेज़ जाँच (तारीख वेबसाइट पर बाद में)",
-   "link": "https://rrcser.co.in/",
-   "link_display": "rrcser.co.in",
-   "source": "https://rrcser.co.in/pdf/Notification%20Sports%20Quota%20OA%202026-27%20SER.pdf",
-   "source_note": "RRC दक्षिण पूर्व रेलवे की आधिकारिक अधिसूचना PDF (26.10.2026, पढ़ी 27 Oct सुबह)",
-   "unconfirmed": [],
-   "checked_at": "2026-10-27T08:50+05:30",
-   "category": "Railway",
-   "state": "All India"
-  },
-  {
    "id": "upsssc-inter-26-2026",
    "status": "upcoming",
    "name_hi": "UPSSSC इंटर लेवल (संयुक्त अवर अधीनस्थ सेवा, विज्ञापन 26-परीक्षा/2026)",
@@ -987,6 +958,32 @@
    "checked_at": "2026-10-25T19:45+05:30",
    "category": "Railway",
    "state": "All India"
+  },
+  {
+   "id": "cg-police-sukma-bastar-fighter-2026",
+   "status": "upcoming",
+   "name_hi": "छत्तीसगढ़ पुलिस बस्तर फाइटर आरक्षक भर्ती 2026 — सुकमा (केवल सुकमा ज़िले के निवासी)",
+   "name_en": "CG Police Bastar Fighter Constable Recruitment 2026 — SP Office Sukma (Advt 1201/2026, Special Executive Force)",
+   "posts": "375 (अनारक्षित 26, OBC 26, SC 8, ST 315)",
+   "qualification": "आधिकारिक प्रेस नोट में नहीं — थानों के सूचना पटल / sukma.cgpolice.gov.in पर विज्ञापन देखें",
+   "age": "विज्ञापन देखें (प्रेस नोट में नहीं)",
+   "fee": "विज्ञापन देखें",
+   "start": "2026-11-02",
+   "last": "2026-12-12",
+   "last_note": "ऑफ़लाइन आवेदन 2 नवंबर से 12 दिसंबर 2026 शाम 5 बजे तक — SP कार्यालय सुकमा या SDOP कार्यालय (सुकमा, दोरनापाल, कोण्टा, जगरगुण्डा, मरईगुड़ा) में जमा करें या रजिस्टर्ड डाक से भेजें",
+   "exam": "शारीरिक मापदंड + शारीरिक दक्षता परीक्षा + लिखित परीक्षा (तारीख बाद में)",
+   "link": "https://sukma.cgpolice.gov.in/",
+   "link_display": "sukma.cgpolice.gov.in",
+   "source": "https://dprcg.gov.in/post/1793371095/%E0%A4%B8%E0%A5%81%E0%A4%95%E0%A4%AE%E0%A4%BE-%E0%A4%B8%E0%A5%81%E0%A4%95%E0%A4%AE%E0%A4%BE-%E0%A4%AA%E0%A5%81%E0%A4%B2%E0%A4%BF%E0%A4%B8-%E0%A4%AE%E0%A5%87%E0%A4%82-%E0%A4%AC%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A4%B0-%E0%A4%AB%E0%A4%BE%E0%A4%87%E0%A4%9F%E0%A4%B0%E0%A5%8D%E0%A4%B8-%E0%A4%95%E0%A5%87-375-%E0%A4%AA%E0%A4%A6%E0%A5%8B%E0%A4%82-%E0%A4%AA%E0%A4%B0-%E0%A4%AC%E0%A4%82%E0%A4%AA%E0%A4%B0-%E0%A4%AD%E0%A4%B0%E0%A5%8D%E0%A4%A4%E0%A5%80",
+   "source_note": "आधिकारिक प्रेस नोट — जनसंपर्क संचालनालय छत्तीसगढ़ (dprcg.gov.in), 30.10.2026: पद, आरक्षण और तिथियाँ पुष्ट; केवल सुकमा ज़िले के स्थानीय निवासी पात्र",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee"
+   ],
+   "checked_at": "2026-10-31T08:40+05:30",
+   "category": "Police",
+   "state": "Chhattisgarh"
   },
   {
    "id": "upsc-nda1-2027",
@@ -1341,6 +1338,32 @@
    "checked_at": "2026-10-25T08:10+05:30",
    "category": "State",
    "state": "Gujarat"
+  },
+  {
+   "id": "karnataka-forest-department",
+   "status": "closed",
+   "name_hi": "कर्नाटक वन विभाग (KFD) फॉरेस्ट ऑब्जर्वर भर्ती 2026",
+   "name_en": "Karnataka Forest Department (KFD) Forest Observer Recruitment 2026 (No. KFD/HOFF/B9(RCT)/5/2026-PnR)",
+   "posts": "750 (700 Non-HK + 50 HK)",
+   "qualification": "SSLC (10वीं) या समकक्ष परीक्षा उत्तीर्ण",
+   "age": "नोटिफिकेशन देखें",
+   "fee": "नोटिफिकेशन देखें",
+   "start": "2026-08-01",
+   "last": "2026-10-30",
+   "last_note": "आवेदन की अंतिम तिथि कई बार बढ़ाई गई (31.08.2026 → 07.09.2026 → 30.09.2026 → अब 30.10.2026)",
+   "exam": "बाद में घोषित",
+   "link": "https://aranya.gov.in/",
+   "link_display": "aranya.gov.in",
+   "source": "https://aranya.gov.in/aranyacms/(S(nqof132jmwemfgjlulecervc))/downloads/latestNews/Forest%20watchers%20extension%20for%20all%20circles%202026-27_30-09-2026_05.23.38.pdf",
+   "source_note": "आधिकारिक अधिसूचना",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee"
+   ],
+   "checked_at": "2026-10-25T08:10+05:30",
+   "category": "State",
+   "state": "Karnataka"
   }
  ]
 }
