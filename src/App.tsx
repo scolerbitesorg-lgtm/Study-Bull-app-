@@ -25,7 +25,7 @@ const EligibilityExam = React.lazy(() => import('./components/EligibilityChecker
 import { trackTile, trackResult } from './lib/views';
 const JobAlert = React.lazy(() => import('./components/JobAlert').then((m) => ({ default: m.JobAlert })));
 // 🔥 पढ़ाई स्ट्रीक + रोज़ का लक्ष्य (Oct 30 2026): slim home card + result nudge (eager, tiny); full screen lazy
-import { StreakStrip, StreakNudge } from './components/StreakStrip';
+import { StreakNudge } from './components/StreakStrip';
 import { recordTest } from './lib/streak';
 const StudyStreak = React.lazy(() => import('./components/StudyStreak').then((m) => ({ default: m.StudyStreak })));
 // 📤 score-card share sheet (Oct 27 2026) — its own chunk, loaded only when "स्कोर कार्ड शेयर करें" is tapped
@@ -1973,8 +1973,7 @@ export default function App() {
                   transition={{ duration: 0.16 }}
                   className="space-y-4"
                 >
-                  {/* Always rendered (device-only data) so the tiles don't jump down when it appears (CLS fix, 31 Oct 2026) */}
-                  <StreakStrip onOpen={() => { trackTile('पढ़ाई स्ट्रीक'); navigateTo('streak'); }} />
+                  {/* Streak card removed from home at Aarav's request (31 Oct 2026 11:05 AM); streak page still opens from the post-test nudge */}
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {/* Loading skeleton while fetching live buttons from database */}
                     {!isDbLoaded && adminNodes.length === 0 && (
