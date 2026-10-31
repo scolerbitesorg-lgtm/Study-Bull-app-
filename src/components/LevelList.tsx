@@ -361,6 +361,12 @@ export function LevelList(p: LevelListProps) {
     // Aarav 11:18 AM Oct 26: the left pill shows the row's serial number (1, 2, 3…); the question count
     // lives in the subtitle only (added there when the subtitle doesn't already say it).
     const kindHint = leafPill(n, langHindi);
+    // Aarav 1:32 PM Oct 31: syllabus topics are titled "<n>. <title>" (numbered across a subject's part folders);
+    // show that number in the pill and the rest as the title, so the number is not printed twice.
+    const rawTitle = String(titleOf(n) ?? '');
+    const numM = /^(\d{1,3})\.\s+(.+)$/.exec(rawTitle);
+    const pillNo = numM ? numM[1] : String(idx + 1);
+    const shownTitle = numM ? numM[2] : titleOf(n);
     const q = countQuestions(n);
     let sub = cleanSub(subtitleOf(n));
     if (q > 0 && !/प्रश्न|\bQs?\b|question|MCQ/i.test(sub)) sub = [`${q} ${langHindi ? 'प्रश्न' : 'Qs'}`, sub].filter(Boolean).join(' • ');
@@ -373,12 +379,12 @@ export function LevelList(p: LevelListProps) {
       >
         {veil(n)}
         <div className="w-10 h-10 shrink-0 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center leading-none">
-          <span className="text-[16px] font-extrabold text-blue-700 tabular-nums">{idx + 1}</span>
+          <span className="text-[16px] font-extrabold text-blue-700 tabular-nums">{pillNo}</span>
         </div>
         <div className="min-w-0 flex-1">
           <h4 className="font-bold text-slate-900 text-[14.5px] leading-snug truncate">
             {iconOf(n) && iconOf(n) !== '⚡' ? <span className="mr-1">{iconOf(n)}</span> : null}
-            {titleOf(n)}
+            {shownTitle}
           </h4>
           {sub && <p className="text-[11.5px] text-slate-500 truncate mt-0.5">{sub}</p>}
         </div>
