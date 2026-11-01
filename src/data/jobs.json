@@ -1,6 +1,6 @@
 {
- "updatedAt": "31 अक्टूबर 2026, शाम 7 बजे",
- "updatedAtIso": "2026-10-31T19:20+05:30",
+ "updatedAt": "1 नवंबर 2026, सुबह 8 बजे",
+ "updatedAtIso": "2026-11-01T08:30+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -14,31 +14,6 @@
   "Other"
  ],
  "jobs": [
-  {
-   "id": "dlrs-assam",
-   "status": "open",
-   "name_hi": "असम DLRS भूमि अभिलेख सहायक भर्ती 2026",
-   "name_en": "DLRS Assam Land Record Assistant (LRA) Recruitment 2026 (Advt No. DLR-11013(21)/50/2025/372)",
-   "posts": "579",
-   "qualification": "RCCC प्रशिक्षण उत्तीर्ण व सर्वे-सेटलमेंट में दक्षता प्राप्त; कंप्यूटर व टाइपिंग ज्ञान आवश्यक",
-   "age": "21–40 वर्ष (01.01.2026 को); आरक्षित वर्ग को छूट",
-   "fee": "नोटिफिकेशन देखें",
-   "start": "2026-09-21",
-   "last": "2026-10-31",
-   "last_note": "मूल अंतिम तिथि 21.10.2026; 31.10.2026 तक बढ़ने की आधिकारिक पुष्टि नहीं हुई",
-   "exam": "बाद में घोषित",
-   "link": "https://sebaonline.org",
-   "link_display": "sebaonline.org",
-   "source": "https://sebamis.sebaonline.org/landrecdpt/uploads/DLRS_19092026_Advertisement_for_Post_of_Land_Record_Assistant.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [
-    "fee",
-    "last"
-   ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "State",
-   "state": "Assam"
-  },
   {
    "id": "itbp-ct-gd-sports-2025",
    "status": "open",
@@ -980,28 +955,56 @@
    "state": "All India"
   },
   {
+   "id": "osssc-ophthalmic-officer-2026",
+   "status": "upcoming",
+   "name_hi": "OSSSC नेत्र अधिकारी (Ophthalmic Officer) भर्ती 2026 — स्वास्थ्य विभाग, ओडिशा (ज़िला कैडर ग्रुप-C)",
+   "name_en": "OSSSC Ophthalmic Officer Recruitment 2026 (Advt No. IIE-103/2026-3226/OSSSC dt 30.10.2026)",
+   "posts": "238 (29 ज़िला प्रतिष्ठान)",
+   "qualification": "विस्तृत विज्ञापन में आएगा",
+   "age": "विस्तृत विज्ञापन में आएगा",
+   "fee": "विस्तृत विज्ञापन में आएगा",
+   "start": "2026-11-05",
+   "last": "2026-12-05",
+   "last_note": "ऑनलाइन — पंजीकरण 5 से 29 नवंबर, आवेदन जमा 5 दिसंबर 2026 तक (लघु विज्ञापन के अनुसार; विस्तृत विज्ञापन बाकी)",
+   "exam": "विस्तृत विज्ञापन में आएगा",
+   "link": "https://www.osssc.gov.in/",
+   "link_display": "osssc.gov.in",
+   "source": "https://www.osssc.gov.in/",
+   "source_note": "विज्ञापन संख्या व तारीख osssc.gov.in 'Recruitment News' पर पुष्ट (30.10.2026); पद व तिथियाँ FreeJobAlert के लघु-विज्ञापन सारांश से — आधिकारिक PDF अभी नहीं पढ़ा",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "age",
+    "fee",
+    "start",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-11-01T08:30+05:30",
+   "category": "State",
+   "state": "Odisha"
+  },
+  {
    "id": "cg-police-sukma-bastar-fighter-2026",
    "status": "upcoming",
    "name_hi": "छत्तीसगढ़ पुलिस बस्तर फाइटर आरक्षक भर्ती 2026 — सुकमा (केवल सुकमा ज़िले के निवासी)",
    "name_en": "CG Police Bastar Fighter Constable Recruitment 2026 — SP Office Sukma (Advt 1201/2026, Special Executive Force)",
    "posts": "375 (अनारक्षित 26, OBC 26, SC 8, ST 315)",
-   "qualification": "आधिकारिक प्रेस नोट में नहीं — थानों के सूचना पटल / sukma.cgpolice.gov.in पर विज्ञापन देखें",
-   "age": "विज्ञापन देखें (प्रेस नोट में नहीं)",
-   "fee": "विज्ञापन देखें",
+   "qualification": "10वीं पास (छत्तीसगढ़/मध्यप्रदेश के विद्यालय से); ST तथा नक्सल-पीड़ित/राहत शिविर परिवार के अभ्यर्थी 5वीं पास भी पात्र; केवल सुकमा ज़िले के स्थानीय निवासी",
+   "age": "18–28 वर्ष (01.01.2026 को); SC/ST/OBC को 5 वर्ष तथा ज़िले की स्थानीय महिलाओं को 10 वर्ष तक छूट",
+   "fee": "विज्ञापन में शुल्क का उल्लेख नहीं",
    "start": "2026-11-02",
    "last": "2026-12-12",
    "last_note": "ऑफ़लाइन आवेदन 2 नवंबर से 12 दिसंबर 2026 शाम 5 बजे तक — SP कार्यालय सुकमा या SDOP कार्यालय (सुकमा, दोरनापाल, कोण्टा, जगरगुण्डा, मरईगुड़ा) में जमा करें या रजिस्टर्ड डाक से भेजें",
-   "exam": "शारीरिक मापदंड + शारीरिक दक्षता परीक्षा + लिखित परीक्षा (तारीख बाद में)",
+   "exam": "शारीरिक नापजोख व दक्षता परीक्षा, लिखित परीक्षा (50 अंक, वस्तुनिष्ठ — सामान्य ज्ञान, बुद्धि क्षमता, स्थानीय भूगोल/संस्कृति, अंकगणित), साक्षात्कार (20 अंक) — तारीख बाद में",
    "link": "https://sukma.cgpolice.gov.in/",
    "link_display": "sukma.cgpolice.gov.in",
-   "source": "https://dprcg.gov.in/post/1793371095/%E0%A4%B8%E0%A5%81%E0%A4%95%E0%A4%AE%E0%A4%BE-%E0%A4%B8%E0%A5%81%E0%A4%95%E0%A4%AE%E0%A4%BE-%E0%A4%AA%E0%A5%81%E0%A4%B2%E0%A4%BF%E0%A4%B8-%E0%A4%AE%E0%A5%87%E0%A4%82-%E0%A4%AC%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A4%B0-%E0%A4%AB%E0%A4%BE%E0%A4%87%E0%A4%9F%E0%A4%B0%E0%A5%8D%E0%A4%B8-%E0%A4%95%E0%A5%87-375-%E0%A4%AA%E0%A4%A6%E0%A5%8B%E0%A4%82-%E0%A4%AA%E0%A4%B0-%E0%A4%AC%E0%A4%82%E0%A4%AA%E0%A4%B0-%E0%A4%AD%E0%A4%B0%E0%A5%8D%E0%A4%A4%E0%A5%80",
-   "source_note": "आधिकारिक प्रेस नोट — जनसंपर्क संचालनालय छत्तीसगढ़ (dprcg.gov.in), 30.10.2026: पद, आरक्षण और तिथियाँ पुष्ट; केवल सुकमा ज़िले के स्थानीय निवासी पात्र",
+   "source": "https://cgpolice.gov.in//cms/sites/default/files/2026-10/Advertisement%20and%20Application%20form%2C%20Sukma.pdf",
+   "source_note": "SP सुकमा का आधिकारिक विज्ञापन व आवेदन पत्र (cgpolice.gov.in, स्कैन PDF, OCR से पढ़ा और पेज इमेज से मिलाया); पद व तिथियाँ 30.10.2026 के DPR प्रेस नोट से भी मेल खाती हैं",
    "unconfirmed": [
-    "qualification",
-    "age",
     "fee"
    ],
-   "checked_at": "2026-10-31T08:40+05:30",
+   "checked_at": "2026-11-01T08:30+05:30",
    "category": "Police",
    "state": "Chhattisgarh"
   },
@@ -1028,6 +1031,54 @@
     "fee"
    ],
    "checked_at": "2026-10-31T19:20+05:30"
+  },
+  {
+   "id": "cg-police-bijapur-bastar-fighter-2026",
+   "status": "upcoming",
+   "name_hi": "छत्तीसगढ़ पुलिस बस्तर फाइटर आरक्षक भर्ती 2026 — SP कार्यालय बीजापुर (केवल बीजापुर ज़िले के निवासी)",
+   "name_en": "CG Police Bastar Fighter Constable Recruitment 2026 — SP Office Bijapur",
+   "posts": "417 (अनारक्षित 19, OBC 68, SC 40, ST 290)",
+   "qualification": "10वीं पास (छत्तीसगढ़/मध्यप्रदेश के विद्यालय से); ST तथा नक्सल-पीड़ित/राहत शिविर परिवार के अभ्यर्थी 5वीं पास भी पात्र; केवल बीजापुर ज़िले के स्थानीय निवासी",
+   "age": "18–28 वर्ष (01.01.2026 को); SC/ST/OBC को 5 वर्ष तथा ज़िले की स्थानीय महिलाओं को 10 वर्ष तक छूट",
+   "fee": "विज्ञापन में शुल्क का उल्लेख नहीं",
+   "start": "2026-11-02",
+   "last": "2026-12-12",
+   "last_note": "ऑफ़लाइन आवेदन 2 नवंबर से 12 दिसंबर 2026 शाम 5 बजे तक — SP कार्यालय बीजापुर या SDOP कार्यालय (भैरमगढ़, फरसेगढ़, भोपालपटनम, आवापल्ली आदि) में जमा या रजिस्टर्ड डाक से",
+   "exam": "शारीरिक नापजोख व दक्षता परीक्षा, लिखित परीक्षा (50 अंक, वस्तुनिष्ठ — सामान्य ज्ञान, बुद्धि क्षमता, स्थानीय भूगोल/संस्कृति, अंकगणित), साक्षात्कार (20 अंक) — तारीख बाद में",
+   "link": "https://cgpolice.gov.in/",
+   "link_display": "cgpolice.gov.in",
+   "source": "https://cgpolice.gov.in//cms/sites/default/files/2026-10/Recruitment%20of%20Bastar%20Fighter%20in%20District%20Bijapur%20%E2%80%93%20Advertisement%20and%20Application%20Form_0.pdf",
+   "source_note": "SP बीजापुर का आधिकारिक विज्ञापन व आवेदन पत्र (cgpolice.gov.in 'What's New', स्कैन PDF, OCR से पढ़ा और पेज इमेज से मिलाया)",
+   "unconfirmed": [
+    "fee"
+   ],
+   "checked_at": "2026-11-01T08:30+05:30",
+   "category": "Police",
+   "state": "Chhattisgarh"
+  },
+  {
+   "id": "cg-police-kanker-bastar-fighter-2026",
+   "status": "upcoming",
+   "name_hi": "छत्तीसगढ़ पुलिस बस्तर फाइटर आरक्षक भर्ती 2026 — SP कार्यालय कांकेर (केवल कांकेर ज़िले के निवासी)",
+   "name_en": "CG Police Bastar Fighter Constable Recruitment 2026 — SP Office Kanker (Uttar Bastar)",
+   "posts": "125 (अनारक्षित 33, OBC 17, SC 5, ST 70)",
+   "qualification": "10वीं पास (छत्तीसगढ़/मध्यप्रदेश के विद्यालय से); ST तथा नक्सल-पीड़ित/राहत शिविर परिवार के अभ्यर्थी 5वीं पास भी पात्र; केवल कांकेर ज़िले के स्थानीय निवासी",
+   "age": "18–28 वर्ष (01.01.2026 को); SC/ST/OBC को 5 वर्ष तथा ज़िले की स्थानीय महिलाओं को 10 वर्ष तक छूट",
+   "fee": "विज्ञापन में शुल्क का उल्लेख नहीं",
+   "start": "2026-11-02",
+   "last": "2026-12-12",
+   "last_note": "ऑफ़लाइन आवेदन 2 नवंबर से 12 दिसंबर 2026 शाम 5 बजे तक — SP कार्यालय कांकेर या SDOP कार्यालय (भानुप्रतापपुर, अंतागढ़, पखांजूर) में जमा या रजिस्टर्ड डाक से",
+   "exam": "शारीरिक नापजोख व दक्षता परीक्षा, लिखित परीक्षा (50 अंक, वस्तुनिष्ठ — सामान्य ज्ञान, बुद्धि क्षमता, स्थानीय भूगोल/संस्कृति, अंकगणित), साक्षात्कार (20 अंक) — तारीख बाद में",
+   "link": "https://cgpolice.gov.in/",
+   "link_display": "cgpolice.gov.in",
+   "source": "https://cgpolice.gov.in//cms/sites/default/files/2026-10/Bastar%20Fighter%20Kanker%20ad.pdf",
+   "source_note": "SP उत्तर बस्तर कांकेर का आधिकारिक विज्ञापन व आवेदन पत्र (cgpolice.gov.in 'What's New', स्कैन PDF, OCR से पढ़ा और पेज इमेज से मिलाया)",
+   "unconfirmed": [
+    "fee"
+   ],
+   "checked_at": "2026-11-01T08:30+05:30",
+   "category": "Police",
+   "state": "Chhattisgarh"
   },
   {
    "id": "upsc-nda1-2027",
@@ -1408,6 +1459,31 @@
    "checked_at": "2026-10-25T08:10+05:30",
    "category": "State",
    "state": "Karnataka"
+  },
+  {
+   "id": "dlrs-assam",
+   "status": "closed",
+   "name_hi": "असम DLRS भूमि अभिलेख सहायक भर्ती 2026",
+   "name_en": "DLRS Assam Land Record Assistant (LRA) Recruitment 2026 (Advt No. DLR-11013(21)/50/2025/372)",
+   "posts": "579",
+   "qualification": "RCCC प्रशिक्षण उत्तीर्ण व सर्वे-सेटलमेंट में दक्षता प्राप्त; कंप्यूटर व टाइपिंग ज्ञान आवश्यक",
+   "age": "21–40 वर्ष (01.01.2026 को); आरक्षित वर्ग को छूट",
+   "fee": "नोटिफिकेशन देखें",
+   "start": "2026-09-21",
+   "last": "2026-10-31",
+   "last_note": "मूल अंतिम तिथि 21.10.2026; 31.10.2026 तक बढ़ने की आधिकारिक पुष्टि नहीं हुई",
+   "exam": "बाद में घोषित",
+   "link": "https://sebaonline.org",
+   "link_display": "sebaonline.org",
+   "source": "https://sebamis.sebaonline.org/landrecdpt/uploads/DLRS_19092026_Advertisement_for_Post_of_Land_Record_Assistant.pdf",
+   "source_note": "आधिकारिक अधिसूचना",
+   "unconfirmed": [
+    "fee",
+    "last"
+   ],
+   "checked_at": "2026-10-25T08:10+05:30",
+   "category": "State",
+   "state": "Assam"
   }
  ]
 }
