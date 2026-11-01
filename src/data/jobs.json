@@ -1,6 +1,6 @@
 {
- "updatedAt": "1 नवंबर 2026, सुबह 8 बजे",
- "updatedAtIso": "2026-11-01T08:30+05:30",
+ "updatedAt": "1 नवंबर 2026, शाम 7 बजे",
+ "updatedAtIso": "2026-11-01T19:15+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -207,7 +207,7 @@
    "source": "https://www.rrbapply.gov.in/ + CEN 06/2026 official PDF",
    "source_note": "Dates on rrbapply.gov.in; posts/age/fee from the official CEN PDF",
    "unconfirmed": [],
-   "checked_at": "2026-10-29T19:50+05:30",
+   "checked_at": "2026-11-01T19:15+05:30",
    "category": "Railway",
    "state": "All India"
   },
@@ -426,7 +426,7 @@
     "posts",
     "age"
    ],
-   "checked_at": "2026-10-29T19:50+05:30",
+   "checked_at": "2026-11-01T19:15+05:30",
    "category": "Railway",
    "state": "All India"
   },
@@ -700,7 +700,7 @@
    "source": "https://rrb.indianrailways.gov.in/-/image/1793016771817CEN_08_2026_StationMaster.pdf/examsDocuments",
    "source_note": "RRB का आधिकारिक विस्तृत CEN 08/2026 PDF (पढ़ा 26 Oct शाम)",
    "unconfirmed": [],
-   "checked_at": "2026-10-29T19:50+05:30",
+   "checked_at": "2026-11-01T19:15+05:30",
    "category": "Railway",
    "state": "All India"
   },
@@ -1004,7 +1004,7 @@
    "unconfirmed": [
     "fee"
    ],
-   "checked_at": "2026-11-01T08:30+05:30",
+   "checked_at": "2026-11-01T19:15+05:30",
    "category": "Police",
    "state": "Chhattisgarh"
   },
@@ -1030,7 +1030,7 @@
    "unconfirmed": [
     "fee"
    ],
-   "checked_at": "2026-10-31T19:20+05:30"
+   "checked_at": "2026-11-01T19:15+05:30"
   },
   {
    "id": "cg-police-bijapur-bastar-fighter-2026",
@@ -1052,7 +1052,7 @@
    "unconfirmed": [
     "fee"
    ],
-   "checked_at": "2026-11-01T08:30+05:30",
+   "checked_at": "2026-11-01T19:15+05:30",
    "category": "Police",
    "state": "Chhattisgarh"
   },
@@ -1076,7 +1076,32 @@
    "unconfirmed": [
     "fee"
    ],
-   "checked_at": "2026-11-01T08:30+05:30",
+   "checked_at": "2026-11-01T19:15+05:30",
+   "category": "Police",
+   "state": "Chhattisgarh"
+  },
+  {
+   "id": "cg-police-kondagaon-bastar-fighter-2026",
+   "status": "upcoming",
+   "name_hi": "छत्तीसगढ़ पुलिस बस्तर फाइटर आरक्षक भर्ती 2026 — SP कार्यालय कोण्डागांव (केवल कोण्डागांव ज़िले के निवासी)",
+   "name_en": "CG Police Bastar Fighter Constable Recruitment 2026 — SP Office Kondagaon",
+   "posts": "81",
+   "qualification": "10वीं पास (छत्तीसगढ़/मध्यप्रदेश के विद्यालय से); ST तथा नक्सल-पीड़ित/राहत शिविर परिवार के अभ्यर्थी 5वीं पास भी पात्र; केवल कोण्डागांव ज़िले के स्थानीय निवासी",
+   "age": "18–28 वर्ष (01.01.2026 को); SC/ST/OBC को 5 वर्ष तथा ज़िले की स्थानीय महिलाओं को 10 वर्ष तक छूट",
+   "fee": "विज्ञापन में शुल्क का उल्लेख नहीं",
+   "start": "2026-11-02",
+   "last": "2026-12-12",
+   "last_note": "ऑफ़लाइन आवेदन 2 नवंबर से 12 दिसंबर 2026 तक — निर्धारित प्रपत्र भरकर SP कार्यालय कोण्डागांव/विज्ञापन में दिए स्थानों पर कार्यालयीन समय में जमा करें या रजिस्टर्ड डाक से भेजें",
+   "exam": "शारीरिक नापजोख व दक्षता परीक्षा, लिखित परीक्षा, साक्षात्कार — तारीख बाद में",
+   "link": "https://cgpolice.gov.in/",
+   "link_display": "cgpolice.gov.in",
+   "source": "https://cgpolice.gov.in//cms/sites/default/files/2026-11/Document%20431.pdf",
+   "source_note": "SP कोण्डागांव का आधिकारिक विज्ञापन व आवेदन पत्र (cgpolice.gov.in 'What's New', 1 Nov 2026 को जुड़ा; स्कैन PDF, OCR से पढ़ा और पेज इमेज से मिलाया)",
+   "unconfirmed": [
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-01T19:15+05:30",
    "category": "Police",
    "state": "Chhattisgarh"
   },
