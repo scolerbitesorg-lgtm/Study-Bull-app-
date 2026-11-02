@@ -1,6 +1,6 @@
 {
- "updatedAt": "2 नवंबर 2026, सुबह 8 बजे",
- "updatedAtIso": "2026-11-02T08:20+05:30",
+ "updatedAt": "2 नवंबर 2026, शाम 7 बजे",
+ "updatedAtIso": "2026-11-02T19:25+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -949,6 +949,31 @@
    "state": "Chhattisgarh"
   },
   {
+   "id": "cg-police-bastar-jagdalpur-bastar-fighter-2026",
+   "status": "open",
+   "name_hi": "छत्तीसगढ़ पुलिस बस्तर फाइटर आरक्षक भर्ती 2026 — SP कार्यालय जगदलपुर, ज़िला बस्तर (केवल बस्तर ज़िले के निवासी)",
+   "name_en": "CG Police Bastar Fighter Constable Recruitment 2026 — SP Office Jagdalpur, District Bastar",
+   "posts": "79 (अनारक्षित 16, OBC 11, SC 02, ST 50)",
+   "qualification": "10वीं पास (छत्तीसगढ़/मध्यप्रदेश के विद्यालय से); ST तथा नक्सल-पीड़ित/राहत शिविर परिवार के अभ्यर्थी 5वीं पास भी पात्र (बस्तर फाइटर भर्ती नियम 2026); केवल बस्तर ज़िले के स्थानीय निवासी",
+   "age": "18–28 वर्ष (01.01.2026 को); SC/ST/OBC को 5 वर्ष तथा ज़िले की स्थानीय महिलाओं को 10 वर्ष तक छूट",
+   "fee": "विज्ञापन में शुल्क का उल्लेख नहीं",
+   "start": "2026-11-02",
+   "last": "2026-12-12",
+   "last_note": "ऑफ़लाइन आवेदन 2 नवंबर से 12 दिसंबर 2026 (शाम 5 बजे तक) — निर्धारित प्रपत्र रक्षित केंद्र जगदलपुर, SDOP कार्यालय केशलूर (परपा), लोहण्डीगुड़ा या भानपुरी में जमा करें, या रजिस्टर्ड डाक से SP कार्यालय जगदलपुर, ज़िला बस्तर (पिन 494001) भेजें",
+   "exam": "दस्तावेज़ जाँच, शारीरिक नापजोख, शारीरिक दक्षता परीक्षा (100 अंक), लिखित परीक्षा, साक्षात्कार (20 अंक) — तारीख बाद में",
+   "link": "https://bastar.cgpolice.gov.in/",
+   "link_display": "bastar.cgpolice.gov.in",
+   "source": "https://cgpolice.gov.in/cms/sites/default/files/2026-11/Advertisement%20and%20Application%20Form%20Bastar.pdf",
+   "source_note": "SP बस्तर (जगदलपुर) का आधिकारिक विज्ञापन व आवेदन पत्र (cgpolice.gov.in, 2 Nov 2026 को जुड़ा; स्कैन PDF — पद, तारीखें व जमा-स्थान पेज इमेज से पढ़े; योग्यता/आयु राज्य के बस्तर फाइटर भर्ती नियम 2026 के अनुसार, जो दंतेवाड़ा विज्ञापन में पढ़े गए)",
+   "unconfirmed": [
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-02T19:25+05:30",
+   "category": "Police",
+   "state": "Chhattisgarh"
+  },
+  {
    "id": "sci-junior-court-attendant-2026",
    "status": "upcoming",
    "name_hi": "सुप्रीम कोर्ट जूनियर कोर्ट अटेंडेंट भर्ती 2026",
@@ -1108,6 +1133,35 @@
    "checked_at": "2026-11-01T08:30+05:30",
    "category": "State",
    "state": "Odisha"
+  },
+  {
+   "id": "iaf-afcat-01-2027",
+   "status": "upcoming",
+   "name_hi": "भारतीय वायुसेना AFCAT 01/2027 — फ्लाइंग व ग्राउंड ड्यूटी (टेक्निकल/नॉन-टेक्निकल) अधिकारी, NCC स्पेशल एंट्री व GATE एंट्री (जनवरी 2028 कोर्स)",
+   "name_en": "Indian Air Force AFCAT 01/2027 (Flying & Ground Duty branches, NCC Special Entry, GATE Score Entry) — course Jan 2028",
+   "posts": "विस्तृत नोटिफिकेशन में घोषित होंगी",
+   "qualification": "स्नातक/B.E./B.Tech (शाखा अनुसार); फ्लाइंग शाखा के लिए 12वीं में गणित व भौतिकी ज़रूरी — केवल 12वीं पास पात्र नहीं",
+   "age": "फ्लाइंग: 20–24 वर्ष (DGCA CPL धारक 26 तक); ग्राउंड ड्यूटी: 20–26 वर्ष — 01.01.2028 को",
+   "fee": "AFCAT एंट्री ₹550 + GST; NCC स्पेशल एंट्री व GATE एंट्री: निःशुल्क",
+   "start": "2026-11-12",
+   "last": "2026-12-11",
+   "last_note": "शॉर्ट नोटिस के अनुसार ऑनलाइन आवेदन 12 नवंबर (सुबह 11 बजे) से 11 दिसंबर 2026 (रात 11:30 बजे) तक — afcat.edcil.co.in पर विस्तृत नोटिफिकेशन आना बाकी",
+   "exam": "AFCAT ऑनलाइन परीक्षा, फिर AFSB इंटरव्यू व मेडिकल — परीक्षा तारीख बाद में",
+   "link": "https://afcat.edcil.co.in/",
+   "link_display": "afcat.edcil.co.in",
+   "source": "https://www.freejobalert.com/articles/afcat-01-2027-notification-3077773",
+   "source_note": "वायुसेना का शॉर्ट नोटिस (रोज़गार समाचार में प्रकाशित, समाचार/जॉब पोर्टल के अनुसार); 2 Nov 7 PM तक afcat.edcil.co.in पर नोटिस नहीं दिखा — इसलिए तारीखें अपुष्ट",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "start",
+    "last",
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-02T19:25+05:30",
+   "category": "Defence",
+   "state": "All India"
   },
   {
    "id": "upsc-nda1-2027",
