@@ -1,6 +1,6 @@
 {
- "updatedAt": "2 नवंबर 2026, शाम 7 बजे",
- "updatedAtIso": "2026-11-02T19:25+05:30",
+ "updatedAt": "3 नवंबर 2026, सुबह 8 बजे",
+ "updatedAtIso": "2026-11-03T08:20+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -1135,6 +1135,32 @@
    "state": "Odisha"
   },
   {
+   "id": "hprca-teacher-14-2026",
+   "status": "upcoming",
+   "name_hi": "हिमाचल प्रदेश राज्य चयन आयोग (HPRCA) शिक्षक भर्ती 2026 — CBSE/सरकारी स्कूल (विज्ञापन 14/2026)",
+   "name_en": "HPRCA Himachal Pradesh Teacher Recruitment 2026 (English, Maths, Hindi, Science & other subject teachers), Advt No. 14/2026",
+   "posts": "2,423 (15 विषय)",
+   "qualification": "विषय-अनुसार: संबंधित विषय में स्नातकोत्तर (स्नातक में 50%), B.Ed व TET; कुछ पदों पर स्नातक + B.Ed/D.El.Ed — पूरी जानकारी अधिसूचना में",
+   "age": "18–45 वर्ष (01.01.2026 को; आरक्षित वर्ग को छूट)",
+   "fee": "अधिसूचना देखें",
+   "start": "2026-11-10",
+   "last": "2026-12-05",
+   "last_note": "ऑनलाइन आवेदन hprca.hp.gov.in पर 10.11.2026 से 05.12.2026 तक; मानदेय ₹30,000 प्रति माह (योजना आधारित नियुक्ति)",
+   "exam": "लिखित स्क्रीनिंग टेस्ट (CBT/OMR) + दस्तावेज़ सत्यापन; तिथि बाद में",
+   "link": "https://hprca.hp.gov.in/advertisements",
+   "link_display": "hprca.hp.gov.in",
+   "source": "https://hprca.hp.gov.in/advertisements",
+   "source_note": "आधिकारिक विज्ञापन 14/2026 दिनांक 02.11.2026 (स्कैन PDF, तिथियाँ व आयु पेज से पढ़ी गईं); पद संख्या व योग्यता FreeJobAlert सार से",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "fee"
+   ],
+   "checked_at": "2026-11-03T08:15+05:30",
+   "category": "Teaching",
+   "state": "Himachal Pradesh"
+  },
+  {
    "id": "iaf-afcat-01-2027",
    "status": "upcoming",
    "name_hi": "भारतीय वायुसेना AFCAT 01/2027 — फ्लाइंग व ग्राउंड ड्यूटी (टेक्निकल/नॉन-टेक्निकल) अधिकारी, NCC स्पेशल एंट्री व GATE एंट्री (जनवरी 2028 कोर्स)",
@@ -1248,31 +1274,6 @@
    "checked_at": "2026-10-30T19:20+05:30",
    "category": "SSC",
    "state": "All India"
-  },
-  {
-   "id": "cg-vyapam-lecturer",
-   "status": "closed",
-   "name_hi": "छत्तीसगढ़ व्यापम (CGSSB) व्याख्याता भर्ती 2026",
-   "name_en": "CG Vyapam (CGSSB) Lecturer Recruitment 2026 (LSL26)",
-   "posts": "854 (ई संवर्ग: 424, टी संवर्ग: 430)",
-   "qualification": "संबंधित विषय में द्वितीय श्रेणी स्नातकोत्तर डिग्री व B.Ed., छ.ग. स्थानीय निवासी",
-   "age": "21–35 वर्ष (01.01.2026 को); आरक्षित वर्ग को छूट",
-   "fee": "सामान्य ₹350, OBC ₹250, SC/ST/दिव्यांग ₹200",
-   "start": "2026-09-29",
-   "last": "2026-10-26",
-   "last_note": null,
-   "exam": "29.11.2026 (संभावित, LSL26)",
-   "link": "https://vyapamcg.cgstate.gov.in",
-   "link_display": "vyapamcg.cgstate.gov.in",
-   "source": "https://vyapamcg.cgstate.gov.in/uploads/pdfs/64c01caa-f23b-4f56-ba74-346e73078581.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [
-    "qualification",
-    "age"
-   ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "Teaching",
-   "state": "Chhattisgarh"
   },
   {
    "id": "itbp-hc-esc-2026",
