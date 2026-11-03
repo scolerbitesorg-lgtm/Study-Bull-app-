@@ -1,6 +1,6 @@
 {
- "updatedAt": "3 नवंबर 2026, सुबह 8 बजे",
- "updatedAtIso": "2026-11-03T08:20+05:30",
+ "updatedAt": "3 नवंबर 2026, शाम 7 बजे",
+ "updatedAtIso": "2026-11-03T19:15+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -759,6 +759,31 @@
    "state": "Uttar Pradesh"
   },
   {
+   "id": "kea-je-civil-2026",
+   "status": "open",
+   "category": "State",
+   "state": "Karnataka",
+   "name_hi": "कर्नाटक KEA ग्रुप-C जूनियर इंजीनियर (सिविल) व समकक्ष पद भर्ती 2026 (RPC)",
+   "name_en": "KEA Group-C Junior Engineer (Civil) & Equivalent Posts Recruitment 2026 — RPC (Asst. Town Planner, JE, Draughtsman)",
+   "posts": "187 (सहायक नगर योजनाकार 105, ग्रेटर बेंगलुरु JE 46, KHB 15, KRIDL 12, भूजल 5, KSMCL 2, ड्राफ्ट्समैन 2)",
+   "qualification": "सिविल इंजीनियरिंग डिप्लोमा (पदानुसार समकक्ष योग्यता)",
+   "age": "18–40 वर्ष (2A/2B/3A/3B: 43, SC/ST/श्रेणी-1: 45 वर्ष)",
+   "fee": "अधिसूचना देखें",
+   "start": "2026-10-31",
+   "last": "2026-11-26",
+   "last_note": "ऑनलाइन आवेदन 31.10.2026 से 26.11.2026 तक, फीस 27.11.2026 तक; अनिवार्य कन्नड़ भाषा परीक्षा भी होगी; यह RPC (शेष कर्नाटक) अधिसूचना है, कल्याण-कर्नाटक (KK) की अलग",
+   "exam": "प्रतियोगी परीक्षा जनवरी 2027 (तिथि बाद में)",
+   "link": "https://cetonline.karnataka.gov.in/kea/gpcjecivilrpc2026",
+   "link_display": "cetonline.karnataka.gov.in/kea",
+   "source": "https://cetonline.karnataka.gov.in/keawebentry456/gpcjecivilrpc2026/20261031183143_RPCkannada.pdf",
+   "source_note": "आधिकारिक KEA अधिसूचना (RPC) दिनांक 31.10.2026, कन्नड़ में स्कैन — पद, योग्यता, आयु व आवेदन तिथियाँ पेज से पढ़ी गईं; परीक्षा माह FreeJobAlert से",
+   "unconfirmed": [
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-03T19:15+05:30"
+  },
+  {
    "id": "nagaland-police-constable",
    "status": "open",
    "name_hi": "नागालैंड पुलिस कांस्टेबल (GD) भर्ती 2026",
@@ -1159,6 +1184,32 @@
    "checked_at": "2026-11-03T08:15+05:30",
    "category": "Teaching",
    "state": "Himachal Pradesh"
+  },
+  {
+   "id": "hprca-radiographer-15-2026",
+   "status": "upcoming",
+   "category": "State",
+   "state": "Himachal Pradesh",
+   "name_hi": "हिमाचल प्रदेश राज्य चयन आयोग (HPRCA) रेडियोग्राफर (जॉब ट्रेनी) भर्ती 2026 (विज्ञापन 15/2026)",
+   "name_en": "HPRCA Radiographer (Job Trainee) Recruitment 2026, Advt No. 15/2026",
+   "posts": "43",
+   "qualification": "10+2 (विज्ञान) + रेडियोग्राफी/मेडिकल इमेजिंग में B.Sc; हिमाचल पैरामेडिकल काउंसिल में पंजीकरण",
+   "age": "18–45 वर्ष (01.01.2026 को; हिमाचल के आरक्षित वर्ग को 5 वर्ष छूट)",
+   "fee": "₹800 (परीक्षा ₹100 + प्रोसेसिंग ₹700)",
+   "start": "2026-11-12",
+   "last": "2026-12-07",
+   "last_note": "ऑनलाइन आवेदन hprca.hp.gov.in पर 12.11.2026 (सुबह 10 बजे) से 07.12.2026 (रात 11:59) तक; OTR पंजीकरण ज़रूरी; बाद में 4 दिन की करेक्शन विंडो",
+   "exam": "CBT/लिखित परीक्षा; तिथि बाद में",
+   "link": "https://hprca.hp.gov.in/advertisements",
+   "link_display": "hprca.hp.gov.in",
+   "source": "https://hprca.hp.gov.in/advertisements",
+   "source_note": "आधिकारिक विज्ञापन 15/2026 दिनांक 03.11.2026 (स्कैन PDF; तिथियाँ व आयु पेज से पढ़ी गईं); पद संख्या, योग्यता व फीस FreeJobAlert सार से",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "fee"
+   ],
+   "checked_at": "2026-11-03T19:15+05:30"
   },
   {
    "id": "iaf-afcat-01-2027",
