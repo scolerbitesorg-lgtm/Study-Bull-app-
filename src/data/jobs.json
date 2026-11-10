@@ -1,6 +1,6 @@
 {
- "updatedAt": "10 नवंबर 2026, रात 12 बजे",
- "updatedAtIso": "2026-11-10T00:10+05:30",
+ "updatedAt": "11 नवंबर 2026, रात 12 बजे",
+ "updatedAtIso": "2026-11-11T00:40+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -14,33 +14,6 @@
   "Other"
  ],
  "jobs": [
-  {
-   "id": "gsssb-fso-465-2026",
-   "status": "open",
-   "name_hi": "GSSSB फूड सेफ्टी ऑफिसर (वर्ग-3) भर्ती 2026 (विज्ञापन 465/202627)",
-   "name_en": "GSSSB Food Safety Officer, Class-3 Recruitment 2026 (Advt No. 465/202627)",
-   "posts": "84",
-   "qualification": "रसायन विज्ञान में परास्नातक या नियमों में दी गई विधा में डिग्री (फूड टेक/डेयरी/बायोटेक आदि); कंप्यूटर व गुजराती/हिंदी का ज्ञान",
-   "age": "18–37 वर्ष (10.11.2026 को); आरक्षित वर्ग/महिला को छूट",
-   "fee": "सामान्य ₹500; आरक्षित वर्ग ₹400 (परीक्षा देने पर वापस); फीस 13.11.2026 तक",
-   "start": "2026-10-27",
-   "last": "2026-11-10",
-   "last_note": "ऑनलाइन फीस भुगतान 13.11.2026 तक",
-   "exam": "MCQ परीक्षा (CBRT/OMR) — तारीख बाद में",
-   "link": "https://ojas.gujarat.gov.in/",
-   "link_display": "ojas.gujarat.gov.in",
-   "source": "https://gsssb.gujarat.gov.in/Notification",
-   "source_note": "आधिकारिक GSSSB सूची में विज्ञापन 465/202627 (27.10.2026) दिखा; अंतिम तिथि/योग्यता/फीस द्वितीयक स्रोत (FreeJobAlert) से — PDF यहाँ से नहीं खुली",
-   "unconfirmed": [
-    "qualification",
-    "age",
-    "fee",
-    "last"
-   ],
-   "checked_at": "2026-10-28T08:20+05:30",
-   "category": "State",
-   "state": "Gujarat"
-  },
   {
    "id": "crpf-sports-2026",
    "status": "open",
@@ -162,6 +135,32 @@
    "state": "All India"
   },
   {
+   "id": "ibps-assistant-programming-2026",
+   "status": "open",
+   "name_hi": "IBPS भर्ती 2026 — असिस्टेंट, प्रोग्रामिंग असिस्टेंट व अन्य पद (ऑक्टोबर–नवंबर)",
+   "name_en": "IBPS Recruitment 2026 — Assistant, Programming Assistant & more",
+   "posts": "अपुष्ट",
+   "qualification": "स्नातक / B.Tech / BCA (पद अनुसार)",
+   "age": "23–33 वर्ष (अपुष्ट)",
+   "fee": "₹250 (इंटिमेशन शुल्क)",
+   "start": "2026-10-29",
+   "last": "2026-11-12",
+   "last_note": "IBPS का ऑनलाइन आवेदन 12.11.2026 तक (IBPS की विज्ञापन PDF से मिलान)",
+   "exam": "अपुष्ट",
+   "link": "https://ibpsreg.ibps.in/ibpsafeb26/",
+   "link_display": "ibps.in",
+   "source": "https://www.ibps.in/wp-content/uploads/Advertisement-for-Server-Administrator-Programming-Assistant-and-Assistant-Oct._Nov.-2026.pdf",
+   "source_note": "IBPS की विज्ञापन PDF (FJA में लिंक)",
+   "unconfirmed": [
+    "posts",
+    "age",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Bank",
+   "state": "All India"
+  },
+  {
    "id": "rrb-ntpc-ug-cen07-2026",
    "status": "open",
    "name_hi": "रेलवे NTPC 12वीं लेवल (CEN 07/2026)",
@@ -181,9 +180,10 @@
     "posts",
     "age"
    ],
-   "checked_at": "2026-11-02T08:20+05:30",
+   "checked_at": "2026-11-11T00:30+05:30",
    "category": "Railway",
-   "state": "All India"
+   "state": "All India",
+   "last_note": "rrbapply.gov.in पर CEN 07/26: 15.10.2026–13.11.2026 (पुष्ट)"
   },
   {
    "id": "odisha-police-constable",
@@ -215,82 +215,6 @@
    "state": "Odisha"
   },
   {
-   "id": "isro-ursc-04-2026",
-   "status": "open",
-   "name_hi": "ISRO URSC टेक्नीशियन-B व ड्राइवर भर्ती 2026 (URSC:04:2026)",
-   "name_en": "ISRO URSC Technician-B / Heavy, Light & Staff Car Driver-A Recruitment (Advt URSC:04:2026)",
-   "posts": "61",
-   "qualification": "टेक्नीशियन-B: 10वीं + संबंधित ट्रेड में ITI/NTC/NAC; ड्राइवर: 10वीं + ड्राइविंग लाइसेंस + अनुभव",
-   "age": "18–35 वर्ष (13.11.2026 को); आरक्षित वर्ग को छूट",
-   "fee": "₹500 (परीक्षा में बैठने पर ₹400 वापस; SC/ST/PwBD/महिला/पूर्व सैनिक को पूरी वापसी)",
-   "start": "2026-10-24",
-   "last": "2026-11-13",
-   "last_note": null,
-   "exam": "लिखित परीक्षा + स्किल टेस्ट (बेंगलुरु; तारीख बाद में)",
-   "link": "https://www.isro.gov.in/URSCRecruitment13.html",
-   "link_display": "isro.gov.in",
-   "source": "https://www.isro.gov.in/media_isro/pdf/recruitmentNotice/2026/Oct/URSClAdvt2410_24102026.pdf",
-   "source_note": "आधिकारिक ISRO पेज: विज्ञापन 24.10.2026, अंतिम तिथि 13.11.2026, स्थिति Open; पदों की कुल संख्या/आयु द्वितीयक स्रोत से",
-   "unconfirmed": [
-    "posts",
-    "age"
-   ],
-   "checked_at": "2026-10-27T19:20+05:30",
-   "category": "Other",
-   "state": "All India"
-  },
-  {
-   "id": "cwc-am-je-2026",
-   "status": "open",
-   "name_hi": "केंद्रीय भंडारण निगम (CWC) असिस्टेंट मैनेजर व जूनियर एग्ज़िक्यूटिव भर्ती 2026",
-   "name_en": "Central Warehousing Corporation (CWC) Assistant Manager & Junior Executive Recruitment 2026 (Advt CWC/I-Manpower/DR/Rectt/2026/01)",
-   "posts": "327",
-   "qualification": "पद अनुसार — जूनियर एग्ज़िक्यूटिव (जनरल): किसी भी विषय में ग्रेजुएशन + कंप्यूटर ज्ञान; टेक्निकल: B.Sc (कृषि/जीव विज्ञान); असिस्टेंट मैनेजर: ग्रेजुएशन/PG (पद अनुसार)",
-   "age": "पद अनुसार (15.11.2026 को)",
-   "fee": "₹1350 (₹850 + ₹500 सूचना शुल्क); SC/ST/दिव्यांग/पूर्व सैनिक/महिला: ₹500",
-   "start": "2026-10-17",
-   "last": "2026-11-15",
-   "last_note": "ऑनलाइन आवेदन व फ़ीस 17.10.2026 से 15.11.2026 तक",
-   "exam": "ऑनलाइन टेस्ट + दस्तावेज़ जाँच (तारीख बाद में)",
-   "link": "https://www.cwceportal.com/",
-   "link_display": "cwceportal.com",
-   "source": "https://www.cwceportal.com/Careers/Guidelines/45/45_Detailed%20Advertisement_7109fe46-7e18-4b68-84a5-8b6d6708e571.pdf",
-   "source_note": "CWC का आधिकारिक विस्तृत विज्ञापन PDF (17.10.2026); कुल पद FreeJobAlert से",
-   "unconfirmed": [
-    "posts",
-    "age"
-   ],
-   "checked_at": "2026-10-27T08:50+05:30",
-   "category": "Other",
-   "state": "All India"
-  },
-  {
-   "id": "odisha-ssb-laboratory",
-   "status": "open",
-   "name_hi": "ओडिशा SSB लैबोरेटरी असिस्टेंट-कम-स्टोरकीपर भर्ती 2026",
-   "name_en": "Odisha SSB Laboratory Assistant-cum-Storekeeper Recruitment (Advt. No. 04/2026)",
-   "posts": "435",
-   "qualification": "संबंधित प्रैक्टिकल विषय में ऑनर्स सहित स्नातक डिग्री; उड़िया भाषा ज्ञान अनिवार्य",
-   "age": "21–42 वर्ष (01.01.2026 को); SC/ST/SEBC/महिला/भूतपूर्व सैनिक को 5 वर्ष, PwD को 10 वर्ष छूट",
-   "fee": "SC/ST/PwD: ₹200; अन्य सभी वर्ग: ₹500",
-   "start": "2026-10-12",
-   "last": "2026-11-16",
-   "last_note": null,
-   "exam": "लिखित परीक्षा (OMR/CBT) की तिथि बाद में घोषित",
-   "link": "https://www.ssbodisha.ac.in",
-   "link_display": "ssbodisha.ac.in",
-   "source": "https://ssbodisha.ac.in/wp-content/uploads/2026/10/Advt.-No.-04-of-2026_SSB.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [
-    "qualification",
-    "fee",
-    "exam"
-   ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "State",
-   "state": "Odisha"
-  },
-  {
    "id": "karnataka-gpstr-2026",
    "status": "open",
    "name_hi": "कर्नाटक शिक्षक भर्ती 2026 (ग्रेजुएट प्राइमरी टीचर, कक्षा 6–8)",
@@ -318,32 +242,30 @@
    "state": "Karnataka"
   },
   {
-   "id": "bhel-artisan-2027",
+   "id": "bsf-sub-inspector-2026",
    "status": "open",
-   "name_hi": "BHEL आर्टिज़न भर्ती 2027 (विज्ञापन 01/2026)",
-   "name_en": "BHEL Artisan Recruitment 2027 (Advt 01/2026)",
-   "posts": "660",
-   "qualification": "10वीं + संबंधित ट्रेड में ITI (NTC) + NAC (सामान्य/OBC 60%, SC/ST 55%)",
-   "age": "अधिकतम 27 वर्ष (01.10.2026 को), आरक्षित वर्गों को नियमानुसार छूट",
-   "fee": "₹1072 (₹600 परीक्षा + ₹400 प्रोसेसिंग + GST); SC/ST/दिव्यांग/पूर्व सैनिक: ₹472",
-   "start": "2026-10-21",
-   "last": "2026-11-18",
-   "last_note": "ऑनलाइन आवेदन careers.bhel.in पर",
-   "exam": "CBT (संभावित 11 दिसंबर 2026) + दस्तावेज़ जाँच + स्किल टेस्ट",
-   "link": "https://careers.bhel.in/",
-   "link_display": "careers.bhel.in",
-   "source": "https://careers.bhel.in/ar_2027/Artisan_Detailed%20AD.pdf",
-   "source_note": "BHEL करियर पोर्टल पर 'Artisan Recruitment – 2027' लाइव (27 Oct देखा); तारीख़/फ़ीस FreeJobAlert से — आधिकारिक PDF यहाँ से नहीं खुला",
+   "name_hi": "BSF सब-इंस्पेक्टर भर्ती 2026 (34 पद, ऑफ़लाइन)",
+   "name_en": "BSF Sub-Inspector Recruitment 2026 (34 posts, offline)",
+   "posts": "34",
+   "qualification": "12वीं / डिप्लोमा",
+   "age": "अधिकतम 56 वर्ष (नियम अनुसार) — अपुष्ट",
+   "fee": "अपुष्ट",
+   "start": "अपुष्ट",
+   "last": "2026-11-16",
+   "last_note": "ऑफ़लाइन आवेदन की अंतिम तिथि 16.11.2026 (BSF की सूचना PDF से; महानिदेशालय का मेडिकल डायरेक्टोरेट)",
+   "exam": "अपुष्ट",
+   "link": "https://www.bsf.gov.in/",
+   "link_display": "bsf.gov.in",
+   "source": "https://d3t79nicn48uzj.cloudfront.net/bsf/custom/1790339814.pdf",
+   "source_note": "BSF की सूचना PDF (FJA में लिंक); पद का नाम PDF में \"Sub-Inspector\" लिखा है",
    "unconfirmed": [
-    "posts",
     "age",
     "fee",
     "start",
-    "last",
     "exam"
    ],
-   "checked_at": "2026-10-27T08:50+05:30",
-   "category": "Other",
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Defence",
    "state": "All India"
   },
   {
@@ -369,30 +291,6 @@
     "qualification"
    ],
    "checked_at": "2026-10-31T08:40+05:30"
-  },
-  {
-   "id": "ongc-apprentice-2026",
-   "status": "open",
-   "category": "Other",
-   "state": "All India",
-   "name_hi": "ONGC अप्रेंटिस भर्ती 2026 (3047 पद) — 10वीं/12वीं/ITI/डिप्लोमा/ग्रेजुएट",
-   "name_en": "ONGC Apprentice Engagement 2026-27 (Advt No. ONGC/APPR/1/2026)",
-   "posts": "3047 (कई ट्रेड, सेक्टर व वर्क-सेंटर अनुसार)",
-   "qualification": "ट्रेड अनुसार 10वीं / 12वीं / ITI / डिप्लोमा / ग्रेजुएट; वर्क-सेंटर वाले ज़िलों का निवासी या वहीं से योग्यता प्राप्त",
-   "age": "18–24 वर्ष (जन्म 29.11.2002 से 29.11.2008 के बीच); SC/ST को 5, OBC को 3 वर्ष छूट",
-   "fee": "शुल्क का उल्लेख नहीं",
-   "start": "2026-10-29",
-   "last": "2026-11-20",
-   "last_note": "apprenticeshipindia.gov.in (ट्रेड अप्रेंटिस) / nats.education.gov.in (ग्रेजुएट/डिप्लोमा) पर रजिस्टर करके आवेदन; 12 महीने की ट्रेनिंग, मासिक स्टाइपेंड",
-   "exam": "कोई परीक्षा नहीं — योग्यता परीक्षा के अंकों से मेरिट लिस्ट",
-   "link": "https://www.ongcapprentices.ongc.co.in/",
-   "link_display": "ongcapprentices.ongc.co.in",
-   "source": "https://ongcindia.com/documents/77751/2660534/Advertisement-engagement-Apprentices2026-27.pdf/e926a825-c08b-6403-60f1-ea0232bcaab8",
-   "source_note": "ONGC का आधिकारिक विज्ञापन ONGC/APPR/1/2026 (दिनांक 29.10.2026)",
-   "unconfirmed": [
-    "fee"
-   ],
-   "checked_at": "2026-10-31T19:20+05:30"
   },
   {
    "id": "rrc-nwr-apprentice-04-2026",
@@ -438,6 +336,32 @@
    "state": "All India"
   },
   {
+   "id": "nia-inspector-si-2026",
+   "status": "open",
+   "name_hi": "NIA भर्ती 2026 — इंस्पेक्टर व सब-इंस्पेक्टर (57 पद, प्रतिनियुक्ति/ऑफ़लाइन)",
+   "name_en": "NIA Recruitment 2026 — Inspector & Sub-Inspector (57 posts, offline)",
+   "posts": "57",
+   "qualification": "स्नातक (कोई भी)",
+   "age": "अधिकतम 56 वर्ष (नियम अनुसार) — अपुष्ट",
+   "fee": "अपुष्ट",
+   "start": "2026-10-07",
+   "last": "2026-11-22",
+   "last_note": "ऑफ़लाइन आवेदन की अंतिम तिथि 22.11.2026 (NIA की सूचना से; FJA पर आधारित)",
+   "exam": "अपुष्ट",
+   "link": "https://nia.mha.gov.in/",
+   "link_display": "nia.mha.gov.in",
+   "source": "https://nia.mha.gov.in/",
+   "source_note": "NIA की भर्ती सूचना (secure PDF लिंक); तिथि FJA से मिलान",
+   "unconfirmed": [
+    "age",
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Police",
+   "state": "All India"
+  },
+  {
    "id": "upessc-tgt",
    "status": "open",
    "name_hi": "यूपी TGT सहायक अध्यापक (स्नातक वेतनक्रम) भर्ती 2026 (विज्ञापन 07/2026)",
@@ -470,14 +394,14 @@
    "fee": "₹500 (CBT देने पर ₹400 वापस); SC/ST/महिला/पूर्व सैनिक/अल्पसंख्यक/EBC: ₹250 (CBT देने पर वापस)",
    "start": "2026-10-26",
    "last": "2026-11-25",
-   "last_note": "फीस भुगतान 27.11.2026 तक; rrbapply.gov.in पर आवेदन चालू (पोर्टल: 26.10.2026 से 25.11.2026 रात 11:59)",
+   "last_note": "rrbapply.gov.in पर पोर्टल 26.10.2026–25.11.2026 (पुष्ट); फीस भुगतान 27.11.2026 तक",
    "exam": "CBT (120 मिनट, 100 प्रश्न, −1/3) + CBAT + दस्तावेज़ सत्यापन (तारीख बाद में)",
    "link": "https://www.rrbapply.gov.in/",
    "link_display": "rrbapply.gov.in",
    "source": "https://rrb.indianrailways.gov.in/-/image/1793016771817CEN_08_2026_StationMaster.pdf/examsDocuments",
    "source_note": "RRB का आधिकारिक विस्तृत CEN 08/2026 PDF (पढ़ा 26 Oct शाम)",
    "unconfirmed": [],
-   "checked_at": "2026-11-02T08:20+05:30",
+   "checked_at": "2026-11-11T00:30+05:30",
    "category": "Railway",
    "state": "All India"
   },
@@ -538,6 +462,33 @@
    "state": "All India"
   },
   {
+   "id": "sbi-so-security-2026",
+   "status": "open",
+   "name_hi": "SBI भर्ती 2026 — मैनेजर व डिप्टी मैनेजर (सिक्योरिटी) 60 पद",
+   "name_en": "SBI Recruitment 2026 — Manager & Deputy Manager (Security), 60 posts",
+   "posts": "60",
+   "qualification": "स्नातक (अपुष्ट)",
+   "age": "अपुष्ट",
+   "fee": "अपुष्ट",
+   "start": "2026-11-04",
+   "last": "2026-11-25",
+   "last_note": "ऑनलाइन आवेदन 04.11.2026 से 25.11.2026 तक (sbi.bank.in पर विज्ञापन; FJA से मिलान)",
+   "exam": "अपुष्ट",
+   "link": "https://sbi.bank.in/web/careers/current-openings",
+   "link_display": "sbi.bank.in",
+   "source": "https://sbi.bank.in/web/careers/current-openings",
+   "source_note": "SBI करियर पेज (सूची); पात्रता/शुल्क PDF से मिलान बाकी",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Bank",
+   "state": "All India"
+  },
+  {
    "id": "uppsc-ro-aro-2026",
    "status": "open",
    "name_hi": "UPPSC समीक्षा अधिकारी / सहायक समीक्षा अधिकारी (RO/ARO) भर्ती 2026 (501 पद)",
@@ -586,6 +537,61 @@
     "exam"
    ],
    "checked_at": "2026-11-03T19:15+05:30"
+  },
+  {
+   "id": "tgpsc-mpso-aso-2026",
+   "status": "open",
+   "name_hi": "तेलंगाना TGPSC मंडल योजना व सांख्यिकी अधिकारी / सहायक सांख्यिकी अधिकारी (MPSO/ASO) भर्ती 2026",
+   "name_en": "TGPSC Mandal Planning & Statistical Officer / Assistant Statistical Officer Recruitment 2026 (Notification No. 07/2026)",
+   "posts": "102",
+   "qualification": "स्नातक — सांख्यिकी मुख्य विषय, या गणित/अर्थशास्त्र/कॉमर्स के साथ सांख्यिकी एक पेपर",
+   "age": "18–44 वर्ष; आरक्षित वर्ग को छूट",
+   "fee": "आवेदन शुल्क ₹1,000 (OC/BC), ₹500 (SC/ST/दिव्यांग) + परीक्षा शुल्क ₹80 (बेरोज़गार को छूट)",
+   "start": "2026-10-30",
+   "last": "2026-11-27",
+   "last_note": "27 नवंबर 2026, शाम 5 बजे तक",
+   "exam": "जनवरी 2027 (संभावित) — पेपर I सामान्य अध्ययन + पेपर II सांख्यिकी (150-150 प्रश्न)",
+   "link": "https://www.tgpsc.gov.in/",
+   "link_display": "tgpsc.gov.in",
+   "source": "https://websitenew.tgpsc.gov.in/preview/RElSRUNUUkVDUlVJVE1FTlROT1RJLzA3LUctMjAyNi1NUFNPLU5PVElGTjIwMjYxMDI4MjI1NDE2LnBkZg==r95v17a0y2d8i13v",
+   "source_note": "TGPSC अधिसूचना (28.10.2026) — विवरण FreeJobAlert से; आधिकारिक PDF यहाँ से नहीं खुली",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee",
+    "start",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "State",
+   "state": "Telangana"
+  },
+  {
+   "id": "cgssb-assistant-stenographer-2026",
+   "status": "open",
+   "name_hi": "छत्तीसगढ़ कर्मचारी चयन मंडल (CGSSB) — सहायक, स्टेनोग्राफ़र व अन्य पद (1,703)",
+   "name_en": "CGSSB Recruitment 2026 — Assistant, Stenographer & more (1,703 posts)",
+   "posts": "1,703",
+   "qualification": "स्नातक",
+   "age": "अपुष्ट",
+   "fee": "वर्ग अनुसार — अपुष्ट",
+   "start": "2026-11-05",
+   "last": "2026-11-27",
+   "last_note": "ऑनलाइन आवेदन 05.11.2026 से 27.11.2026 तक (CGSSB सूचना से; FJA पर आधारित)",
+   "exam": "अपुष्ट",
+   "link": "https://cgssb.cgstate.gov.in",
+   "link_display": "cgssb.cgstate.gov.in",
+   "source": "https://cgssb.cgstate.gov.in",
+   "source_note": "CGSSB की सूचना; पद/तारीख द्वितीयक स्रोत से",
+   "unconfirmed": [
+    "age",
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "State",
+   "state": "Chhattisgarh"
   },
   {
    "id": "nagaland-police-constable",
@@ -680,6 +686,79 @@
    "state": "Uttar Pradesh"
   },
   {
+   "id": "upsssc-store-keeper-2026",
+   "status": "open",
+   "name_hi": "UPSSSC स्टोर कीपर-कम-क्लर्क, फार्म क्लर्क व अन्य पद (अधीनस्थ — इंटरमीडिएट स्तर) 2026",
+   "name_en": "UPSSSC Store Keeper cum Clerk, Farm Clerk and more (Intermediate level) 2026",
+   "posts": "1,784",
+   "qualification": "12वीं",
+   "age": "18–40 वर्ष",
+   "fee": "₹25 ऑनलाइन प्रोसेसिंग शुल्क (सभी श्रेणी)",
+   "start": "2026-11-10",
+   "last": "2026-12-01",
+   "last_note": "ऑनलाइन आवेदन 10.11.2026 से 01.12.2026 तक (द्वितीयक स्रोत से; UPSSSC पर सूचना सूची में देखें)",
+   "exam": "लिखित परीक्षा — तारीख बाद में",
+   "link": "https://upsssc.gov.in/AllNotifications.aspx",
+   "link_display": "upsssc.gov.in",
+   "source": "https://upsssc.gov.in/AllNotifications.aspx",
+   "source_note": "UPSSSC की अधिसूचना सूची; पद/तारीख FJA से मिलान",
+   "unconfirmed": [
+    "exam",
+    "last"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "State",
+   "state": "Uttar Pradesh"
+  },
+  {
+   "id": "rrc-central-railway-act-apprentice-2026",
+   "status": "open",
+   "name_hi": "RRC मध्य रेलवे — एक्ट अप्रेंटिस भर्ती 2026 (2,861 पद)",
+   "name_en": "RRC Central Railway Act Apprentice 2026 (2,861 posts)",
+   "posts": "2,861",
+   "qualification": "ITI",
+   "age": "15–24 वर्ष",
+   "fee": "₹100 (छूट लागू)",
+   "start": "2026-11-03",
+   "last": "2026-12-02",
+   "last_note": "ऑनलाइन आवेदन 03.11.2026 से 02.12.2026 तक (RRC मध्य रेलवे की सूचना PDF से)",
+   "exam": "मेरिट (ITI अंक) — अपुष्ट",
+   "link": "https://rrccr.com",
+   "link_display": "rrccr.com",
+   "source": "https://rrccr.com/rrwc/Files/7131ab94-6fc8-45c1-a2ed-f9191914dcbd.pdf",
+   "source_note": "RRC मध्य रेलवे की सूचना PDF (FJA में लिंक)",
+   "unconfirmed": [
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Railway",
+   "state": "Maharashtra"
+  },
+  {
+   "id": "rrb-isolated-cen09-2026",
+   "status": "open",
+   "name_hi": "RRB आइसोलेटेड कैटेगरी भर्ती 2026 (CEN 09/2026)",
+   "name_en": "RRB Various Posts of Isolated Categories, CEN 09/2026 (Indicative Notice)",
+   "posts": "191",
+   "qualification": "पद के अनुसार — विस्तृत CEN देखें",
+   "age": "विस्तृत CEN के अनुसार (आयु 01.01.2027 को)",
+   "fee": "विस्तृत CEN में घोषित होगी",
+   "start": "2026-11-05",
+   "last": "2026-12-04",
+   "last_note": "rrbapply.gov.in पर CEN 09/26: 05.11.2026 से 04.12.2026 (पोर्टल पर पुष्ट); पदों की संख्या FJA के अनुसार 191",
+   "exam": "विस्तृत CEN में घोषित होगी",
+   "link": "https://rrb.indianrailways.gov.in/",
+   "link_display": "rrb.indianrailways.gov.in",
+   "source": "https://img2.freejobalert.com/news/2026/10/54855656-6ad88c652ef0f65729859.pdf",
+   "source_note": "Copy of RRB indicative notice No. RRB/GHY/Advt./CEN/09/2026 dated 24/10/2026 (pay level 2 & 7; dates tentative); detailed CEN not yet on RRB sites",
+   "unconfirmed": [
+    "posts"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Railway",
+   "state": "All India"
+  },
+  {
    "id": "hprca-teacher-14-2026",
    "status": "open",
    "name_hi": "हिमाचल प्रदेश राज्य चयन आयोग (HPRCA) शिक्षक भर्ती 2026 — CBSE/सरकारी स्कूल (विज्ञापन 14/2026)",
@@ -704,6 +783,87 @@
    "checked_at": "2026-11-03T08:15+05:30",
    "category": "Teaching",
    "state": "Himachal Pradesh"
+  },
+  {
+   "id": "osssc-ophthalmic-officer-2026",
+   "status": "open",
+   "name_hi": "OSSSC नेत्र अधिकारी (Ophthalmic Officer) भर्ती 2026 — स्वास्थ्य विभाग, ओडिशा (ज़िला कैडर ग्रुप-C)",
+   "name_en": "OSSSC Ophthalmic Officer Recruitment 2026 (Advt No. IIE-103/2026-3226/OSSSC dt 30.10.2026)",
+   "posts": "238 (29 ज़िला प्रतिष्ठान)",
+   "qualification": "विस्तृत विज्ञापन में आएगा",
+   "age": "विस्तृत विज्ञापन में आएगा",
+   "fee": "विस्तृत विज्ञापन में आएगा",
+   "start": "2026-11-05",
+   "last": "2026-12-05",
+   "last_note": "ऑनलाइन — पंजीकरण 5 से 29 नवंबर, आवेदन जमा 5 दिसंबर 2026 तक (लघु विज्ञापन के अनुसार; विस्तृत विज्ञापन बाकी)",
+   "exam": "विस्तृत विज्ञापन में आएगा",
+   "link": "https://www.osssc.gov.in/",
+   "link_display": "osssc.gov.in",
+   "source": "https://www.osssc.gov.in/",
+   "source_note": "विज्ञापन संख्या व तारीख osssc.gov.in 'Recruitment News' पर पुष्ट (30.10.2026); पद व तिथियाँ FreeJobAlert के लघु-विज्ञापन सारांश से — आधिकारिक PDF अभी नहीं पढ़ा",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "age",
+    "fee",
+    "start",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "State",
+   "state": "Odisha"
+  },
+  {
+   "id": "bihar-vidhan-sabha-jsa-2026",
+   "status": "open",
+   "name_hi": "बिहार विधान सभा — जूनियर सचिवालय सहायक भर्ती 2026 (15 पद)",
+   "name_en": "Bihar Vidhan Sabha Junior Secretariat Assistant Recruitment 2026 (15 posts)",
+   "posts": "15",
+   "qualification": "12वीं / इंटरमीडिएट",
+   "age": "18–37 वर्ष",
+   "fee": "₹600 / ₹150 (श्रेणी व निवास के अनुसार)",
+   "start": "2026-11-07",
+   "last": "2026-12-06",
+   "last_note": "ऑनलाइन आवेदन 07.11.2026 से 06.12.2026 तक (विधान सभा की विज्ञापन सं. 01/2026 PDF से)",
+   "exam": "अपुष्ट",
+   "link": "https://vidhansabha.bihar.gov.in/",
+   "link_display": "vidhansabha.bihar.gov.in",
+   "source": "https://vidhansabha.bihar.gov.in/pdf/recruitment/2026/Advertisment/Advertisemnt%20No-01-2026%20(Junior%20Secretariat%20Assistant).pdf",
+   "source_note": "बिहार विधान सभा की विज्ञापन सं. 01/2026 PDF (FJA में लिंक)",
+   "unconfirmed": [
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "State",
+   "state": "Bihar"
+  },
+  {
+   "id": "rrc-northern-railway-scouts-guides-2026",
+   "status": "open",
+   "name_hi": "RRC उत्तर रेलवे — स्काउट्स व गाइड्स कोटा भर्ती 2026 (27 पद)",
+   "name_en": "RRC Northern Railway Scouts & Guides Quota Recruitment 2026 (27 posts)",
+   "posts": "27",
+   "qualification": "ITI / 12वीं / 10वीं (पद अनुसार)",
+   "age": "अपुष्ट",
+   "fee": "अपुष्ट",
+   "start": "अपुष्ट",
+   "last": "2026-12-06",
+   "last_note": "आवेदन की अंतिम तिथि 06.12.2026 (FJA के अनुसार; सूचना PDF से मिलान)",
+   "exam": "स्पोर्ट्स/स्काउट्स कोटा — चयन नियम PDF में",
+   "link": "https://rrcnr.org",
+   "link_display": "rrcnr.org",
+   "source": "https://rrcnr.org/downloads/S&G_Quota_Notification_2026.pdf",
+   "source_note": "RRC उत्तर रेलवे की S&G कोटा सूचना PDF (FJA में लिंक)",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee",
+    "start"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Railway",
+   "state": "Delhi"
   },
   {
    "id": "cg-police-sukma-bastar-fighter-2026",
@@ -877,77 +1037,22 @@
    "state": "Chhattisgarh"
   },
   {
-   "id": "tgpsc-mpso-aso-2026",
-   "status": "upcoming",
-   "name_hi": "तेलंगाना TGPSC मंडल योजना व सांख्यिकी अधिकारी / सहायक सांख्यिकी अधिकारी (MPSO/ASO) भर्ती 2026",
-   "name_en": "TGPSC Mandal Planning & Statistical Officer / Assistant Statistical Officer Recruitment 2026 (Notification No. 07/2026)",
-   "posts": "102",
-   "qualification": "स्नातक — सांख्यिकी मुख्य विषय, या गणित/अर्थशास्त्र/कॉमर्स के साथ सांख्यिकी एक पेपर",
-   "age": "18–44 वर्ष; आरक्षित वर्ग को छूट",
-   "fee": "आवेदन शुल्क ₹1,000 (OC/BC), ₹500 (SC/ST/दिव्यांग) + परीक्षा शुल्क ₹80 (बेरोज़गार को छूट)",
-   "start": "2026-10-30",
-   "last": "2026-11-27",
-   "last_note": "27 नवंबर 2026, शाम 5 बजे तक",
-   "exam": "जनवरी 2027 (संभावित) — पेपर I सामान्य अध्ययन + पेपर II सांख्यिकी (150-150 प्रश्न)",
-   "link": "https://www.tgpsc.gov.in/",
-   "link_display": "tgpsc.gov.in",
-   "source": "https://websitenew.tgpsc.gov.in/preview/RElSRUNUUkVDUlVJVE1FTlROT1RJLzA3LUctMjAyNi1NUFNPLU5PVElGTjIwMjYxMDI4MjI1NDE2LnBkZg==r95v17a0y2d8i13v",
-   "source_note": "TGPSC अधिसूचना (28.10.2026) — विवरण FreeJobAlert से; आधिकारिक PDF यहाँ से नहीं खुली",
-   "unconfirmed": [
-    "qualification",
-    "age",
-    "fee",
-    "start",
-    "last",
-    "exam"
-   ],
-   "checked_at": "2026-10-29T19:50+05:30",
-   "category": "State",
-   "state": "Telangana"
-  },
-  {
-   "id": "rrb-isolated-cen09-2026",
-   "status": "upcoming",
-   "name_hi": "RRB आइसोलेटेड कैटेगरी भर्ती 2026 (CEN 09/2026)",
-   "name_en": "RRB Various Posts of Isolated Categories, CEN 09/2026 (Indicative Notice)",
-   "posts": "लगभग 195 (सभी RRB, अस्थायी)",
-   "qualification": "पद के अनुसार — विस्तृत CEN देखें",
-   "age": "विस्तृत CEN के अनुसार (आयु 01.01.2027 को)",
-   "fee": "विस्तृत CEN में घोषित होगी",
-   "start": "2026-11-05",
-   "last": "2026-12-04",
-   "last_note": "सूचना में दोनों तारीखें 'अस्थायी (Tentative)' लिखी हैं",
-   "exam": "विस्तृत CEN में घोषित होगी",
-   "link": "https://rrb.indianrailways.gov.in/",
-   "link_display": "rrb.indianrailways.gov.in",
-   "source": "https://img2.freejobalert.com/news/2026/10/54855656-6ad88c652ef0f65729859.pdf",
-   "source_note": "Copy of RRB indicative notice No. RRB/GHY/Advt./CEN/09/2026 dated 24/10/2026 (pay level 2 & 7; dates tentative); detailed CEN not yet on RRB sites",
-   "unconfirmed": [
-    "qualification",
-    "start",
-    "last"
-   ],
-   "checked_at": "2026-10-25T19:45+05:30",
-   "category": "Railway",
-   "state": "All India"
-  },
-  {
-   "id": "osssc-ophthalmic-officer-2026",
-   "status": "upcoming",
-   "name_hi": "OSSSC नेत्र अधिकारी (Ophthalmic Officer) भर्ती 2026 — स्वास्थ्य विभाग, ओडिशा (ज़िला कैडर ग्रुप-C)",
-   "name_en": "OSSSC Ophthalmic Officer Recruitment 2026 (Advt No. IIE-103/2026-3226/OSSSC dt 30.10.2026)",
-   "posts": "238 (29 ज़िला प्रतिष्ठान)",
-   "qualification": "विस्तृत विज्ञापन में आएगा",
-   "age": "विस्तृत विज्ञापन में आएगा",
-   "fee": "विस्तृत विज्ञापन में आएगा",
-   "start": "2026-11-05",
-   "last": "2026-12-05",
-   "last_note": "ऑनलाइन — पंजीकरण 5 से 29 नवंबर, आवेदन जमा 5 दिसंबर 2026 तक (लघु विज्ञापन के अनुसार; विस्तृत विज्ञापन बाकी)",
-   "exam": "विस्तृत विज्ञापन में आएगा",
-   "link": "https://www.osssc.gov.in/",
-   "link_display": "osssc.gov.in",
-   "source": "https://www.osssc.gov.in/",
-   "source_note": "विज्ञापन संख्या व तारीख osssc.gov.in 'Recruitment News' पर पुष्ट (30.10.2026); पद व तिथियाँ FreeJobAlert के लघु-विज्ञापन सारांश से — आधिकारिक PDF अभी नहीं पढ़ा",
+   "id": "manipur-police-2026",
+   "status": "open",
+   "name_hi": "मणिपुर पुलिस भर्ती 2026 — कांस्टेबल, सब-इंस्पेक्टर व अन्य पद",
+   "name_en": "Manipur Police Recruitment 2026 — Constable, SI and other posts",
+   "posts": "2,698",
+   "qualification": "10वीं",
+   "age": "अपुष्ट",
+   "fee": "अपुष्ट",
+   "start": null,
+   "last": "2026-12-20",
+   "last_note": "आवेदन की अंतिम तिथि 20.12.2026 (द्वितीयक स्रोत से; मणिपुर पुलिस की साइट पर पुष्टि बाकी)",
+   "exam": "अपुष्ट",
+   "link": "https://manipurpolice.gov.in/",
+   "link_display": "manipurpolice.gov.in",
+   "source": "https://manipurpolice.gov.in/",
+   "source_note": "FreeJobAlert सूची/लेख से; आधिकारिक PDF/तिथि इस रन में पढ़ी नहीं जा सकीं",
    "unconfirmed": [
     "posts",
     "qualification",
@@ -957,9 +1062,36 @@
     "last",
     "exam"
    ],
-   "checked_at": "2026-11-01T08:30+05:30",
-   "category": "State",
-   "state": "Odisha"
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Police",
+   "state": "Manipur"
+  },
+  {
+   "id": "nia-deo-asi-hc-2026",
+   "status": "open",
+   "name_hi": "NIA भर्ती 2026 — DEO, ASI व हेड कॉन्स्टेबल (111 पद)",
+   "name_en": "NIA Recruitment 2026 — DEO, ASI, Head Constable (111 posts)",
+   "posts": "111",
+   "qualification": "स्नातक / 12वीं (पद अनुसार)",
+   "age": "अपुष्ट",
+   "fee": "अपुष्ट",
+   "start": "2026-10-24",
+   "last": "2026-12-20",
+   "last_note": "आवेदन की अंतिम तिथि 20.12.2026 (NIA सूचना से; FJA पर आधारित)",
+   "exam": "अपुष्ट",
+   "link": "https://nia.mha.gov.in/",
+   "link_display": "nia.mha.gov.in",
+   "source": "https://nia.mha.gov.in/",
+   "source_note": "NIA की भर्ती सूचना; तिथियाँ/पात्रता FJA से — PDF से मिलान बाकी",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Police",
+   "state": "All India"
   },
   {
    "id": "hprca-radiographer-15-2026",
@@ -985,7 +1117,7 @@
     "qualification",
     "fee"
    ],
-   "checked_at": "2026-11-03T19:15+05:30"
+   "checked_at": "2026-11-11T00:30+05:30"
   },
   {
    "id": "iaf-afcat-01-2027",
@@ -1015,6 +1147,30 @@
    "checked_at": "2026-11-02T19:25+05:30",
    "category": "Defence",
    "state": "All India"
+  },
+  {
+   "id": "dsssb-06-2026-je-mts",
+   "status": "upcoming",
+   "name_hi": "DSSSB भर्ती 2026 (विज्ञापन 06/2026) — जूनियर इंजीनियर व मल्टी-टास्किंग स्टाफ़ (MTS)",
+   "name_en": "DSSSB Advt 06/2026 — Junior Engineer & Multi-Tasking Staff (MTS)",
+   "posts": "1,260",
+   "qualification": "JE: B.Tech/B.E/डिप्लोमा; MTS: 10वीं/ITI",
+   "age": "18–32 वर्ष",
+   "fee": "₹100 (आरक्षित/छूट वाले वर्ग के लिए छूट)",
+   "start": "2026-11-12",
+   "last": "2026-12-11",
+   "last_note": "ऑनलाइन आवेदन 12.11.2026 से 11.12.2026 (दिल्ली अधीनस्थ सेवा बोर्ड की सूचना PDF से)",
+   "exam": "अपुष्ट",
+   "link": "https://dsssbonline.nic.in/",
+   "link_display": "dsssbonline.nic.in",
+   "source": "https://dsssb.delhi.gov.in/sites/default/files/DSSSB/circulars-orders/final_advt_06_2026_j_e_electrical_mts_1.pdf",
+   "source_note": "DSSSB की advt 06/2026 PDF (FJA में लिंक); तिथियाँ PDF से मिलान बाकी",
+   "unconfirmed": [
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "State",
+   "state": "Delhi"
   },
   {
    "id": "upsc-nda1-2027",
@@ -1101,33 +1257,6 @@
    "checked_at": "2026-10-30T19:20+05:30",
    "category": "SSC",
    "state": "All India"
-  },
-  {
-   "id": "bpsc-tre-40",
-   "status": "closed",
-   "name_hi": "बिहार BPSC शिक्षक भर्ती (TRE 4.0)",
-   "name_en": "BPSC TRE-4.0 School Teacher Recruitment 2026 (Advt No. 14/2026)",
-   "posts": "32,388",
-   "qualification": "स्कूल स्तरानुसार NCTE/RCI मान्यता प्राप्त योग्यता; CTET/BTET/STET अनिवार्य",
-   "age": "18–42 वर्ष (न्यूनतम 01.08.2026, अधिकतम 01.08.2024 के अनुसार)",
-   "fee": "₹100 (सभी वर्ग)",
-   "start": "2026-09-25",
-   "last": "2026-11-03",
-   "last_note": "26 अक्टूबर से बढ़ाकर 3 नवंबर 2026 (फीस भुगतान 2 नवंबर तक)",
-   "exam": "बाद में घोषित",
-   "link": "https://bpsconline.bihar.gov.in/",
-   "link_display": "bpsconline.bihar.gov.in",
-   "source": "https://timesofindia.indiatimes.com/education/news/bpsc-tre-4-0-recruitment-2026-application-deadline-extended-for-33320-vacancies-candidates-can-apply-till-november-3/articleshow/135213254.cms",
-   "source_note": "BPSC की वेबसाइट पर 26.10.2026 का नोटिस: \"TRE 4.0 - Online Application Date has been extended\" (Advt 15/2026); नई तारीख 3 नवंबर TOI/News18 से",
-   "unconfirmed": [
-    "qualification",
-    "age",
-    "fee",
-    "last"
-   ],
-   "checked_at": "2026-10-29T19:50+05:30",
-   "category": "Teaching",
-   "state": "Bihar"
   },
   {
    "id": "upessc-primary-assistant",
@@ -1299,13 +1428,11 @@
    "link_display": "rrbapply.gov.in",
    "source": "https://www.rrbapply.gov.in/ + CEN 06/2026 official PDF",
    "source_note": "Dates on rrbapply.gov.in; posts/age/fee from the official CEN PDF",
-   "unconfirmed": [
-    "last"
-   ],
-   "checked_at": "2026-11-10T00:10+05:30",
+   "unconfirmed": [],
+   "checked_at": "2026-11-11T00:30+05:30",
    "category": "Railway",
    "state": "All India",
-   "last_note": "अंतिम तिथि 8 नवंबर 2026 (पहले 6 नवंबर लिखी थी) — तीसरे-पक्ष रिपोर्ट से; rrbapply पर पुष्टि बाकी"
+   "last_note": "rrbapply.gov.in पर CEN 06/26 की अवधि 08.11.2026 (23:59) तक बढ़ी — बंद"
   },
   {
    "id": "wbpsc-sub-surveyor",
@@ -1328,6 +1455,33 @@
    "checked_at": "2026-10-25T08:10+05:30",
    "category": "State",
    "state": "West Bengal"
+  },
+  {
+   "id": "gsssb-fso-465-2026",
+   "status": "closed",
+   "name_hi": "GSSSB फूड सेफ्टी ऑफिसर (वर्ग-3) भर्ती 2026 (विज्ञापन 465/202627)",
+   "name_en": "GSSSB Food Safety Officer, Class-3 Recruitment 2026 (Advt No. 465/202627)",
+   "posts": "84",
+   "qualification": "रसायन विज्ञान में परास्नातक या नियमों में दी गई विधा में डिग्री (फूड टेक/डेयरी/बायोटेक आदि); कंप्यूटर व गुजराती/हिंदी का ज्ञान",
+   "age": "18–37 वर्ष (10.11.2026 को); आरक्षित वर्ग/महिला को छूट",
+   "fee": "सामान्य ₹500; आरक्षित वर्ग ₹400 (परीक्षा देने पर वापस); फीस 13.11.2026 तक",
+   "start": "2026-10-27",
+   "last": "2026-11-10",
+   "last_note": "ऑनलाइन फीस भुगतान 13.11.2026 तक",
+   "exam": "MCQ परीक्षा (CBRT/OMR) — तारीख बाद में",
+   "link": "https://ojas.gujarat.gov.in/",
+   "link_display": "ojas.gujarat.gov.in",
+   "source": "https://gsssb.gujarat.gov.in/Notification",
+   "source_note": "आधिकारिक GSSSB सूची में विज्ञापन 465/202627 (27.10.2026) दिखा; अंतिम तिथि/योग्यता/फीस द्वितीयक स्रोत (FreeJobAlert) से — PDF यहाँ से नहीं खुली",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee",
+    "last"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "State",
+   "state": "Gujarat"
   }
  ]
 }
