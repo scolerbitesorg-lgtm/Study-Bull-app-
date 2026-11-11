@@ -2178,7 +2178,7 @@ export default function App() {
                         className="group relative bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex flex-col items-start justify-between text-left overflow-hidden h-36 active:scale-98"
                       >
                         <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5">
-                              <span className="px-1.5 py-0.5 bg-emerald-600 text-white text-[9px] font-extrabold rounded-md leading-none">NEW</span>
+                              <span className="px-1.5 py-0.5 bg-emerald-700 text-white text-[9px] font-extrabold rounded-md leading-none">NEW</span>
                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
                         </div>
 
