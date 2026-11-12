@@ -1,6 +1,6 @@
 {
- "updatedAt": "12 नवंबर 2026, दोपहर 12:10 बजे",
- "updatedAtIso": "2026-11-12T12:10+05:30",
+ "updatedAt": "12 नवंबर 2026, रात 8:10 बजे",
+ "updatedAtIso": "2026-11-12T20:10+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -223,6 +223,32 @@
    "checked_at": "2026-10-31T08:40+05:30"
   },
   {
+   "id": "nia-inspector-si-2026",
+   "status": "open",
+   "name_hi": "NIA भर्ती 2026 — इंस्पेक्टर व सब-इंस्पेक्टर (57 पद, प्रतिनियुक्ति/ऑफ़लाइन)",
+   "name_en": "NIA Recruitment 2026 — Inspector & Sub-Inspector (57 posts, offline)",
+   "posts": "57",
+   "qualification": "स्नातक (कोई भी)",
+   "age": "अधिकतम 56 वर्ष (नियम अनुसार) — अपुष्ट",
+   "fee": "अपुष्ट",
+   "start": "2026-10-07",
+   "last": "2026-11-22",
+   "last_note": "ऑफ़लाइन आवेदन की अंतिम तिथि 22.11.2026 (NIA की सूचना से; FJA पर आधारित)",
+   "exam": "अपुष्ट",
+   "link": "https://nia.mha.gov.in/",
+   "link_display": "nia.mha.gov.in",
+   "source": "https://nia.mha.gov.in/",
+   "source_note": "NIA की भर्ती सूचना (secure PDF लिंक); तिथि FJA से मिलान",
+   "unconfirmed": [
+    "age",
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-11T00:30+05:30",
+   "category": "Police",
+   "state": "All India"
+  },
+  {
    "id": "rrc-nwr-apprentice-04-2026",
    "status": "open",
    "name_hi": "RRC जयपुर (उत्तर पश्चिम रेलवे) अप्रेंटिस भर्ती 2026",
@@ -266,32 +292,6 @@
    "state": "All India"
   },
   {
-   "id": "nia-inspector-si-2026",
-   "status": "open",
-   "name_hi": "NIA भर्ती 2026 — इंस्पेक्टर व सब-इंस्पेक्टर (57 पद, प्रतिनियुक्ति/ऑफ़लाइन)",
-   "name_en": "NIA Recruitment 2026 — Inspector & Sub-Inspector (57 posts, offline)",
-   "posts": "57",
-   "qualification": "स्नातक (कोई भी)",
-   "age": "अधिकतम 56 वर्ष (नियम अनुसार) — अपुष्ट",
-   "fee": "अपुष्ट",
-   "start": "2026-10-07",
-   "last": "2026-11-22",
-   "last_note": "ऑफ़लाइन आवेदन की अंतिम तिथि 22.11.2026 (NIA की सूचना से; FJA पर आधारित)",
-   "exam": "अपुष्ट",
-   "link": "https://nia.mha.gov.in/",
-   "link_display": "nia.mha.gov.in",
-   "source": "https://nia.mha.gov.in/",
-   "source_note": "NIA की भर्ती सूचना (secure PDF लिंक); तिथि FJA से मिलान",
-   "unconfirmed": [
-    "age",
-    "fee",
-    "exam"
-   ],
-   "checked_at": "2026-11-11T00:30+05:30",
-   "category": "Police",
-   "state": "All India"
-  },
-  {
    "id": "upessc-tgt",
    "status": "open",
    "name_hi": "यूपी TGT सहायक अध्यापक (स्नातक वेतनक्रम) भर्ती 2026 (विज्ञापन 07/2026)",
@@ -312,6 +312,36 @@
    "checked_at": "2026-10-25T08:10+05:30",
    "category": "Teaching",
    "state": "Uttar Pradesh"
+  },
+  {
+   "id": "apssb-mts-93-2026",
+   "status": "open",
+   "name_hi": "अरुणाचल प्रदेश कर्मचारी चयन बोर्ड (APSSB) — मल्टी टास्किंग स्टाफ (MTS) भर्ती 2026",
+   "name_en": "APSSB Multi Tasking Staff (MTS) Recruitment 2026 (93 posts)",
+   "posts": "93 (अपुष्ट)",
+   "qualification": "कक्षा 10 / ITI (अपुष्ट)",
+   "age": "18–35 वर्ष (अपुष्ट)",
+   "fee": "₹150 (PwD/PwBD छूट) (अपुष्ट)",
+   "start": "2026-11-09",
+   "last": "2026-11-23",
+   "last_note": "ऑनलाइन आवेदन 9 नवंबर (दोपहर 3 बजे) से 23 नवंबर 2026 (दोपहर 3 बजे) तक — FreeJobAlert से; आधिकारिक साइट apssb.gov.in इस रन में नहीं खुली। लिखित परीक्षा अनुमानित 20 दिसंबर 2026 (अपुष्ट)",
+   "exam": "लिखित परीक्षा (ऑब्जेक्टिव) — तिथि अनुमानित 20 दिसंबर 2026 (अपुष्ट)",
+   "link": "https://apssb.gov.in/",
+   "link_display": "apssb.gov.in",
+   "source": "https://www.freejobalert.com/articles/apssb-mts-recruitment-2026-3073601",
+   "source_note": "सेकेंडरी स्रोत (FreeJobAlert, 12 नवंबर); आधिकारिक APSSB साइट पर जाँच बाकी",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "age",
+    "fee",
+    "start",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-11-12T20:10+05:30",
+   "category": "State",
+   "state": "Arunachal Pradesh"
   },
   {
    "id": "rrb-station-master-cen08-2026",
@@ -550,6 +580,35 @@
    "state": "Chhattisgarh"
   },
   {
+   "id": "gsssb-sub-registrar-1237-2026",
+   "status": "open",
+   "name_hi": "गुजरात GSSSB — सब रजिस्ट्रार, सहायक ट्राइबल डेवलपमेंट ऑफ़िसर व अन्य भर्ती (1,237 पद)",
+   "name_en": "GSSSB Sub Registrar, Assistant Tribal Development Officer & more (1,237 posts, Advt 468/202627)",
+   "posts": "1,237 (अपुष्ट)",
+   "qualification": "कोई भी स्नातक (Any Bachelor's Degree) (अपुष्ट)",
+   "age": "अधिसूचना देखें",
+   "fee": "अधिसूचना देखें",
+   "start": null,
+   "last": "2026-11-30",
+   "last_note": "आवेदन की अंतिम तिथि 30 नवंबर 2026 — FreeJobAlert सूची (4 नवंबर की पोस्ट); GSSSB साइट इस रन में नहीं खुली",
+   "exam": "अधिसूचना देखें (अपुष्ट)",
+   "link": "https://gsssb.gujarat.gov.in/",
+   "link_display": "gsssb.gujarat.gov.in",
+   "source": "https://www.freejobalert.com/latest-notifications/",
+   "source_note": "सेकेंडरी स्रोत (FreeJobAlert सूची, 12 नवंबर); आधिकारिक GSSSB विज्ञापन पर जाँच बाकी",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "age",
+    "fee",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-11-12T20:10+05:30",
+   "category": "State",
+   "state": "Gujarat"
+  },
+  {
    "id": "nagaland-police-constable",
    "status": "open",
    "name_hi": "नागालैंड पुलिस कांस्टेबल (GD) भर्ती 2026",
@@ -715,32 +774,6 @@
    "state": "All India"
   },
   {
-   "id": "hprca-teacher-14-2026",
-   "status": "open",
-   "name_hi": "हिमाचल प्रदेश राज्य चयन आयोग (HPRCA) शिक्षक भर्ती 2026 — CBSE/सरकारी स्कूल (विज्ञापन 14/2026)",
-   "name_en": "HPRCA Himachal Pradesh Teacher Recruitment 2026 (English, Maths, Hindi, Science & other subject teachers), Advt No. 14/2026",
-   "posts": "2,423 (15 विषय)",
-   "qualification": "विषय-अनुसार: संबंधित विषय में स्नातकोत्तर (स्नातक में 50%), B.Ed व TET; कुछ पदों पर स्नातक + B.Ed/D.El.Ed — पूरी जानकारी अधिसूचना में",
-   "age": "18–45 वर्ष (01.01.2026 को; आरक्षित वर्ग को छूट)",
-   "fee": "अधिसूचना देखें",
-   "start": "2026-11-10",
-   "last": "2026-12-05",
-   "last_note": "ऑनलाइन आवेदन hprca.hp.gov.in पर 10.11.2026 से 05.12.2026 तक; मानदेय ₹30,000 प्रति माह (योजना आधारित नियुक्ति)",
-   "exam": "लिखित स्क्रीनिंग टेस्ट (CBT/OMR) + दस्तावेज़ सत्यापन; तिथि बाद में",
-   "link": "https://hprca.hp.gov.in/advertisements",
-   "link_display": "hprca.hp.gov.in",
-   "source": "https://hprca.hp.gov.in/advertisements",
-   "source_note": "आधिकारिक विज्ञापन 14/2026 दिनांक 02.11.2026 (स्कैन PDF, तिथियाँ व आयु पेज से पढ़ी गईं); पद संख्या व योग्यता FreeJobAlert सार से",
-   "unconfirmed": [
-    "posts",
-    "qualification",
-    "fee"
-   ],
-   "checked_at": "2026-11-03T08:15+05:30",
-   "category": "Teaching",
-   "state": "Himachal Pradesh"
-  },
-  {
    "id": "osssc-ophthalmic-officer-2026",
    "status": "open",
    "name_hi": "OSSSC नेत्र अधिकारी (Ophthalmic Officer) भर्ती 2026 — स्वास्थ्य विभाग, ओडिशा (ज़िला कैडर ग्रुप-C)",
@@ -769,6 +802,32 @@
    "checked_at": "2026-11-11T00:30+05:30",
    "category": "State",
    "state": "Odisha"
+  },
+  {
+   "id": "hprca-teacher-14-2026",
+   "status": "open",
+   "name_hi": "हिमाचल प्रदेश राज्य चयन आयोग (HPRCA) शिक्षक भर्ती 2026 — CBSE/सरकारी स्कूल (विज्ञापन 14/2026)",
+   "name_en": "HPRCA Himachal Pradesh Teacher Recruitment 2026 (English, Maths, Hindi, Science & other subject teachers), Advt No. 14/2026",
+   "posts": "2,423 (15 विषय)",
+   "qualification": "विषय-अनुसार: संबंधित विषय में स्नातकोत्तर (स्नातक में 50%), B.Ed व TET; कुछ पदों पर स्नातक + B.Ed/D.El.Ed — पूरी जानकारी अधिसूचना में",
+   "age": "18–45 वर्ष (01.01.2026 को; आरक्षित वर्ग को छूट)",
+   "fee": "अधिसूचना देखें",
+   "start": "2026-11-10",
+   "last": "2026-12-05",
+   "last_note": "ऑनलाइन आवेदन hprca.hp.gov.in पर 10.11.2026 से 05.12.2026 तक; मानदेय ₹30,000 प्रति माह (योजना आधारित नियुक्ति)",
+   "exam": "लिखित स्क्रीनिंग टेस्ट (CBT/OMR) + दस्तावेज़ सत्यापन; तिथि बाद में",
+   "link": "https://hprca.hp.gov.in/advertisements",
+   "link_display": "hprca.hp.gov.in",
+   "source": "https://hprca.hp.gov.in/advertisements",
+   "source_note": "आधिकारिक विज्ञापन 14/2026 दिनांक 02.11.2026 (स्कैन PDF, तिथियाँ व आयु पेज से पढ़ी गईं); पद संख्या व योग्यता FreeJobAlert सार से",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "fee"
+   ],
+   "checked_at": "2026-11-03T08:15+05:30",
+   "category": "Teaching",
+   "state": "Himachal Pradesh"
   },
   {
    "id": "bihar-vidhan-sabha-jsa-2026",
@@ -900,6 +959,33 @@
    "checked_at": "2026-11-11T00:30+05:30",
    "category": "State",
    "state": "Delhi"
+  },
+  {
+   "id": "iaf-afcat-01-2027",
+   "status": "open",
+   "name_hi": "भारतीय वायुसेना AFCAT 01/2027 — फ्लाइंग व ग्राउंड ड्यूटी (टेक्निकल/नॉन-टेक्निकल) अधिकारी, NCC स्पेशल एंट्री व GATE एंट्री (जनवरी 2028 कोर्स)",
+   "name_en": "Indian Air Force AFCAT 01/2027 (Flying & Ground Duty branches, NCC Special Entry, GATE Score Entry) — course Jan 2028",
+   "posts": "284 (FreeJobAlert से, अपुष्ट)",
+   "qualification": "स्नातक/B.E./B.Tech (शाखा अनुसार); फ्लाइंग शाखा के लिए 12वीं में गणित व भौतिकी ज़रूरी — केवल 12वीं पास पात्र नहीं",
+   "age": "फ्लाइंग: 20–24 वर्ष (DGCA CPL धारक 26 तक); ग्राउंड ड्यूटी: 20–26 वर्ष — 01.01.2028 को",
+   "fee": "AFCAT एंट्री ₹550 + GST; NCC स्पेशल एंट्री व GATE एंट्री: निःशुल्क",
+   "start": "2026-11-12",
+   "last": "2026-12-11",
+   "last_note": "ऑनलाइन आवेदन 12 नवंबर (सुबह 11 बजे) से 11 दिसंबर 2026 (रात 11:30 बजे) तक — आधिकारिक AFCAT साइट afcat.edcil.co.in पर पुष्टि (12 नवंबर)",
+   "exam": "AFCAT ऑनलाइन परीक्षा, फिर AFSB इंटरव्यू व मेडिकल — परीक्षा तारीख बाद में",
+   "link": "https://afcat.edcil.co.in/",
+   "link_display": "afcat.edcil.co.in",
+   "source": "https://afcat.edcil.co.in/",
+   "source_note": "आधिकारिक AFCAT साइट पर आवेदन की तिथियाँ दिखीं (12 नवंबर); पदों की संख्या FreeJobAlert से, अपुष्ट",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "fee",
+    "exam"
+   ],
+   "checked_at": "2026-11-12T20:10+05:30",
+   "category": "Defence",
+   "state": "All India"
   },
   {
    "id": "cg-police-sukma-bastar-fighter-2026",
@@ -1160,35 +1246,6 @@
    "state": "Maharashtra"
   },
   {
-   "id": "iaf-afcat-01-2027",
-   "status": "upcoming",
-   "name_hi": "भारतीय वायुसेना AFCAT 01/2027 — फ्लाइंग व ग्राउंड ड्यूटी (टेक्निकल/नॉन-टेक्निकल) अधिकारी, NCC स्पेशल एंट्री व GATE एंट्री (जनवरी 2028 कोर्स)",
-   "name_en": "Indian Air Force AFCAT 01/2027 (Flying & Ground Duty branches, NCC Special Entry, GATE Score Entry) — course Jan 2028",
-   "posts": "विस्तृत नोटिफिकेशन में घोषित होंगी",
-   "qualification": "स्नातक/B.E./B.Tech (शाखा अनुसार); फ्लाइंग शाखा के लिए 12वीं में गणित व भौतिकी ज़रूरी — केवल 12वीं पास पात्र नहीं",
-   "age": "फ्लाइंग: 20–24 वर्ष (DGCA CPL धारक 26 तक); ग्राउंड ड्यूटी: 20–26 वर्ष — 01.01.2028 को",
-   "fee": "AFCAT एंट्री ₹550 + GST; NCC स्पेशल एंट्री व GATE एंट्री: निःशुल्क",
-   "start": "2026-11-12",
-   "last": "2026-12-11",
-   "last_note": "शॉर्ट नोटिस के अनुसार ऑनलाइन आवेदन 12 नवंबर (सुबह 11 बजे) से 11 दिसंबर 2026 (रात 11:30 बजे) तक — afcat.edcil.co.in पर विस्तृत नोटिफिकेशन आना बाकी",
-   "exam": "AFCAT ऑनलाइन परीक्षा, फिर AFSB इंटरव्यू व मेडिकल — परीक्षा तारीख बाद में",
-   "link": "https://afcat.edcil.co.in/",
-   "link_display": "afcat.edcil.co.in",
-   "source": "https://www.freejobalert.com/articles/afcat-01-2027-notification-3077773",
-   "source_note": "वायुसेना का शॉर्ट नोटिस (रोज़गार समाचार में प्रकाशित, समाचार/जॉब पोर्टल के अनुसार); 2 Nov 7 PM तक afcat.edcil.co.in पर नोटिस नहीं दिखा — इसलिए तारीखें अपुष्ट",
-   "unconfirmed": [
-    "posts",
-    "qualification",
-    "start",
-    "last",
-    "fee",
-    "exam"
-   ],
-   "checked_at": "2026-11-02T19:25+05:30",
-   "category": "Defence",
-   "state": "All India"
-  },
-  {
    "id": "assam-rifles-tradesman-354-2026",
    "status": "upcoming",
    "name_hi": "असम राइफल्स तकनीकी व ट्रेडसमैन भर्ती 2026 — Rifleman, Warrant Officer, Havildar (354 पद)",
@@ -1303,32 +1360,6 @@
    "state": "All India"
   },
   {
-   "id": "apssb-nmte-2026",
-   "status": "closed",
-   "name_hi": "अरुणाचल प्रदेश APSSB ग्रुप सी भर्ती 2026 (NMTE)",
-   "name_en": "APSSB Group C Recruitment 2026 (NMTE), Advt No. 06/26",
-   "posts": "217",
-   "qualification": "पदानुसार 10वीं/12वीं + संबंधित डिप्लोमा/लाइसेंस (ANM, लैब टेक्नीशियन, ड्राइवर आदि)",
-   "age": "18–35 वर्ष (अधिकांश पद); हेड कांस्टेबल ड्राइवर 18–32; कांस्टेबल ड्राइवर 18–22 वर्ष (05.11.2026 को); APST/PwBD/भूतपूर्व सैनिक को छूट",
-   "fee": "₹150 (ऑनलाइन, अप्रतिदेय); PwBD को छूट",
-   "start": "2026-10-21",
-   "last": "2026-11-05",
-   "last_note": null,
-   "exam": "29.11.2026 (तत्कालिक, लिखित परीक्षा)",
-   "link": "https://apssb.nic.in/",
-   "link_display": "apssb.nic.in",
-   "source": "https://apssb.nic.in/upload/files/RECINS001/Advt_NMTE2026_20261009_184101.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [
-    "qualification",
-    "age",
-    "fee"
-   ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "State",
-   "state": "Arunachal Pradesh"
-  },
-  {
    "id": "tnpsc-group4-2026",
    "status": "closed",
    "name_hi": "तमिलनाडु TNPSC ग्रुप 4 (CCSE-IV) भर्ती 2026 (अधिसूचना सं. 11/2026)",
@@ -1354,6 +1385,32 @@
    "checked_at": "2026-10-25T08:10+05:30",
    "category": "State",
    "state": "Tamil Nadu"
+  },
+  {
+   "id": "apssb-nmte-2026",
+   "status": "closed",
+   "name_hi": "अरुणाचल प्रदेश APSSB ग्रुप सी भर्ती 2026 (NMTE)",
+   "name_en": "APSSB Group C Recruitment 2026 (NMTE), Advt No. 06/26",
+   "posts": "217",
+   "qualification": "पदानुसार 10वीं/12वीं + संबंधित डिप्लोमा/लाइसेंस (ANM, लैब टेक्नीशियन, ड्राइवर आदि)",
+   "age": "18–35 वर्ष (अधिकांश पद); हेड कांस्टेबल ड्राइवर 18–32; कांस्टेबल ड्राइवर 18–22 वर्ष (05.11.2026 को); APST/PwBD/भूतपूर्व सैनिक को छूट",
+   "fee": "₹150 (ऑनलाइन, अप्रतिदेय); PwBD को छूट",
+   "start": "2026-10-21",
+   "last": "2026-11-05",
+   "last_note": null,
+   "exam": "29.11.2026 (तत्कालिक, लिखित परीक्षा)",
+   "link": "https://apssb.nic.in/",
+   "link_display": "apssb.nic.in",
+   "source": "https://apssb.nic.in/upload/files/RECINS001/Advt_NMTE2026_20261009_184101.pdf",
+   "source_note": "आधिकारिक अधिसूचना",
+   "unconfirmed": [
+    "qualification",
+    "age",
+    "fee"
+   ],
+   "checked_at": "2026-10-25T08:10+05:30",
+   "category": "State",
+   "state": "Arunachal Pradesh"
   },
   {
    "id": "upsssc-regional-youth",
