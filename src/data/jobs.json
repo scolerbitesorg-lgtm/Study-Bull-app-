@@ -1,6 +1,6 @@
 {
- "updatedAt": "12 नवंबर 2026, रात 12:10 बजे",
- "updatedAtIso": "2026-11-12T00:10+05:30",
+ "updatedAt": "12 नवंबर 2026, दोपहर 12:10 बजे",
+ "updatedAtIso": "2026-11-12T12:10+05:30",
  "sortRule": "🟢 open by last date asc, then 🟡 upcoming by last date asc (no-date last), then 🔴 closed; drop closed >7 days",
  "categories": [
   "Defence",
@@ -14,32 +14,6 @@
   "Other"
  ],
  "jobs": [
-  {
-   "id": "jkssb-class-iv",
-   "status": "open",
-   "name_hi": "जेकेएसएसबी चतुर्थ श्रेणी (MTS/सफाई कर्मचारी) भर्ती 2026",
-   "name_en": "JKSSB Class-IV (MTS)/Sanitation Worker Recruitment 2026 (Advt No. 09 of 2026)",
-   "posts": "2,863",
-   "qualification": "MTS: मैट्रिक–10+2; सफाई कर्मचारी: 8वीं–10+2 (जम्मू-कश्मीर डोमिसाइल अनिवार्य)",
-   "age": "OM: अधिकतम 40 वर्ष; आरक्षित वर्ग: 43 वर्ष; PwBD: 42 वर्ष (01.01.2026 को आधारित)",
-   "fee": "₹600 (सामान्य/OBC/RBA/ALC-IB); ₹500 (SC/ST/EWS/PwBD)",
-   "start": "2026-10-14",
-   "last": "2026-11-12",
-   "last_note": "मूल विज्ञापन: 05.10–03.11.2026; बढ़ी तारीख (12.11.2026) आधिकारिक पेज पर पुष्टि नहीं हुई",
-   "exam": "बाद में घोषित",
-   "link": "https://www.jkssb.nic.in/",
-   "link_display": "jkssb.nic.in",
-   "source": "https://www.jkssb.nic.in/Pdf/ADVT_09OF2026_01092026.pdf",
-   "source_note": "आधिकारिक अधिसूचना",
-   "unconfirmed": [
-    "fee",
-    "start",
-    "last"
-   ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "State",
-   "state": "Jammu and Kashmir"
-  },
   {
    "id": "indian-army-tes-57",
    "status": "open",
@@ -116,33 +90,30 @@
    "last_note": "rrbapply.gov.in पर CEN 07/26: 15.10.2026–13.11.2026 (पुष्ट)"
   },
   {
-   "id": "odisha-police-constable",
+   "id": "isro-ursc-technician-b-driver-2026",
    "status": "open",
-   "name_hi": "ओडिशा पुलिस कॉन्स्टेबल भर्ती 2026 (OUSSSC)",
-   "name_en": "Odisha Police Constable Recruitment 2026 (Advt No. 01-CRE-2026/OUSSSC)",
-   "posts": "7,268",
-   "qualification": "10+2 या समकक्ष (कुछ पदों हेतु विशेष विषय/डिप्लोमा व ड्राइविंग लाइसेंस आवश्यक)",
-   "age": "18–32 वर्ष (पदानुसार भिन्न) (01.01.2026 को); SC/ST/SEBC/महिला को 5 वर्ष छूट",
-   "fee": "नोटिफिकेशन देखें",
-   "start": "2026-10-23",
+   "name_hi": "इसरो URSC टेक्नीशियन-B / ड्राइवर भर्ती 2026 (Advt 04/2026)",
+   "name_en": "ISRO URSC Technician-B, Heavy/Light Vehicle Driver-A & more Recruitment 2026 (Advt No. URSC:04:2026)",
+   "posts": "61 (FreeJobAlert सार से; PDF की पद-तालिका का जोड़ नहीं मिलाया)",
+   "qualification": "ITI / 10वीं (पद-अनुसार; ड्राइवर पदों के लिए वैध लाइसेंस व अनुभव)",
+   "age": "अधिसूचना देखें",
+   "fee": "अधिसूचना देखें",
+   "start": "2026-10-24",
    "last": "2026-11-13",
-   "last_note": "ऑनलाइन पंजीकरण की अंतिम तिथि 12 नवंबर 2026 है जबकि अंतिम आवेदन जमा करने की तिथि 13 नवंबर 2026 (रात 10 बजे तक) है।",
-   "exam": "बाद में घोषित",
-   "link": "https://ousssc.odisha.gov.in/",
-   "link_display": "ousssc.odisha.gov.in",
-   "source": "https://ousssc.odisha.gov.in/",
-   "source_note": "OUSSSC साइट पर विज्ञापन (Notice No.1, 23.10.2026) दिखा; PDF नहीं खुला — तिथियाँ द्वितीयक स्रोत से",
+   "last_note": "ऑनलाइन आवेदन 24.10.2026 (5 PM) – 13.11.2026 (11:55 PM); फ़ीस भुगतान भी 13.11.2026 तक",
+   "exam": "लिखित परीक्षा व स्किल टेस्ट — तिथि अधिसूचना में नहीं; बाद में घोषित",
+   "link": "https://www.ursc.gov.in/",
+   "link_display": "ursc.gov.in",
+   "source": "https://www.isro.gov.in/media_isro/pdf/recruitmentNotice/2026/Oct/URSClAdvt2410_24102026.pdf",
+   "source_note": "ISRO की आधिकारिक PDF (Advt URSC:04:2026, 24.10.2026) पढ़ी — तारीखें PDF से; पद-संख्या FJA से",
    "unconfirmed": [
     "posts",
-    "qualification",
     "age",
-    "fee",
-    "start",
-    "last"
+    "fee"
    ],
-   "checked_at": "2026-10-25T08:10+05:30",
-   "category": "Police",
-   "state": "Odisha"
+   "checked_at": "2026-11-12T12:10+05:30",
+   "category": "Other",
+   "state": "All India"
   },
   {
    "id": "karnataka-gpstr-2026",
@@ -197,6 +168,35 @@
    "checked_at": "2026-11-11T00:30+05:30",
    "category": "Defence",
    "state": "All India"
+  },
+  {
+   "id": "odisha-police-constable",
+   "status": "open",
+   "name_hi": "ओडिशा पुलिस कॉन्स्टेबल भर्ती 2026 (OUSSSC)",
+   "name_en": "Odisha Police Constable Recruitment 2026 (Advt No. 01-CRE-2026/OUSSSC)",
+   "posts": "7,268",
+   "qualification": "10+2 या समकक्ष (कुछ पदों हेतु विशेष विषय/डिप्लोमा व ड्राइविंग लाइसेंस आवश्यक)",
+   "age": "18–32 वर्ष (पदानुसार भिन्न) (01.01.2026 को); SC/ST/SEBC/महिला को 5 वर्ष छूट",
+   "fee": "नोटिफिकेशन देखें",
+   "start": "2026-10-23",
+   "last": "2026-11-17",
+   "last_note": "ऑनलाइन पंजीकरण की अंतिम तिथि 17 नवंबर (पहले 12/13 नवंबर); फ़ीस जमा 18 नवंबर — 'Last Date Extended' (FreeJobAlert, 12 नवंबर 09:51 AM); विस्तार PDF से मिलान अभी बाकी",
+   "exam": "बाद में घोषित",
+   "link": "https://ousssc.odisha.gov.in/",
+   "link_display": "ousssc.odisha.gov.in",
+   "source": "https://ousssc.odisha.gov.in/",
+   "source_note": "OUSSSC साइट पर विज्ञापन (Notice No.1, 23.10.2026) दिखा; PDF नहीं खुला — तिथियाँ द्वितीयक स्रोत से",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "age",
+    "fee",
+    "start",
+    "last"
+   ],
+   "checked_at": "2026-11-12T12:10+05:30",
+   "category": "Police",
+   "state": "Odisha"
   },
   {
    "id": "gsssb-surveyor-467-2026",
@@ -467,6 +467,32 @@
     "exam"
    ],
    "checked_at": "2026-11-03T19:15+05:30"
+  },
+  {
+   "id": "jkssb-class-iv",
+   "status": "open",
+   "name_hi": "जेकेएसएसबी चतुर्थ श्रेणी (MTS/सफाई कर्मचारी) भर्ती 2026",
+   "name_en": "JKSSB Class-IV (MTS)/Sanitation Worker Recruitment 2026 (Advt No. 09 of 2026)",
+   "posts": "2,863",
+   "qualification": "MTS: मैट्रिक–10+2; सफाई कर्मचारी: 8वीं–10+2 (जम्मू-कश्मीर डोमिसाइल अनिवार्य)",
+   "age": "OM: अधिकतम 40 वर्ष; आरक्षित वर्ग: 43 वर्ष; PwBD: 42 वर्ष (01.01.2026 को आधारित)",
+   "fee": "₹600 (सामान्य/OBC/RBA/ALC-IB); ₹500 (SC/ST/EWS/PwBD)",
+   "start": "2026-10-14",
+   "last": "2026-11-27",
+   "last_note": "विस्तार: आवेदन की अंतिम तिथि 12.11 से बढ़ाकर 27.11.2026 (विस्तार नोटिस 11.11.2026; FreeJobAlert 11 नवंबर अपडेट से — नोटिस PDF अभी खुला नहीं)",
+   "exam": "बाद में घोषित",
+   "link": "https://www.jkssb.nic.in/",
+   "link_display": "jkssb.nic.in",
+   "source": "https://www.jkssb.nic.in/Pdf/ADVT_09OF2026_01092026.pdf",
+   "source_note": "आधिकारिक अधिसूचना",
+   "unconfirmed": [
+    "fee",
+    "start",
+    "last"
+   ],
+   "checked_at": "2026-11-12T12:10+05:30",
+   "category": "State",
+   "state": "Jammu and Kashmir"
   },
   {
    "id": "tgpsc-mpso-aso-2026",
@@ -1104,6 +1130,36 @@
    "state": "All India"
   },
   {
+   "id": "mpsc-group-c-2026",
+   "status": "upcoming",
+   "name_hi": "MPSC (महाराष्ट्र) ग्रुप-C भर्ती 2026 — क्लर्क-टाइपिस्ट, स्टाफ नर्स व अन्य",
+   "name_en": "MPSC Group C Recruitment 2026 — Clerk-Typist, Staff Nurse and more (revised schedule)",
+   "posts": "16,797 (FreeJobAlert सार से)",
+   "qualification": "पद-अनुसार (क्लर्क-टाइपिस्ट के लिए 12वीं पास/समकक्ष — अधिसूचना से मिलाना बाकी)",
+   "age": "अधिसूचना देखें",
+   "fee": "अधिसूचना देखें",
+   "start": "2026-11-13",
+   "last": "2026-11-27",
+   "last_note": "संशोधित कार्यक्रम (कॉरिजेंडम 6 नवंबर): ऑनलाइन आवेदन 13–27 नवंबर 2026; फ़ीस 30 नवंबर तक; प्रीलिम्स की तारीख भी बदली है",
+   "exam": "प्रीलिम्स (संशोधित तारीख — अधिसूचना से मिलाना बाकी)",
+   "link": "https://mpsc.gov.in/",
+   "link_display": "mpsc.gov.in",
+   "source": "https://mpsc.gov.in/",
+   "source_note": "MPSC साइट/कॉरिजेंडम का सार FreeJobAlert (11 नवंबर) से — अपुष्ट",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "age",
+    "fee",
+    "start",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-11-12T12:10+05:30",
+   "category": "State",
+   "state": "Maharashtra"
+  },
+  {
    "id": "iaf-afcat-01-2027",
    "status": "upcoming",
    "name_hi": "भारतीय वायुसेना AFCAT 01/2027 — फ्लाइंग व ग्राउंड ड्यूटी (टेक्निकल/नॉन-टेक्निकल) अधिकारी, NCC स्पेशल एंट्री व GATE एंट्री (जनवरी 2028 कोर्स)",
@@ -1129,6 +1185,34 @@
     "exam"
    ],
    "checked_at": "2026-11-02T19:25+05:30",
+   "category": "Defence",
+   "state": "All India"
+  },
+  {
+   "id": "assam-rifles-tradesman-354-2026",
+   "status": "upcoming",
+   "name_hi": "असम राइफल्स तकनीकी व ट्रेडसमैन भर्ती 2026 — Rifleman, Warrant Officer, Havildar (354 पद)",
+   "name_en": "Assam Rifles Technical & Tradesman Recruitment 2026 — Rifleman, Warrant Officer, Havildar (354 Group C posts)",
+   "posts": "354 (FreeJobAlert सार से)",
+   "qualification": "10वीं / 12वीं / ITI / डिप्लोमा (पद-अनुसार)",
+   "age": "अधिसूचना देखें",
+   "fee": "अधिसूचना देखें",
+   "start": "2026-11-15",
+   "last": "2026-12-14",
+   "last_note": "ऑनलाइन आवेदन 15 नवंबर – 14 दिसंबर 2026 (11:59 PM) — FreeJobAlert (12 नवंबर अपडेट); असम राइफल्स का ऑनलाइन पोर्टल (Group C) खुला मिला, पर नोटिस का पाठ वहाँ नहीं दिखा",
+   "exam": "लिखित परीक्षा व रैली (फिज़िकल) — तिथि बाद में",
+   "link": "https://www.assamrifles.gov.in/onlineapp",
+   "link_display": "assamrifles.gov.in",
+   "source": "https://www.assamrifles.gov.in/onlineapp",
+   "source_note": "असम राइफल्स आधिकारिक ऑनलाइन-आवेदन पोर्टल; पद व तारीखें FreeJobAlert से — अपुष्ट, अधिसूचना PDF से मिलाना बाकी",
+   "unconfirmed": [
+    "posts",
+    "qualification",
+    "start",
+    "last",
+    "exam"
+   ],
+   "checked_at": "2026-11-12T12:10+05:30",
    "category": "Defence",
    "state": "All India"
   },
